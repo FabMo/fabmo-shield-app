@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"/>
+
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/libs/fabmo.js"></script>
+    <script type="text/javascript">
+        var fabmo = new FabMoDashboard();
+    </script>
+<script src="js/clipper.js"></script>
+
+<style>
+
+body{
+	background:#eee;
+}
+
+input{
+	position: absolute;
+	width: 72px;
+	height: 24px;
+}
+
+#input_submit{
+	right: 30px;
+	bottom: 30px;
+	width:100px;
+	height:100px;
+}
+
+
+#input_depth{
+	display: none;
+	position: absolute;
+	right: 30px;
+	bottom: 150px;
+	width: 92px;
+}
+depth{
+	display: none;
+	position: absolute;
+	right: 60px;
+	bottom: 184px;
+	font-family: arial;
+	font-size: 16px;
+	color: #333;
+}
+
+
+#input_tool{
+	display: none;
+	position: absolute;
+	right: 30px;
+	bottom: 200px;
+	width: 92px;
+}
+
+#input_radius{
+	display: none;
+}
+#input_width{
+	display: none;
+}
+#input_height{
+	display: none;
+}
+
+tool{
+	display: none;
+	position: absolute;
+	right: 32px;
+	bottom: 234px;
+	font-family: arial;
+	font-size: 16px;
+	color: #333;
+}
+
+units{
+	display: none;
+	position: absolute;
+	right: 50px;
+	bottom: 130px;
+	font-family: arial;
+	font-size: 16px;
+	color: #333;
+}
+
+
+#action{
+	display:	none;
+	position: absolute;
+	right: 30px;
+	top:   10px;
+	width: 170px;
+}
+
+
+
+</style>
+
+<!-- dip/smd -->
+<!-- arduino v-->
+
+</head>
+
+<body onload="loadConfig(); makeFrame(radius);">
+
+
+<select id="action" autocomplete="off">
+  <option value="route">ROUTE</option>
+  <option value="end">END</option>
+  <option value="resistor">RESISTOR</option>
+  <option value="undo">UNDO</option>
+  <option value="clear">CLEAR ALL</option>
+  
+</select>
+
+<units>units: mm</units>
+
+<tool>tool diameter:</tool>
+<input id="input_tool" type="number" value="0.8" autocomplete="on" step="0.4"/>
+
+
+<depth>cut depth:</depth>
+<input id="input_depth" type="number" value="1.7" autocomplete="on" step="0.1" min="0"/>
+
+<input id="input_submit" type="submit" value="SUBMIT&#x00A;JOB" onclick="make()"/>
+
+<canvas id="myCanvas"></canvas>
+   
+<input id="input_width" type="number" value="62" autocomplete="off" step="0.1" min="0.1"/>
+<input id="input_height" type="number" value="53" autocomplete="off" step="0.1" min="0.1"/>
+<input id="input_radius" type="number" value="2" autocomplete="off" step="0.1" min="0"/>   
+
+
+<script>
+
+var g = ""
+var frame1 = []
+var path1 = []
+var verts = 100
+var xmin = -31
+var ymin = -26.5
+var xmax = 31
+var ymax = 26.5
+var radius = 2
+var tool = parseFloat(document.getElementById("input_tool").value/2)
+
+var o //x offset
+var c
+var ctx
+var sf
+var r = 1
+
+var input_width
+var input_height
+var input_radius
+
+var myConfig = {}
+
+var arduino = []
+var arduino_pins = []
+var pin_outlines = []
+var grid = []
+var voxel = []
+var vias = []
+var nodes = []
+var pins = []
+var cut = []
+var pocket = []
+var pts = []
+var net = [[]]
+var pin = 0
+
+var led = []
+var resistor = []
+
+function draw(){
+
+var input_width_style = document.getElementById("input_width").style;
+var input_height_style = document.getElementById("input_height").style;
+var input_radius_style = document.getElementById("input_radius").style;
+
+c = document.getElementById("myCanvas");
+ctx = c.getContext("2d");
+
+ctx.canvas.height = $(window).innerHeight()-30
+ctx.canvas.width = $(window).innerWidth()-30
+
+if(((ctx.canvas.height)/((ymax-ymin))*xmax*2)+100>ctx.canvas.width){
+	sf = (ctx.canvas.width-230)/((xmax*2))
+}
+else{
+	sf = (ctx.canvas.height-100)/((ymax*2))
+}
+
+input_width_style.left=((ctx.canvas.width/2)-30 + "px")
+input_width_style.top=(ctx.canvas.height/2+(ymax*sf)+24 + "px")
+
+input_height_style.left=((ctx.canvas.width/2)-(xmax*sf)-100 + "px")
+input_height_style.top=(ctx.canvas.height/2-12 + "px")
+
+input_radius_style.left=((ctx.canvas.width/2)+(xmax*sf)+24 + "px")
+input_radius_style.top=(ctx.canvas.height/2-(ymax*sf) + "px")
+
+ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+ctx.lineJoin="round";
+
+//dims
+/*
+ctx.beginPath()
+	ctx.lineWidth="1"
+	ctx.strokeStyle="red"
+	ctx.lineTo((ctx.canvas.width/2)+(xmin*sf),(ctx.canvas.height/2+(ymax*sf)+32))
+	ctx.lineTo((ctx.canvas.width/2)+(xmax*sf),(ctx.canvas.height/2+(ymax*sf)+32))
+	ctx.lineTo((ctx.canvas.width/2)+(xmax*sf),(ctx.canvas.height/2+(ymax*sf)+22))
+	ctx.moveTo((ctx.canvas.width/2)+(xmin*sf),(ctx.canvas.height/2+(ymax*sf)+32))
+	ctx.lineTo((ctx.canvas.width/2)+(xmin*sf),(ctx.canvas.height/2+(ymax*sf)+22))
+ctx.stroke()
+
+ctx.beginPath()
+	ctx.lineWidth="1"
+	ctx.strokeStyle="green"
+	ctx.lineTo((ctx.canvas.width/2-37)-(sf*(xmax)),ctx.canvas.height/2+(ymin*sf))
+	ctx.lineTo((ctx.canvas.width/2-37)-(sf*(xmax)),ctx.canvas.height/2+(ymax*sf))
+	ctx.lineTo((ctx.canvas.width/2-27)-(sf*(xmax)),ctx.canvas.height/2+(ymax*sf))
+	ctx.moveTo((ctx.canvas.width/2-27)-(sf*(xmax)),ctx.canvas.height/2+(ymin*sf))
+	ctx.lineTo((ctx.canvas.width/2-37)-(sf*(xmax)),ctx.canvas.height/2+(ymin*sf))
+ctx.stroke()
+
+
+if(radius>0){
+	ctx.beginPath()
+		ctx.lineWidth="1"
+		ctx.strokeStyle="#555"
+		ctx.lineTo(ctx.canvas.width/2+((xmax-radius)*sf),ctx.canvas.height/2+((ymin+radius)*sf))
+		ctx.lineTo((frame1[63].X*sf)+ctx.canvas.width/2,(frame1[63].Y*sf)+ctx.canvas.height/2)	
+	ctx.stroke()
+}
+
+*/
+
+ctx.fillStyle="#000"
+
+//ctx.fillRect(20,20,5,5)
+
+for(i=0;i<voxel.length;i++){
+		ctx.fillRect( (voxel[i].x*sf)+(ctx.canvas.width/2),(voxel[i].y*sf)+(ctx.canvas.height/2),(0.635*sf),(0.635*sf) )
+}
+
+ctx.lineWidth="0.5"
+ctx.strokeStyle="#ccc"
+
+for(i=0;i<grid.length;i++){
+
+	ctx.beginPath()
+	for(j=0;j<grid[i].length;j++){
+		ctx.lineTo((ctx.canvas.width/2)+(grid[i][j].x*sf),(ctx.canvas.height/2)+(grid[i][j].y*sf))
+	}
+	ctx.stroke()
+}
+
+//console.log(pts)
+
+ctx.lineWidth="0.2"
+ctx.strokeStyle="#000"
+
+for(i=0;i<pts.length;i++){
+	ctx.beginPath()
+	ctx.arc(ctx.canvas.width/2+((pts[i].x)*sf),ctx.canvas.height/2+((pts[i].y)*sf),0.1*sf,0,(Math.PI*2))
+	ctx.stroke()
+}
+
+ctx.lineWidth="4"
+ctx.strokeStyle="#aaa"
+
+
+for(i=0;i<net.length;i++){
+	ctx.beginPath()
+	for(j=0;j<net[i].length;j++){
+		ctx.lineTo((ctx.canvas.width/2+(net[i][j].x*sf)),(ctx.canvas.height/2+(net[i][j].y*sf)))
+	}
+	ctx.stroke()
+}
+
+
+ctx.lineWidth="1"
+ctx.strokeStyle="red"
+
+for(i=0;i<net.length;i++){
+	for(j=0;j<net[i].length;j++){
+	ctx.beginPath()
+		ctx.arc(ctx.canvas.width/2+((net[i][j].x)*sf),ctx.canvas.height/2+((net[i][j].y)*sf),0.2*sf,0,(Math.PI*2))
+	ctx.stroke()
+	}
+}
+
+
+
+ctx.strokeStyle="#aaa"
+
+for(i=0;i<pin_outlines.length;i++){
+
+	ctx.beginPath()
+	for(j=0;j<pin_outlines[i].length;j++){
+		ctx.lineTo((ctx.canvas.width/2)+(pin_outlines[i][j].x*sf),(ctx.canvas.height/2)+(pin_outlines[i][j].y*sf))
+	}
+	ctx.stroke()
+}
+
+//
+
+ctx.beginPath()
+	ctx.lineWidth="1"
+	ctx.fillStyle = "yellow";
+	ctx.strokeStyle="black"
+	//ctx.arc(ctx.canvas.width/2,ctx.canvas.height/2,2,0,(Math.PI*2))
+ctx.stroke()
+ctx.fill()
+
+	ctx.lineWidth="1"
+	ctx.strokeStyle="#aaa"
+
+for(i=0;i<arduino.length;i++){
+	ctx.beginPath()
+	//ctx.arc((ctx.canvas.width/2)+(arduino[i][0].x*sf),(ctx.canvas.height/2)+(arduino[i][0].y*sf),((1.5)*sf),0,(Math.PI*2))
+
+	for(j=0;j<arduino[i].length;j++){
+		ctx.lineTo((ctx.canvas.width/2)+(arduino[i][j].x*sf),(ctx.canvas.height/2)+(arduino[i][j].y*sf))
+	}
+
+	ctx.stroke()
+
+}
+
+
+	ctx.lineWidth="1"
+	ctx.strokeStyle="blue"
+
+for(i=0;i<arduino_pins.length;i++){
+		ctx.beginPath()
+	for(j=0;j<arduino_pins[i].length;j++){
+		ctx.lineTo((ctx.canvas.width/2)+(arduino_pins[i][j].x*sf),(ctx.canvas.height/2)+(arduino_pins[i][j].y*sf))
+	}
+	ctx.stroke()
+}
+
+//ctx.setLineDash([1,1]);
+
+ctx.fillStyle="#A020F0"
+
+for(i=0;i<nodes.length;i++){
+	ctx.beginPath()
+	//ctx.arc(ctx.canvas.width/2+((nodes[i].x)*sf),ctx.canvas.height/2+((nodes[i].y)*sf),1,0,(Math.PI*2))
+	ctx.fill()
+}
+
+ctx.lineWidth="0.5"
+ctx.strokeStyle="#000"
+
+ctx.beginPath()
+
+	for(i=0;i<path1.length;i++){
+		//ctx.lineTo(((path1[i].X*sf)+ctx.canvas.width/2).toFixed(2),((path1[i].Y*sf)+ctx.canvas.height/2).toFixed(2))
+	}
+ctx.stroke()
+
+	for(i=0;i<vias.length;i++){
+	ctx.beginPath()
+		for(j=0;j<vias[i].length;j++){
+			ctx.lineTo(((vias[i][j].x*sf)+ctx.canvas.width/2).toFixed(2),((vias[i][j].y*sf)+ctx.canvas.height/2).toFixed(2))
+		}
+	ctx.stroke()
+	}
+
+/*
+ctx.beginPath()
+	ctx.fillStyle = "#555";
+	ctx.arc(ctx.canvas.width/2+((xmax-radius)*sf),ctx.canvas.height/2+((ymin+radius)*sf),2,0,(Math.PI*2))
+ctx.fill()
+*/
+
+/*
+ctx.beginPath()
+
+	for(i=0;i<path1.length;i++){
+		ctx.lineTo(((path1[i].X*sf)+ctx.canvas.width/2).toFixed(2),((path1[i].Y*sf)+ctx.canvas.height/2).toFixed(2))
+	}
+ctx.stroke()
+*/
+
+ctx.beginPath()
+ctx.setLineDash([0,0]);
+ctx.lineWidth="2"
+ctx.strokeStyle="blue"
+	for(i=0;i<frame1.length;i++){
+		ctx.lineTo((frame1[i].X*sf)+ctx.canvas.width/2,(frame1[i].Y*sf)+ctx.canvas.height/2)
+	}
+ctx.stroke()
+//
+
+	ctx.lineWidth="1"
+	ctx.strokeStyle="#000"
+
+	for(i=0;i<pins.length;i++){
+		ctx.beginPath()
+		for(j=0;j<pins[i].length;j++){
+		ctx.lineTo((pins[i][j].x*sf)+ctx.canvas.width/2,(pins[i][j].y*sf)+ctx.canvas.height/2)
+		}
+		ctx.stroke()
+	}
+
+var size_font = (1.5*sf)
+
+ctx.font = (size_font + "px Arial")
+ctx.translate(ctx.canvas.width/2,ctx.canvas.height/2)
+
+ctx.translate(((-11.45+o)*sf)+(1.5*sf),-27*sf)
+
+ctx.rotate(-Math.PI/2);
+
+ctx.fillStyle="#ff00ff"
+ctx.fillText(" SCL",0,(-5.06*sf));
+ctx.fillText(" SDA",0,(-2.54*sf));
+ctx.fillText(" AREF",0,0);
+ctx.fillText(" GND",0,(2.54*sf));
+ctx.fillText(" 13",0,(2.54*2*sf));
+ctx.fillText(" 12",0,(2.54*3*sf));
+ctx.fillText("~11",0,(2.54*4*sf));
+ctx.fillText("~10",0,(2.54*5*sf));
+ctx.fillText("  9",0,(2.54*6*sf));
+ctx.fillText("  8",0,(2.54*7*sf));
+ctx.fillText("  7",0,(2.54*8*sf)+(1*sf));
+ctx.fillText("~6",0,(2.54*9*sf)+(1*sf));
+ctx.fillText("~5",0,(2.54*10*sf)+(1*sf));
+ctx.fillText("  4",0,(2.54*11*sf)+(1*sf));
+ctx.fillText("~3",0,(2.54*12*sf)+(1*sf));
+ctx.fillText("  2",0,(2.54*13*sf)+(1*sf));
+ctx.fillText("  1 TX",0,(2.54*14*sf)+(1*sf));
+ctx.fillText("  0 RX",0,(2.54*15*sf)+(1*sf));
+
+ctx.fillText("A5",(-56*sf),(2.54*15*sf)+(1*sf));
+ctx.fillText("A4",(-56*sf),(2.54*14*sf)+(1*sf));
+ctx.fillText("A3",(-56*sf),(2.54*13*sf)+(1*sf));
+ctx.fillText("A2",(-56*sf),(2.54*12*sf)+(1*sf));
+ctx.fillText("A1",(-56*sf),(2.54*11*sf)+(1*sf));
+ctx.fillText("A0",(-56*sf),(2.54*10*sf)+(1*sf));
+
+ctx.fillText("VIN",(-56.5*sf),(2.54*9*sf)-(0.6*sf));
+ctx.fillText("GND",(-57.3*sf),(2.54*8*sf)-(0.6*sf));
+ctx.fillText("GND",(-57.3*sf),(2.54*7*sf)-(0.6*sf));
+ctx.fillText("5V",(-56*sf),(2.54*6*sf)-(0.6*sf));
+ctx.fillText("3.3V",(-57.3*sf),(2.54*5*sf)-(0.6*sf));
+ctx.fillText("RST",(-57.2*sf),(2.54*4*sf)-(0.6*sf));
+ctx.fillText("IOREF",(-58.5*sf),(2.54*3*sf)-(0.6*sf));
+
+}
+
+drill()
+
+$("#myCanvas").bind('click', function(e) {
+
+	if((document.getElementById('action').value=='route') || (document.getElementById('action').value=='resistor')){
+
+	x = ((e.clientX-(10)-(ctx.canvas.width/2))/sf)
+	y = ((e.clientY-(10)-(ctx.canvas.height/2))/sf)
+
+	if(document.getElementById('action').value=='resistor'){
+		pin++
+		if(pin==3){
+			pin=1
+		}
+	}
+
+		for(i=0;i<pts.length;i++){
+	
+			if(((Math.abs(x-pts[i].x))<=0.635) && ((Math.abs(y-pts[i].y))<=0.635)){
+				if((document.getElementById('action').value=='route')&&((net[net.length-1].length)==0)){
+					net[net.length-1].push({x:(pts[i].x),y:(pts[i].y)})
+				}
+				else if((document.getElementById('action').value=='route')&&((net[net.length-1].length)>0)){
+
+					net[net.length-1].push({x:(pts[i].x),y:(pts[i].y)})
+
+
+					/*
+					if( (Math.abs((pts[i].x)-(net[net.length-1][net[net.length-1].length-1].x))) < (Math.abs((pts[i].y)-(net[net.length-1][net[net.length-1].length-1].y))) ){
+						net[net.length-1].push({x:(net[net.length-1][net[net.length-1].length-1].x),y:(pts[i].y)})
+						net[net.length-1].push({x:(pts[i].x),y:(net[net.length-1][net[net.length-1].length-1].y)})
+					}
+					else{
+						net[net.length-1].push({x:(pts[i].x),y:(net[net.length-1][net[net.length-1].length-1].y)})
+						net[net.length-1].push({x:(net[net.length-1][net[net.length-1].length-1].x),y:(pts[i].y)})
+					}
+					*/
+				}
+				else if((document.getElementById('action').value=='resistor')&&(pin==1)){
+
+					net[net.length-1].push({x:(pts[i].x),y:(pts[i].y)})
+					/*
+					if( (Math.abs((pts[i].x)-(net[net.length-1][net[net.length-1].length-1].x))) < (Math.abs((pts[i].y)-(net[net.length-1][net[net.length-1].length-1].y))) ){
+						net[net.length-1].push({x:(net[net.length-1][net[net.length-1].length-1].x),y:(pts[i].y)})
+						net[net.length-1].push({x:(pts[i].x),y:(net[net.length-1][net[net.length-1].length-1].y)})
+					}
+					else{
+						net[net.length-1].push({x:(pts[i].x),y:(net[net.length-1][net[net.length-1].length-1].y)})
+						net[net.length-1].push({x:(net[net.length-1][net[net.length-1].length-1].x),y:(pts[i].y)})
+					}
+					*/
+				}
+				else if((document.getElementById('action').value=='resistor')&&(pin==2)){
+
+				/*
+						if((pts[i].x)-(net[net.length-1][net[net.length-1].length-1].x) < 0 ){
+							x = -1.27
+						}
+						else{
+							x = 1.27
+						}
+					net.push([{x:(net[net.length-1][net[net.length-1].length-1].x+x),y:(net[net.length-1][net[net.length-1].length-1].y)}])
+					*/
+					//net[net.length-1].push({x:(net[net.length-1][net[net.length-1].length-1].x),y:(pts[i].y)})
+					//net[net.length-1].push({x:(pts[i].x),y:(net[net.length-1][net[net.length-1].length-1].y)})
+					//check nodes
+				}
+			}
+		}
+
+		for(i=0;i<nodes.length;i++){
+	
+			if(((Math.abs(x-nodes[i].x))<=1.27) && ((Math.abs(y-nodes[i].y))<=1.27)){
+				if(document.getElementById('action').value=='route'){
+					net[net.length-1].push({x:(nodes[i].x),y:(nodes[i].y)})
+				}
+			}
+		}
+
+	}
+
+	else if(document.getElementById('action').value=='undo'){
+		if(net.length>0){
+		net[net.length-1].pop()
+		}
+	}
+
+	else if(document.getElementById('action').value=='clear'){
+		net=[[]]
+	}
+	else if(document.getElementById('action').value=='end'){
+		net.push([])
+	}
+	
+	draw()
+
+});
+
+
+$("#myCanvas").bind('mousemove', function(e) {
+
+
+});
+
+function makeFrame(radius) {
+
+frame1=[]
+path1=[]
+
+for (i=0;i<=verts;i++) {
+   if(i<=25){
+      frame1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
+      
+      path1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})
+   }
+   else if((i>25)&&(i<=50)){
+      frame1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
+      
+      path1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))}) 
+   }
+   else if((i>50)&&(i<=75)){
+      frame1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
+      
+      path1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})     
+   }
+   else if((i>75)&&(i<=100)){
+      frame1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
+      
+      path1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})  
+           
+      if(i==100){
+      frame1.push(frame1[0])
+      path1.push(path1[0])
+      }      
+   }   
+}
+
+if(radius==0){
+	frame1=[]
+	frame1.push({X:xmax,Y:ymax})
+	frame1.push({X:xmax,Y:ymin})
+	frame1.push({X:xmin,Y:ymin})
+	frame1.push({X:xmin,Y:ymax})
+	frame1.push({X:xmax,Y:ymax})
+}
+
+else if(radius+tool<=0){
+	path1=[]
+	path1.push({X:-xmax-tool,Y:-ymax-tool})
+	path1.push({X:-xmax-tool,Y:-ymin+tool})
+	path1.push({X:-xmin+tool,Y:-ymin+tool})
+	path1.push({X:-xmin+tool,Y:-ymax-tool})
+	path1.push({X:-xmax-tool,Y:-ymax-tool})
+}
+
+	frame1.reverse()
+	draw()
+}
+
+
+function drill(){
+
+	o = -10
+
+	arduino.push( [{x:-34+o,y:-26.5},{x:31+o,y:-26.5},{x:31+o,y:-13.5},{x:34+o,y:-10.5},{x:34+o,y:21.5},{x:31+o,y:24.5},{x:31+o,y:26.5},{x:-34+o,y:26.5},{x:-34+o,y:22.5}] )
+
+	arduino.push([])
+	for(i=0;i<=25;i++){
+		arduino[1].push({x:((-18)+Math.sin((Math.PI*2)/25*i)*1.5)+o,y:((-24)+Math.cos((Math.PI*2)/25*i)*1.5)})
+	}
+
+
+	arduino.push([])
+	for(i=0;i<=25;i++){
+		arduino[2].push({x:((31.5)+Math.sin((Math.PI*2)/25*i)*1.5)+o,y:((19.5)+Math.cos((Math.PI*2)/25*i)*1.5)})
+	}
+
+	arduino.push([])
+	for(i=0;i<=25;i++){
+		arduino[3].push({x:((31.5)+Math.sin((Math.PI*2)/25*i)*1.5)+o,y:((-8.5)+Math.cos((Math.PI*2)/25*i)*1.5)})
+	}
+
+	arduino.push([])
+	for(i=0;i<=25;i++){
+		arduino[4].push({x:((-19)+Math.sin((Math.PI*2)/25*i)*1.5)+o,y:((24)+Math.cos((Math.PI*2)/25*i)*1.5)})
+	}
+
+	arduino.push( [{x:-34+o,y:13.5},{x:-34+o,y:-5.5}] )
+	arduino.push( [{x:-34+o,y:-17.5},{x:-34+o,y:-26.5}] )
+	arduino.push( [{x:-40+o,y:-17.5},{x:-23+o,y:-17.5},{x:-23+o,y:-5.5},{x:-40+o,y:-5.5},{x:-40+o,y:-17.5}] )
+	arduino.push( [{x:-35+o,y:13.5},{x:-22+o,y:13.5},{x:-22+o,y:22.5},{x:-35+o,y:22.5},{x:-35+o,y:13.5}] )
+
+	x=0
+	y=0
+	for(i=0;i<35;i++){
+		x=0
+	for(j=0;j<37;j++){
+		pts.push({x:-15.875+o+x,y:21.59+y})
+		x = x+1.27
+	}
+		y = y-1.27
+	}
+
+	y = 0
+	for(i=0;i<19;i++){
+		grid.push([{x:-15.875+o,y:22.86-y},{x:29.77+o,y:22.86-y}])
+		//grid.push([{x:-16.51+o,y:22.86-y},{x:29.77+o,y:22.86-y}])
+		//y = y + 0.3175
+		y = y + 2.54
+	}
+	x = 0
+	for(i=0;i<19;i++){
+		grid.push([{x:-15.875+o+x,y:22.86},{x:-15.875+o+x,y:-22.86}])
+		//grid.push([{x:-16.51+o+x,y:22.86},{x:-16.51+o+x,y:-22.86}])
+		//x = x + 0.3175
+		x = x + 2.54
+	}
+
+	x = 7.6+1.27
+	arduino.push([{x:(x+o),y:-25.135},{x:(x+o),y:-22.86},{x:(x+o)-25.38,y:-22.86},{x:(x+o)-25.38,y:-25.135},{x:(x+o),y:-25.135}])
+	
+	x = 28.5+1.27
+	arduino.push([{x:(x+o),y:-25.135},{x:(x+o),y:-22.86},{x:(x+o)-20.32,y:-22.86},{x:(x+o)-20.32,y:-25.135},{x:(x+o),y:-25.135}])
+		
+	x = 28.5+1.27
+	arduino.push([{x:(x+o),y:25.135},{x:(x+o),y:22.86},{x:(x+o)-15.24,y:22.86},{x:(x+o)-15.24,y:25.135},{x:(x+o),y:25.135}])
+
+	x = 11.7+1.27
+	arduino.push([{x:(x+o),y:25.135},{x:(x+o),y:22.86},{x:(x+o)-20.3,y:22.86},{x:(x+o)-20.3,y:25.135},{x:(x+o),y:25.135}])
+
+
+	//top pins
+	x = -16.53
+	for(i=0;i<10;i++){
+		pins.push([{x:(x+o),y:-22.86},{x:(x+o),y:-25.135},{x:(x+o+2.54),y:-25.135},{x:(x+o+2.54),y:-22.86},{x:(x+o),y:-22.86}])
+	x = x + 2.54
+	}
+
+	x = 9.505
+	for(i=0;i<8;i++){
+		pins.push([{x:(x+o),y:-22.86},{x:(x+o),y:-25.135},{x:(x+o+2.54),y:-25.135},{x:(x+o+2.54),y:-22.86},{x:(x+o),y:-22.86}])
+	x = x + 2.54
+	}
+	
+	//bottom pins
+
+	x = 29.825
+	for(i=0;i<6;i++){
+		pins.push([{x:(x+o),y:22.86},{x:(x+o),y:25.135},{x:(x+o-2.54),y:25.135},{x:(x+o-2.54),y:22.86},{x:(x+o),y:22.86}])
+	x = x - 2.54
+	}
+
+	x = 13.0025
+	for(i=0;i<8;i++){
+		pins.push([{x:(x+o),y:22.86},{x:(x+o),y:25.135},{x:(x+o-2.54),y:25.135},{x:(x+o-2.54),y:22.86},{x:(x+o),y:22.86}])
+	x = x - 2.54
+	}
+
+	//
+
+	x = 7.6+1.27
+
+	for(i=0;i<10;i++){
+		pin_outlines.push([{x:(x+o),y:-25.135},{x:(x+o),y:-22.86}])
+		x = x -2.54
+	}
+	
+	x = 28.5+1.27
+	for(i=0;i<8;i++){
+		pin_outlines.push([{x:(x+o),y:-25.135},{x:(x+o),y:-22.86}])
+		x = x -2.54
+	}
+	
+
+	x = 28.5+1.27
+	for(i=0;i<6;i++){
+		pin_outlines.push([{x:(x+o),y:25.135},{x:(x+o),y:22.86}])
+		x = x -2.54
+	}
+
+	x = 11.7+1.27
+	for(i=0;i<8;i++){
+		pin_outlines.push([{x:(x+o),y:25.135},{x:(x+o),y:22.86}])
+		x = x -2.54
+	}
+
+	var x = 28.5
+	for(i=0;i<8;i++){
+		arduino_pins.push([])
+		vias.push([])
+		//nodes.push({x:(x+o),y:(-21.73)})
+			nodes.push({x:(x+o),y:(-24)})
+			for(j=0;j<=25;j++){
+				arduino_pins[i].push({x:((x+o)+Math.sin((Math.PI*2)/25*j)*0.5),y:((-24)+Math.cos((Math.PI*2)/25*j)*0.5)})
+				vias[i].push({x:((x+o)+Math.sin((Math.PI*2)/25*j)*0.2),y:((-24)+Math.cos((Math.PI*2)/25*j)*0.2)})
+			}
+		x = x -2.54
+	}
+
+	x = 7.6
+	for(i=8;i<18;i++){
+		arduino_pins.push([])
+		vias.push([])
+		//nodes.push({x:(x+o+0.635),y:(-21.73)})
+		nodes.push({x:(x+o),y:(-24)})
+			for(j=0;j<=25;j++){
+				arduino_pins[i].push({x:((x+o)+Math.sin((Math.PI*2)/25*j)*0.5),y:((-24)+Math.cos((Math.PI*2)/25*j)*0.5)})
+				vias[i].push({x:((x+o)+Math.sin((Math.PI*2)/25*j)*0.2),y:((-24)+Math.cos((Math.PI*2)/25*j)*0.2)})
+			}
+		x = x -2.54
+	}
+
+
+	var x = 28.5
+	for(i=18;i<24;i++){
+		arduino_pins.push([])
+		vias.push([])
+		//nodes.push({x:(x+o),y:(21.73)})
+			nodes.push({x:(x+o),y:(24)})
+			for(j=0;j<=25;j++){
+				arduino_pins[i].push({x:((x+o)+Math.sin((Math.PI*2)/25*j)*0.5),y:((24)+Math.cos((Math.PI*2)/25*j)*0.5)})
+				vias[i].push({x:((x+o)+Math.sin((Math.PI*2)/25*j)*0.2),y:((24)+Math.cos((Math.PI*2)/25*j)*0.2)})
+			}
+		x = x -2.54
+	}
+
+	var x = 11.7
+	for(i=24;i<32;i++){
+		arduino_pins.push([])
+		vias.push([])
+		//nodes.push({x:(x+o-0.79375),y:(21.73)})
+			nodes.push({x:(x+o),y:(24)})
+			for(j=0;j<=25;j++){
+				arduino_pins[i].push({x:((x+o)+Math.sin((Math.PI*2)/25*j)*0.5),y:((24)+Math.cos((Math.PI*2)/25*j)*0.5)})
+				vias[i].push({x:((x+o)+Math.sin((Math.PI*2)/25*j)*0.2),y:((24)+Math.cos((Math.PI*2)/25*j)*0.2)})
+			}
+		x = x -2.54
+	}
+
+	//console.log(pins)
+}
+
+
+$("#input_width").on("change", function(){
+	 xmax = parseFloat(document.getElementById("input_width").value)
+	 if(isNaN(xmax)==true){
+    	xmax=radius*2
+    	document.getElementById('input_width').value=(xmax)
+    }
+    else if(xmax<radius*2){
+	 	xmax=radius*2
+	 	document.getElementById('input_width').value=(xmax).toFixed(1)
+	 }
+    else if(xmax<0.1){
+	 	xmax=Math.abs(xmax)
+	 	document.getElementById('input_width').value=(xmax).toFixed(1)
+	 }
+    xmax=(xmax/2).toFixed(3)	 
+	 xmin = -xmax
+	 //setAppConfig
+	 myConfig.xmin=xmin
+	 myConfig.xmax=xmax
+    //fabmo.setAppConfig(myConfig)
+
+    makeFrame(radius)
+})
+
+$("#input_height").on("change", function(){
+	 ymax = parseFloat(document.getElementById("input_height").value)
+	 if(isNaN(ymax)==true){
+    	ymax=radius*2
+    	document.getElementById('input_height').value=(ymax)
+    }
+    else if(ymax<radius*2){
+	 	ymax=radius*2
+	 	document.getElementById('input_height').value=(ymax).toFixed(1)
+	 }
+	 else if(ymax<0.1){
+	 	ymax=Math.abs(ymax)
+	 	document.getElementById('input_height').value=(ymax).toFixed(1)
+	 }
+    ymax=(ymax/2).toFixed(3) 
+	 ymin = -ymax
+	 myConfig.ymin=ymin
+	 myConfig.ymax=ymax
+    //fabmo.setAppConfig(myConfig)
+    makeFrame(radius)
+})
+
+$("#input_radius").on("change", function(){
+	 radius = parseFloat(document.getElementById("input_radius").value)
+    if(isNaN(radius)==true){
+    	radius=5
+    	document.getElementById('input_radius').value=radius
+    } 
+	 else if(radius<0){
+	 	radius=Math.abs(radius)
+	 	document.getElementById('input_radius').value=radius.toFixed(1)
+	 }
+	 
+	 if(radius>xmax){
+	 	radius=xmax
+	   document.getElementById('input_radius').value=radius.toFixed(1)
+	 }
+	 else if(radius>ymax){
+	 	radius=ymax
+	   document.getElementById('input_radius').value=radius.toFixed(1)
+	 }
+	 //setAppConfig
+	 myConfig.radius=radius
+    //fabmo.setAppConfig(myConfig)
+
+    makeFrame(radius)
+})
+
+$("#input_tool").on("change", function(){
+	 tool=parseFloat(document.getElementById("input_tool").value)
+	 if(isNaN(tool)==true){
+    	tool=0
+    	document.getElementById('input_tool').value=tool
+    }
+    else{
+    	tool=(tool/2)
+    }
+    
+    if(tool<xmin){    
+    	tool=xmin
+    	document.getElementById('input_tool').value=tool*2    	   
+    }
+    else if(tool<ymin){    
+    	tool=ymin
+    	document.getElementById('input_tool').value=tool*2  	   
+    }
+	 //setAppConfig
+	 myConfig.tool=tool
+    //fabmo.setAppConfig(myConfig)
+
+    makeFrame(radius)
+})
+
+
+$("#input_depth").on("change", function(){
+
+	 myConfig.depth=document.getElementById('input_depth').value
+    fabmo.setAppConfig(myConfig)
+
+})
+
+function loadConfig(){
+
+fabmo.getAppConfig(function(err, myConfig) {
+
+if(typeof myConfig.xmin != 'undefined'){
+	xmin = myConfig.xmin
+}
+
+if(typeof myConfig.xmax != 'undefined'){
+	xmax = myConfig.xmax
+}
+
+if(typeof myConfig.ymin != 'undefined'){
+	ymin = myConfig.ymin
+}
+
+if(typeof myConfig.ymax != 'undefined'){
+	ymax = myConfig.ymax
+}
+
+if(typeof myConfig.radius != 'undefined'){
+	radius = myConfig.radius
+}
+
+if(typeof myConfig.tool != 'undefined'){
+	tool = myConfig.tool
+}
+
+if(typeof myConfig.depth != 'undefined'){
+	document.getElementById('input_depth').value = myConfig.depth
+}
+
+document.getElementById('input_tool').value = tool*2
+document.getElementById('input_radius').value = radius
+document.getElementById('input_width').value = xmax*2
+document.getElementById('input_height').value = ymax*2
+
+
+makeFrame(radius)
+
+});
+
+}
+
+$(window).resize(function(){
+
+	draw()
+}); 
+
+function make(){
+
+
+g="(coming soon!)\n"
+
+fabmo.submitJob({
+   file : g,
+   filename : 'shield1.g',
+   name : "MILL TRACES 1/64",
+   description : (xmax*2) + " x " + (ymax*2) + " x " + "mm" 
+});
+
+
+g=""
+
+	pins.reverse()
+
+
+//flip
+
+/*
+
+   for(i=0;i<pins.length;i++){
+		for(j=0;j<pins[i].length;j++){
+			if(pins[i][j].y<0){
+				pins[i][j].y=Math.abs(pins[i][j].y)
+			}
+			else{
+				pins[i][j].y=(0-pins[i][j].y)	
+			}
+		}
+	}
+
+   for(i=0;i<vias.length;i++){
+		for(j=0;j<vias[i].length;j++){
+			if(vias[i][j].y<0){
+				vias[i][j].y=Math.abs(vias[i][j].y)
+			}
+			else{
+				vias[i][j].y=(0-vias[i][j].y)	
+			}
+		}
+	}
+*/
+
+var material = {feed:200,plunge:200}
+var pass_depth = 0.425
+
+g+="g21\n"
+g+="g0z5\n"
+g+="m4\n"
+g+="g4p2\n" 
+  
+
+   for(i=0;i<vias.length;i++){
+
+		pass_no = 4
+		pass = 1
+		g+="g0x"+(vias[i][0].x.toFixed(3))+"y"+ (vias[i][0].y).toFixed(3) + "\n"
+
+		while(pass<=pass_no){
+	   g+="g1z-"+ (pass_depth*pass) + "f" + material.plunge + "\n"
+	   g+="g1f" + material.feed + "\n"
+			for(j=0;j<vias[i].length;j++){
+   	   	g+="g1x"+(vias[i][j].x).toFixed(3) +"y"+ (vias[i][j].y).toFixed(3) + "\n"
+			}
+		pass++
+   	}
+		g+="g0z2\n"
+	}
+
+   for(i=0;i<pins.length;i++){
+		g+="g0x"+(pins[i][0].x.toFixed(3))+"y"+ (pins[i][0].y).toFixed(3) + "\n"
+	   g+="g1z-"+ (0.2) + "f" + material.plunge + "\n"
+	   g+="g1f" + material.feed + "\n"
+			for(j=1;j<pins[i].length;j++){
+				g+="g1x"+(pins[i][j].x.toFixed(3))+"y"+ (pins[i][j].y).toFixed(3) + "\n"		
+			}
+		g+="g0z2\n"
+	}
+
+pass_no = 4
+pass = 1
+
+
+g+="g0z2\n"
+
+path1.reverse()
+path1[0]={X:0,Y:parseFloat(ymax+tool)}
+path1.push(path1[0])
+
+g+="g0x"+(path1[0].X.toFixed(3))+"y"+ (path1[0].Y).toFixed(3) + "\n"
+
+while(pass<=pass_no){
+   
+   g+="g1z-"+ (pass_depth*pass) + "f" + material.plunge + "\n"
+   g+="g1f" + material.feed + "\n"
+   for(i=1;i<path1.length;i++){
+      g+="g1x"+(path1[i].X).toFixed(3) +"y"+ (path1[i].Y).toFixed(3) + "\n"
+   }
+   pass++
+}
+
+g+="g0z5\n"
+g+="m5\n"
+g+="m30\n"
+
+//console.log(g)
+
+fabmo.submitJob({
+   file : g,
+   filename : 'shield2.g',
+   name : "DRILL & CUT OUT 1/32",
+   description : (xmax*2) + " x " + (ymax*2) + " x " + "mm" 
+});
+
+
+	g=""
+
+	vias=[]
+	grid=[]
+	arduino=[]
+	pins=[]
+	pts=[]
+
+	drill()
+
+}
+
+</script>
+
+
+</body>
+</html>
+
