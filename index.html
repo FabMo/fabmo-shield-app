@@ -137,11 +137,11 @@ var g = ""
 var frame1 = []
 var path1 = []
 var verts = 100
-var xmin = -31
+var xmin = -26
 var ymin = -26.5
-var xmax = 31
+var xmax = 26
 var ymax = 26.5
-var radius = 2
+var radius = 1.27
 var tool = parseFloat(document.getElementById("input_tool").value/2)
 
 var o //x offset
@@ -170,6 +170,7 @@ var pts = []
 var net = [[]]
 var pin = 0
 var connect = []
+var trace = []
 
 var led = []
 var resistor = []
@@ -265,23 +266,33 @@ ctx.strokeStyle="#000"
 
 for(i=0;i<pts.length;i++){
 	ctx.beginPath()
-	ctx.arc(ctx.canvas.width/2+((pts[i].x)*sf),ctx.canvas.height/2+((pts[i].y)*sf),0.1*sf,0,(Math.PI*2))
+	//ctx.arc(ctx.canvas.width/2+((pts[i].x)*sf),ctx.canvas.height/2+((pts[i].y)*sf),0.1*sf,0,(Math.PI*2))
 	ctx.stroke()
 }
 
-ctx.lineWidth=0.7*sf
-ctx.strokeStyle="#aaa"
+ctx.lineWidth=0.1*sf
+ctx.strokeStyle="#333"
 
 for(i=0;i<net.length;i++){
 	ctx.beginPath()
 	for(j=0;j<net[i].length;j++){
-		ctx.lineTo((ctx.canvas.width/2+(net[i][j].x*sf)),(ctx.canvas.height/2+(net[i][j].y*sf)))
+		//ctx.lineTo((ctx.canvas.width/2+(net[i][j].x*sf)),(ctx.canvas.height/2+(net[i][j].y*sf)))
+	}
+	ctx.stroke()
+}
+
+console.log(trace)
+
+for(i=0;i<trace.length;i++){
+	ctx.beginPath()
+	for(j=0;j<trace[i].length;j++){
+		ctx.lineTo((ctx.canvas.width/2+(trace[i][j].x*sf)),(ctx.canvas.height/2+(trace[i][j].y*sf)))
 	}
 	ctx.stroke()
 }
 
 ctx.lineWidth="1"
-ctx.strokeStyle="#ff0000"
+ctx.strokeStyle="#0000ff"
 
 for(i=0;i<connect.length;i++){
 	ctx.beginPath()
@@ -296,8 +307,8 @@ ctx.strokeStyle="#333"
 for(i=0;i<net.length;i++){
 	for(j=0;j<net[i].length;j++){
 	ctx.beginPath()
-		ctx.arc(ctx.canvas.width/2+((net[i][j].x)*sf),ctx.canvas.height/2+((net[i][j].y)*sf),0.3*sf,0,(Math.PI*2))
-	ctx.fill()
+		//ctx.arc(ctx.canvas.width/2+((net[i][j].x)*sf),ctx.canvas.height/2+((net[i][j].y)*sf),0.1*sf,0,(Math.PI*2))
+		//ctx.fill()
 	ctx.stroke()
 	}
 }
@@ -423,40 +434,40 @@ ctx.translate(((-11.45+o)*sf)+(1.5*sf),-27*sf)
 ctx.rotate(-Math.PI/2);
 
 ctx.fillStyle="#ff00ff"
-ctx.fillText(" SCL",0,(-5.06*sf));
-ctx.fillText(" SDA",0,(-2.54*sf));
-ctx.fillText(" AREF",0,0);
-ctx.fillText(" GND",0,(2.54*sf));
-ctx.fillText(" 13",0,(2.54*2*sf));
-ctx.fillText(" 12",0,(2.54*3*sf));
-ctx.fillText("~11",0,(2.54*4*sf));
-ctx.fillText("~10",0,(2.54*5*sf));
-ctx.fillText("  9",0,(2.54*6*sf));
-ctx.fillText("  8",0,(2.54*7*sf));
-ctx.fillText("  7",0,(2.54*8*sf)+(1*sf));
-ctx.fillText("~6",0,(2.54*9*sf)+(1*sf));
-ctx.fillText("~5",0,(2.54*10*sf)+(1*sf));
-ctx.fillText("  4",0,(2.54*11*sf)+(1*sf));
-ctx.fillText("~3",0,(2.54*12*sf)+(1*sf));
-ctx.fillText("  2",0,(2.54*13*sf)+(1*sf));
-ctx.fillText("  1 TX",0,(2.54*14*sf)+(1*sf));
-ctx.fillText("  0 RX",0,(2.54*15*sf)+(1*sf));
+ctx.fillText(" SCL",0,(-5.06*sf)-(sf));
+ctx.fillText(" SDA",0,(-2.54*sf)-(sf));
+ctx.fillText(" AREF",0,0-(sf));
+ctx.fillText(" GND",0,(2.54*sf)-(sf));
+ctx.fillText(" 13",0,(2.54*2*sf)-(sf));
+ctx.fillText(" 12",0,(2.54*3*sf)-(sf));
+ctx.fillText("~11",0,(2.54*4*sf)-(sf));
+ctx.fillText("~10",0,(2.54*5*sf)-(sf));
+ctx.fillText("  9",0,(2.54*6*sf)-(sf));
+ctx.fillText("  8",0,(2.54*7*sf)-(sf));
+ctx.fillText("  7",0,(2.54*8*sf)+(sf));
+ctx.fillText("~6",0,(2.54*9*sf)+(sf));
+ctx.fillText("~5",0,(2.54*10*sf)+(sf));
+ctx.fillText("  4",0,(2.54*11*sf)+(sf));
+ctx.fillText("~3",0,(2.54*12*sf)+(sf));
+ctx.fillText("  2",0,(2.54*13*sf)+(sf));
+ctx.fillText("  1 TX",0,(2.54*14*sf)+(sf));
+ctx.fillText("  0 RX",0,(2.54*15*sf)+(sf));
 
-ctx.fillText("A5",(-56*sf),(2.54*15*sf)+(1*sf));
-ctx.fillText("A4",(-56*sf),(2.54*14*sf)+(1*sf));
-ctx.fillText("A3",(-56*sf),(2.54*13*sf)+(1*sf));
-ctx.fillText("A2",(-56*sf),(2.54*12*sf)+(1*sf));
-ctx.fillText("A1",(-56*sf),(2.54*11*sf)+(1*sf));
-ctx.fillText("A0",(-56*sf),(2.54*10*sf)+(1*sf));
+ctx.fillText("A5",(-56*sf),(2.54*15*sf)+(sf));
+ctx.fillText("A4",(-56*sf),(2.54*14*sf)+(sf));
+ctx.fillText("A3",(-56*sf),(2.54*13*sf)+(sf));
+ctx.fillText("A2",(-56*sf),(2.54*12*sf)+(sf));
+ctx.fillText("A1",(-56*sf),(2.54*11*sf)+(sf));
+ctx.fillText("A0",(-56*sf),(2.54*10*sf)+(sf));
 
-ctx.fillText("VIN",(-56.5*sf),(2.54*9*sf)-(0.6*sf));
-ctx.fillText("GND",(-57.3*sf),(2.54*8*sf)-(0.6*sf));
-ctx.fillText("GND",(-57.3*sf),(2.54*7*sf)-(0.6*sf));
-ctx.fillText("5V",(-56*sf),(2.54*6*sf)-(0.6*sf));
-ctx.fillText("3.3V",(-57.3*sf),(2.54*5*sf)-(0.6*sf));
-ctx.fillText("RST",(-57.2*sf),(2.54*4*sf)-(0.6*sf));
-ctx.fillText("IOREF",(-58.5*sf),(2.54*3*sf)-(0.6*sf));
-
+ctx.fillText("VIN",(-56.5*sf),(2.54*9*sf)-(1.5*sf));
+ctx.fillText("GND",(-57.3*sf),(2.54*8*sf)-(1.5*sf));
+ctx.fillText("GND",(-57.3*sf),(2.54*7*sf)-(1.5*sf));
+ctx.fillText("5V",(-56*sf),(2.54*6*sf)-(1.5*sf));
+ctx.fillText("3.3V",(-57.3*sf),(2.54*5*sf)-(1.5*sf));
+ctx.fillText("RST",(-57.2*sf),(2.54*4*sf)-(1.5*sf));
+ctx.fillText("IOREF",(-58.5*sf),(2.54*3*sf)-(1.5*sf));
+ctx.fillText("NC",(-56.5*sf),(2.54*2*sf)-(1.5*sf));
 }
 
 parts()
@@ -480,20 +491,63 @@ $("#myCanvas").bind('click', function(e) {
 			if(((Math.abs(x-pts[i].x))<=0.635) && ((Math.abs(y-pts[i].y))<=0.635)){
 				if((document.getElementById('action').value=='route')&&((net[net.length-1].length)==0)){
 					net[net.length-1].push({x:(pts[i].x),y:(pts[i].y)})
+
+						trace.push([])					
+
+					for(j=0;j<=25;j++){
+						trace[trace.length-1].push({x:((pts[i].x)+Math.sin((Math.PI*2)/25*j)*0.2),y:((pts[i].y)+Math.cos((Math.PI*2)/25*j)*0.2)})
+					}	
+
 				}
 				else if((document.getElementById('action').value=='route')&&((net[net.length-1].length)>0)){
 
-					//net[net.length-1].push({x:(pts[i].x),y:(pts[i].y)})
+							var Ax = net[net.length-1][net[net.length-1].length-1].x
+							var Ay = net[net.length-1][net[net.length-1].length-1].y
+							var Bx = pts[i].x
+							var By = pts[i].y		
 
+							var ABx =  Bx - Ax
+							var ABy =  By - Ay
+
+							var ABLength = Math.sqrt(ABx*ABx + ABy*ABy)
+
+							var NABx = ABx / ABLength
+							var NABy = ABy / ABLength
+
+							var PNABx = -NABy
+							var PNABy =  NABx
+
+							var Dx = Ax + ((0.2)*PNABx)
+							var Dy = Ay + ((0.2)*PNABy)
+	
+							var Cx = Ax + (-(0.2)*PNABx)
+							var Cy = Ay + (-(0.2)*PNABy)
+
+							var Ex = Bx + ((0.2)*PNABx)
+							var Ey = By + ((0.2)*PNABy)
+	
+							var Fx = Bx + (-(0.2)*PNABx)
+							var Fy = By + (-(0.2)*PNABy)
+					
+//					trace.push([{x:Cx,y:Cy},{x:Dx,y:Dy},{x:Ex,y:Ey},{x:Fx,y:Fy},{x:Cx,y:Cy}])
+
+					//add node
+					trace.push([{x:Cx,y:Cy},{x:Fx,y:Fy}])
+					trace.push([{x:Dx,y:Dy},{x:Ex,y:Ey}])
+					trace.push([])
+					for(j=0;j<=25;j++){
+						trace[trace.length-1].push({x:((pts[i].x)+Math.sin((Math.PI*2)/25*j)*0.2),y:((pts[i].y)+Math.cos((Math.PI*2)/25*j)*0.2)})
+					}					
+
+					net[net.length-1].push({x:(pts[i].x),y:(pts[i].y)})
 					
 					if( (Math.abs((pts[i].x)-(net[net.length-1][net[net.length-1].length-1].x))) < (Math.abs((pts[i].y)-(net[net.length-1][net[net.length-1].length-1].y))) ){
 						//net[net.length-1].push({x:(pts[i].x),y:(net[net.length-1][net[net.length-1].length-1].y)})
-						net[net.length-1].push({x:(net[net.length-1][net[net.length-1].length-1].x),y:(pts[i].y)})
-
+						//net[net.length-1].push({x:(net[net.length-1][net[net.length-1].length-1].x),y:(pts[i].y)})
 					}
 					else{
 						//net[net.length-1].push({x:(net[net.length-1][net[net.length-1].length-1].x),y:(pts[i].y)})
-						net[net.length-1].push({x:(pts[i].x),y:(net[net.length-1][net[net.length-1].length-1].y)})
+						//net[net.length-1].push({x:(pts[i].x),y:(net[net.length-1][net[net.length-1].length-1].y)})
 
 					}
 					
@@ -627,7 +681,7 @@ else if(radius+tool<=0){
 
 function parts(){
 
-	o = -10
+	o = -5
 
 	arduino.push( [{x:-34+o,y:-26.5},{x:31+o,y:-26.5},{x:31+o,y:-13.5},{x:34+o,y:-10.5},{x:34+o,y:21.5},{x:31+o,y:24.5},{x:31+o,y:26.5},{x:-34+o,y:26.5},{x:-34+o,y:22.5}] )
 
@@ -661,23 +715,23 @@ function parts(){
 	y=0
 	for(i=0;i<35;i++){
 		x=0
-	for(j=0;j<37;j++){
-		pts.push({x:-15.875+o+x,y:21.59+y})
+	for(j=0;j<40;j++){
+		pts.push({x:-19.685+o+x,y:21.59+y})
 		x = x+1.27
 	}
 		y = y-1.27
 	}
 
 	y = 0
-	for(i=0;i<37;i++){
-		grid.push([{x:-15.875+o,y:22.86-y},{x:29.77+o,y:22.86-y}])
+	for(i=0;i<41;i++){
+		grid.push([{x:-19.685+o,y:25.4-y},{x:29.77+o,y:25.4-y}])
 		//grid.push([{x:-16.51+o,y:22.86-y},{x:29.77+o,y:22.86-y}])
 		//y = y + 0.3175
 		y = y + 1.27
 	}
 	x = 0
-	for(i=0;i<37;i++){
-		grid.push([{x:-15.875+o+x,y:22.86},{x:-15.875+o+x,y:-22.86}])
+	for(i=0;i<40;i++){
+		grid.push([{x:-19.685+o+x,y:25.4},{x:-19.685+o+x,y:-25.4}])
 		//grid.push([{x:-16.51+o+x,y:22.86},{x:-16.51+o+x,y:-22.86}])
 		//x = x + 0.3175
 		x = x + 1.27
@@ -699,13 +753,13 @@ function parts(){
 	//top pins
 	x = -17.8
 	for(i=0;i<10;i++){
-		pins.push([{x:(x+o+0.635),y:-20.32},{x:(x+o+0.635),y:-22.86},{x:(x+o),y:-22.86},{x:(x+o),y:-25.135},{x:(x+o+2.54),y:-25.135},{x:(x+o+2.54),y:-22.86},{x:(x+o+3.175),y:-22.86},{x:(x+o+3.175),y:-20.32},{x:(x+o+0.635),y:-20.32}])
+		pins.push([{x:(x+o+0.635),y:-20.32},{x:(x+o+0.635),y:-22.86},{x:(x+o),y:-22.86},{x:(x+o),y:-25.4},{x:(x+o+2.54),y:-25.4},{x:(x+o+2.54),y:-22.86},{x:(x+o+3.175),y:-22.86},{x:(x+o+3.175),y:-20.32},{x:(x+o+0.635),y:-20.32}])
 	x = x + 2.54
 	}
 
 	x = 9.505
 	for(i=0;i<8;i++){
-		pins.push([{x:(x+o),y:-20.32},{x:(x+o),y:-25.135},{x:(x+o+2.54),y:-25.135},{x:(x+o+2.54),y:-20.32},{x:(x+o),y:-20.32}])
+		pins.push([{x:(x+o),y:-20.32},{x:(x+o),y:-25.4},{x:(x+o+2.54),y:-25.4},{x:(x+o+2.54),y:-20.32},{x:(x+o),y:-20.32}])
 	x = x + 2.54
 	}
 	
@@ -713,17 +767,17 @@ function parts(){
 
 	x = 29.825
 	for(i=0;i<6;i++){
-		pins.push([{x:(x+o),y:20.32},{x:(x+o),y:25.135},{x:(x+o-2.54),y:25.135},{x:(x+o-2.54),y:20.32},{x:(x+o),y:20.32}])
+		pins.push([{x:(x+o),y:20.32},{x:(x+o),y:25.4},{x:(x+o-2.54),y:25.4},{x:(x+o-2.54),y:20.32},{x:(x+o),y:20.32}])
 	x = x - 2.54
 	}
 
 	x = 12.06
 	for(i=0;i<8;i++){
 		if(i==7){
-		pins.push([{x:(x+o),y:22.86},{x:(x+o),y:25.135},{x:(x+o-2.54),y:25.135},{x:(x+o-2.54),y:22.86},{x:(x+o),y:22.86}])
+		pins.push([{x:(x+o),y:22.86},{x:(x+o),y:25.4},{x:(x+o-2.54),y:25.4},{x:(x+o-2.54),y:22.86},{x:(x+o),y:22.86}])
 		}
 		else{
-		pins.push([{x:(x+o),y:20.32},{x:(x+o),y:25.135},{x:(x+o-2.54),y:25.135},{x:(x+o-2.54),y:20.32},{x:(x+o),y:20.32}])
+		pins.push([{x:(x+o),y:20.32},{x:(x+o),y:25.4},{x:(x+o-2.54),y:25.4},{x:(x+o-2.54),y:20.32},{x:(x+o),y:20.32}])
 		}
 //pins.push([{x:(x+o-2.54+0.3175),y:22.86},{x:(x+o)+0.3175-2.54,y:20.32},{x:(x+o)+0.3175,y:20.32},{x:(x+o)+0.3175,y:22.86},{x:(x+o),y:22.86},{x:(x+o),y:25.135},{x:(x+o-2.54),y:25.135},{x:(x+o-2.54),y:22.86},{x:(x+o-2.54+0.3175),y:22.86}])
 	x = x - 2.54
@@ -830,55 +884,34 @@ function parts(){
 		pins[i].name='nc'
 	}
 
-	//
-	//if name == name {connect}
+
 
 	}
 
-	//console.log(pins)
-	//
-	//node array
-
 x=-15.95
-
 for(i=0;i<10;i++){
-
-connect.push({x:(x+o),y:(-21.59)})
-
-x = x +2.54
-
+	connect.push({x:(x+o),y:(-21.59)})
+	x = x +2.54
 }
 
 
 x=10.72
-
 for(i=10;i<18;i++){
-
-connect.push({x:(x+o),y:(-21.59)})
-
-x = x +2.54
-
+	connect.push({x:(x+o),y:(-21.59)})
+	x = x +2.54
 }
 
 
 x=28.5
-
 for(i=18;i<24;i++){
-
-connect.push({x:(x+o),y:(21.59)})
-
-x = x -2.54
-
+	connect.push({x:(x+o),y:(21.59)})
+	x = x -2.54
 }
 
 x=10.72
-
 for(i=24;i<31;i++){
-
-connect.push({x:(x+o),y:(21.59)})
-
-x = x -2.54
-
+	connect.push({x:(x+o),y:(21.59)})
+	x = x -2.54
 }
 
 	//
@@ -961,20 +994,10 @@ x = x -2.54
 		x = x -2.54
 	}
 
-	//pin array breakout
-	//[0] default
-	//[1] if connect == true
-
-	//trace array structure
-	
-	//part array structure: 
-	//[0] part,type,size
-	//[1] operation,depth,tool
-	//[2] outline (connectors top,bottom,left,right)
-
-	//led.push({part:'led',type:'dip',tool:'1/32'})
-	
-
+//outline all pins
+//outline traces and simplify path	
+//ClipperLib.Clipper.SimplifyPolygon()
+//offset
 
 }
 
