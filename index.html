@@ -96,9 +96,6 @@ units{
 
 </style>
 
-<!-- dip/smd -->
-<!-- arduino v-->
-
 </head>
 
 <body onload="makeFrame(radius); parts();">
@@ -130,15 +127,6 @@ units{
 <input id="input_radius" type="number" value="2" autocomplete="off" step="0.1" min="0"/>   
 
 <script>
-
-//TODO
-//modify trace outlines to cut back of pin
-//add SBP output
-//add two point trace
-//center drill for DIP
-//add select for SMD/DIP
-//
-
 
 var g = ""
 var frame1 = []
@@ -328,8 +316,6 @@ for(i=0;i<trace.length;i++){
 	//ctx.stroke()
 }
 
-
-
 ctx.lineWidth="1"
 ctx.strokeStyle="#ffff00"
 ctx.fillStyle="#fff"
@@ -340,10 +326,6 @@ for(i=0;i<connect.length;i++){
 	ctx.fill()
 	ctx.stroke()
 }
-
-
-
-
 
 //
 
@@ -382,8 +364,6 @@ for(i=0;i<arduino_pins.length;i++){
 	ctx.stroke()
 
 }
-
-
 
 
 //ctx.setLineDash([1,1]);
@@ -711,11 +691,7 @@ $("#myCanvas").bind('click', function(e) {
 		seg++
 	}
 	
-
-	//console.log(pts[pts.length-1].X)
-	//console.log(net[net.length-1][net[net.length-1].length-1].X)
-	//if((pts[i].X!=net[net.length-1][net[net.length-1].length-1].X)&&(pts[i].Y!=net[net.length-1][net[net.length-1].length-1].Y)){
-	console.log(trace)
+	//console.log(trace)
 
 	add_trace()
 
@@ -1581,8 +1557,6 @@ g+="JZ,5\n"
 g+="SO,1,1\n"
 g+="PAUSE 3\n" 
 
-
-
 //drill connect holes
 /*
    for(i=0;i<connect.length;i++){
@@ -1695,13 +1669,6 @@ fabmo.submitJob({
 
 	g=""
 
-	//vias=[]
-	//grid=[]
-	//arduino=[]
-	//pins=[]
-	//pts=[]
-
-	//parts()
 
 }
 
