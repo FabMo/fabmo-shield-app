@@ -29,7 +29,6 @@ input{
 	height:100px;
 }
 
-
 #input_depth{
 	displaY: none;
 	position: absolute;
@@ -94,13 +93,30 @@ units{
 	width: 170px;
 }
 
+#input_undo{
+	right: 30px;
+	top: 50px;
+	width:100px;
+	height:50px;
+}
+
+#type{
+	position: absolute;
+	right: 30px;
+	top:   5px;
+	width: 100px;
+}
+
 </style>
 
 </head>
 
 <body onload="makeFrame(radius); parts();">
-<body>
 
+<select id="type" autocomplete="on">
+  <option value="dip">DIP</option>
+  <option value="smd">SMD</option>
+</select>
 
 <select id="action" autocomplete="off">
   <option value="route">ROUTE</option>
@@ -120,6 +136,8 @@ units{
 
 <input id="input_submit" type="submit" value="SUBMIT&#x00A;JOB" onclick="make()"/>
 
+<input id="input_undo" type="submit" value="UNDO" onclick="undo()"/>
+
 <canvas id="myCanvas"></canvas>
    
 <input id="input_width" type="number" value="62" autocomplete="off" step="0.1" min="0.1"/>
@@ -127,6 +145,18 @@ units{
 <input id="input_radius" type="number" value="2" autocomplete="off" step="0.1" min="0"/>   
 
 <script>
+
+//TODO
+
+//cleanup canvas
+//
+//undo button
+//smd
+//square pads
+//
+//label trace object type
+//save configuration
+//
 
 var g = ""
 var frame1 = []
@@ -136,7 +166,7 @@ var xmin = -26
 var ymin = -26.5
 var xmax = 26
 var ymax = 26.5
-var radius = 1.27
+var radius = 2
 var tool = parseFloat(document.getElementById("input_tool").value/2)
 var scale = 100
 
@@ -167,8 +197,7 @@ var net = [[]]
 var pin = 0
 var connect = []
 var trace = []
-var simple = []
-
+var paths = []
 
 var seg = 0
 
@@ -238,7 +267,6 @@ if(radius>0){
 }
 
 */
-
 
 ctx.fillStyle="#aaa"
 
@@ -439,7 +467,6 @@ ctx.stroke()
 		ctx.stroke()
 	}
 
-
 ctx.lineWidth="1"
 ctx.fillStyle="#fff"
 ctx.strokeStyle="#333"
@@ -448,13 +475,13 @@ for(i=0;i<net.length;i++){
 	for(j=0;j<net[i].length;j++){
 		//console.log(Math.abs(net[i][j].Y))
 		ctx.beginPath()
-		if((Math.abs(net[i][j].Y))<21){
+		if(((Math.abs(net[i][j].Y))<21)&&(net[i][j].D==true)){
 		ctx.fillStyle="#fff"
 		ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.4*sf,0,(Math.PI*2))
 		}
 		else{
 		ctx.fillStyle="#00ff00"
-		ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.2*sf,0,(Math.PI*2))
+		//ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.2*sf,0,(Math.PI*2))
 		}
 		ctx.fill()
 
@@ -463,15 +490,13 @@ for(i=0;i<net.length;i++){
 
 //ctx.setLineDash([4,4]);
 
-
-
 ctx.strokeStyle="#ff00ff"
 ctx.lineWidth="2"
-for(i=0;i<simple.length;i++){
+for(i=0;i<paths.length;i++){
 	ctx.beginPath()
-	for(j=0;j<simple[i].length;j++){
-		//console.log(simple[i][j].X)
-		//ctx.lineTo((ctx.canvas.width/2+(simple[i][j].X*sf)),(ctx.canvas.height/2+(simple[i][j].Y*sf)))
+	for(j=0;j<paths[i].length;j++){
+		//console.log(paths[i][j].X)
+		//ctx.lineTo((ctx.canvas.width/2+(paths[i][j].X*sf)),(ctx.canvas.height/2+(paths[i][j].Y*sf)))
 	}
 	ctx.stroke()
 }
@@ -542,20 +567,31 @@ $("#myCanvas").bind('click', function(e) {
 		var d = 0.3
 		var r = 0.85
 		var v = 100
-
-		
+		var drill = false
+		if(document.getElementById("type").value=="dip"){
+			drill=true
+		}
 
 		for(i=0;i<pts.length;i++){
 	
 			if(((Math.abs(x-pts[i].X))<=0.635) && ((Math.abs(y-pts[i].Y))<=0.635)){
 				if((document.getElementById('action').value=='route')&&((net[net.length-1].length)==0)){
-					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y)})
+					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill})
 
-						trace.push([])					
-
-					for(j=0;j<=v;j++){
-						trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
-					}	
+						trace.push([])
+						
+						if(document.getElementById("type").value=="dip"){
+							for(j=0;j<=v;j++){
+								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
+							}
+						}
+						else if(document.getElementById("type").value=="smd"){
+							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y-r})
+							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y+r})
+							trace[trace.length-1].push({X:pts[i].X+r,Y:pts[i].Y+r})
+							trace[trace.length-1].push({X:pts[i].X+r,Y:pts[i].Y-r})
+							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y-r})
+						}	
 
 				}
 				else if((pts[i].X==net[net.length-1][net[net.length-1].length-1].X) && (pts[i].Y==net[net.length-1][net[net.length-1].length-1].Y)){
@@ -564,9 +600,6 @@ $("#myCanvas").bind('click', function(e) {
 
 				}
 				else if((document.getElementById('action').value=='route')&&((net[net.length-1].length)>0)){
-
-							
-							
 
 							var Ax = net[net.length-1][net[net.length-1].length-1].X
 							var Ay = net[net.length-1][net[net.length-1].length-1].Y
@@ -600,16 +633,21 @@ $("#myCanvas").bind('click', function(e) {
 					
 					trace.push([{X:Cx,Y:Cy},{X:Dx,Y:Dy},{X:Ex,Y:Ey},{X:Fx,Y:Fy},{X:Cx,Y:Cy}])
 
-					//add node
-					//trace.push([{X:Cx,Y:Cy},{X:Fx,Y:Fy},{X:Ex,Y:Ey},{X:Dx,Y:Dy},{X:Cx,Y:Cy}])
-					//trace.push([{X:Fx,Y:Fy},{X:Dx,Y:Dy}])
-					//trace.push([{X:Dx,Y:Dy},{X:Ex,Y:Ey}])
 					trace.push([])
-					for(j=0;j<=v;j++){
-						trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
-					}					
+						if(document.getElementById("type").value=="dip"){
+							for(j=0;j<=v;j++){
+								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
+							}
+						}
+						else if(document.getElementById("type").value=="smd"){
+							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y-r})
+							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y+r})
+							trace[trace.length-1].push({X:pts[i].X+r,Y:pts[i].Y+r})
+							trace[trace.length-1].push({X:pts[i].X+r,Y:pts[i].Y-r})
+							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y-r})		
+						}					
 
-					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y)})
+					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill})
 
 					//add_trace()
 					
@@ -640,33 +678,11 @@ $("#myCanvas").bind('click', function(e) {
 				}
 				else if((document.getElementById('action').value=='resistor')&&(pin==2)){
 
-				/*
-						if((pts[i].X)-(net[net.length-1][net[net.length-1].length-1].X) < 0 ){
-							x = -1.27
-						}
-						else{
-							x = 1.27
-						}
-					net.push([{X:(net[net.length-1][net[net.length-1].length-1].X+x),Y:(net[net.length-1][net[net.length-1].length-1].Y)}])
-					*/
-					//net[net.length-1].push({X:(net[net.length-1][net[net.length-1].length-1].X),Y:(pts[i].Y)})
-					//net[net.length-1].push({X:(pts[i].X),Y:(net[net.length-1][net[net.length-1].length-1].Y)})
-					//check nodes
 
 				}
-			//}
+			
 		}
 
-/*
-		for(i=0;i<nodes.length;i++){
-	
-			if(((Math.abs(x-nodes[i].X))<=1.27) && ((Math.abs(y-nodes[i].Y))<=1.27)){
-				if(document.getElementById('action').value=='route'){
-					net[net.length-1].push({X:(nodes[i].X),Y:(nodes[i].Y)})
-				}
-			}
-		}	
-*/
 
 	}
 
@@ -699,6 +715,47 @@ $("#myCanvas").bind('click', function(e) {
 	
 
 });
+
+
+function undo(){
+
+console.log(net)
+
+if(net.length>0)
+{
+	if(net[net.length-1].length==0){
+		net.pop()
+		if(net.length==0){
+			net = [[]]
+		}
+	}
+	if(net[net.length-1].length==2){
+		net[net.length-1].pop()
+		if(net.length==0){
+			net = [[]]
+		}
+	}
+	else{
+		net[net.length-1].pop()
+	}
+}
+else{
+	net = [[]]
+}
+
+if(seg==1){
+	trace.pop()
+	seg--
+}
+else{
+	trace.pop()
+	trace.pop()
+	seg=1
+}
+
+add_trace()
+
+}
 
 
 $("#myCanvas").bind('mousemove', function(e) {
@@ -1162,7 +1219,7 @@ for(i=0;i<solution_paths.length;i++){
 
 //console.log(solution_paths)
 
-simple = solution_paths
+paths = solution_paths
 
 draw()
 
@@ -1392,7 +1449,6 @@ g=""
 
 //flip (smd)
 
-/*
    for(i=0;i<connect.length;i++){
 
 			if(connect[i].Y<0){
@@ -1427,7 +1483,7 @@ g=""
 			}
 		}
 	}
-*/
+
 //
 
 
@@ -1492,7 +1548,7 @@ g+="g4p2\n"
    	for(j=0;j<net[i].length;j++){
 		pass_no = 5
 		pass = 1
-		if((Math.abs(net[i][j].Y))<21){
+		if(((Math.abs(net[i][j].Y))<21)&&(net[i][j].D==true)){
 			g+="g0x"+(net[i][j].X.toFixed(3))+"y"+ (net[i][j].Y).toFixed(3) + "\n"
 				while(pass<=pass_no){
 	   			g+="g1z-"+ (pass_depth*pass) + "f" + material.plunge + "\n"
@@ -1607,7 +1663,7 @@ g+="PAUSE 3\n"
    	for(j=0;j<net[i].length;j++){
 		pass_no = 5
 		pass = 1
-		if((Math.abs(net[i][j].Y))<21){
+		if(((Math.abs(net[i][j].Y))<21)&&(net[i][j].D==true)){
 			g+="J2,"+(net[i][j].X.toFixed(3))+","+ (net[i][j].Y).toFixed(3) + "\n"
 				while(pass<=pass_no){
 	   			g+="MZ,-"+ (pass_depth*pass) + "\n"
