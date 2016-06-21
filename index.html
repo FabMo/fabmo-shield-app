@@ -46,7 +46,6 @@ depth{
 	color: #333;
 }
 
-
 #input_tool{
 	displaY: none;
 	position: absolute;
@@ -147,8 +146,8 @@ units{
 <script>
 
 //TODO
-
 //
+//last point start/end
 //cleanup canvas
 //save configuration
 //
@@ -466,20 +465,38 @@ ctx.lineWidth="1"
 ctx.fillStyle="#fff"
 ctx.strokeStyle="#333"
 
+console.log(net)
+
 for(i=0;i<net.length;i++){
 	for(j=0;j<net[i].length;j++){
-		//console.log(Math.abs(net[i][j].Y))
+
+
+
 		ctx.beginPath()
 		if(((Math.abs(net[i][j].Y))<21)&&(net[i][j].D==true)){
 		ctx.fillStyle="#fff"
 		ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.4*sf,0,(Math.PI*2))
 		}
 		else{
-		ctx.fillStyle="#00ff00"
+		//ctx.fillStyle="#00ff00"
 		//ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.2*sf,0,(Math.PI*2))
 		}
+		if( (i==net.length-1) && (j==(net[i].length-1)) ){
+			ctx.fillStyle="#00ff00"
+			ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.3*sf,0,(Math.PI*2))
+		}
 		ctx.fill()
-
+	}
+	if( (net[i].length==0) && (net.length>1) ){
+		ctx.beginPath()
+		if(seg==1){
+			ctx.fillStyle="#00ff00"
+		}
+		else{
+			ctx.fillStyle="#ff0000"
+		}
+		ctx.arc(ctx.canvas.width/2+((net[i-1][net[i-1].length-1].X)*sf),ctx.canvas.height/2+((net[i-1][net[i-1].length-1].Y)*sf),0.3*sf,0,(Math.PI*2))
+		ctx.fill()		
 	}
 }
 
@@ -570,6 +587,7 @@ $("#myCanvas").bind('click', function(e) {
 		for(i=0;i<pts.length;i++){
 	
 			if(((Math.abs(x-pts[i].X))<=0.635) && ((Math.abs(y-pts[i].Y))<=0.635)){
+
 				if((document.getElementById('action').value=='route')&&((net[net.length-1].length)==0)){
 					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill})
 
@@ -610,9 +628,7 @@ $("#myCanvas").bind('click', function(e) {
 							var NABy = ABy / ABLength
 
 							var PNABx = -NABy
-							var PNABy =  NABx
-							
-							
+							var PNABy =  NABx					
 
 							var Dx = Ax + ((d)*PNABx)
 							var Dy = Ay + ((d)*PNABy)
@@ -657,6 +673,15 @@ $("#myCanvas").bind('click', function(e) {
 
 					}
 					}
+
+					if(seg==1){
+						net.push([])	
+						seg = 0
+					}
+					else{
+						seg++
+					}
+
 				}
 				else if((document.getElementById('action').value=='resistor')&&(pin==1)){
 
@@ -673,11 +698,9 @@ $("#myCanvas").bind('click', function(e) {
 				}
 				else if((document.getElementById('action').value=='resistor')&&(pin==2)){
 
-
 				}
 			
 		}
-
 
 	}
 
@@ -688,19 +711,13 @@ $("#myCanvas").bind('click', function(e) {
 	}
 
 	else if(document.getElementById('action').value=='clear'){
-		net=[[]]
+		//net=[[]]
 	}
 	else if(document.getElementById('action').value=='end'){
-		net.push([])
+		//net.push([])
 	}
 	//route()
-	if(seg==1){
-		net.push([])	
-		seg = 0
-	}
-	else{
-		seg++
-	}
+
 	
 	//console.log(trace)
 
