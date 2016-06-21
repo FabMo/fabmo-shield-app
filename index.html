@@ -1444,41 +1444,7 @@ g=""
 
 //flip (smd)
 
-   for(i=0;i<outlines.length;i++){
-		for(j=0;j<outlines[i].length;j++){
-			if((outlines[i][j].Y)<0){
-				console.log(j)
-				outlines[i][j]={X:outlines[i][j].X,Y:(Math.abs(outlines[i][j].Y))}
-			}
-			else{
-				outlines[i][j]={X:outlines[i][j].X,Y:(0-(outlines[i][j].Y))}	
-			}
-		}
-	}
-
-
-   for(i=0;i<pins.length;i++){
-		for(j=0;j<pins[i].length;j++){
-			if(pins[i][j].Y<0){
-				pins[i][j].Y=Math.abs(pins[i][j].Y)
-			}
-			else{
-				pins[i][j].Y=(0-pins[i][j].Y)	
-			}
-		}
-	}
-
-   for(i=0;i<vias.length;i++){
-		for(j=0;j<vias[i].length;j++){
-			if(vias[i][j].Y<0){
-				vias[i][j].Y=Math.abs(vias[i][j].Y)
-			}
-			else{
-				vias[i][j].Y=(0-vias[i][j].Y)	
-			}
-		}
-	}
-
+flip()
 //
 
 
@@ -1710,7 +1676,6 @@ g+="SO,1,0\n"
 
 //console.log(g)
 
-
 fabmo.submitJob({
    file : g,
    filename : 'shield.SBP',
@@ -1719,6 +1684,46 @@ fabmo.submitJob({
 });
 
 	g=""
+	flip()
+
+}
+
+function flip(){
+
+   for(i=0;i<outlines.length;i++){
+		for(j=0;j<outlines[i].length;j++){
+			if((outlines[i][j].Y)<0){
+				console.log(j)
+				outlines[i][j]={X:outlines[i][j].X,Y:(Math.abs(outlines[i][j].Y))}
+			}
+			else{
+				outlines[i][j]={X:outlines[i][j].X,Y:(0-(outlines[i][j].Y))}	
+			}
+		}
+	}
+
+
+   for(i=0;i<pins.length;i++){
+		for(j=0;j<pins[i].length;j++){
+			if(pins[i][j].Y<0){
+				pins[i][j].Y=Math.abs(pins[i][j].Y)
+			}
+			else{
+				pins[i][j].Y=(0-pins[i][j].Y)	
+			}
+		}
+	}
+
+   for(i=0;i<vias.length;i++){
+		for(j=0;j<vias[i].length;j++){
+			if(vias[i][j].Y<0){
+				vias[i][j].Y=Math.abs(vias[i][j].Y)
+			}
+			else{
+				vias[i][j].Y=(0-vias[i][j].Y)	
+			}
+		}
+	}
 
 
 }
