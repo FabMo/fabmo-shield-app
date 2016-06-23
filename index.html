@@ -160,6 +160,11 @@ units{
 
 //TODO
 //
+//move 0,0 of toolpath to bottom left
+//remove duplicate drill holes
+//fix multi same node (seg) click
+//
+//
 //add parts
 //zoom/pan
 //save configuration
@@ -310,16 +315,12 @@ for(i=7;i<arduino.length;i++){
 	ctx.stroke()
 }
 
-
-
 ctx.fillStyle="#ccccff"
 ctx.beginPath()
 	for(i=0;i<frame1.length;i++){
 		ctx.lineTo((frame1[i].X*sf)+ctx.canvas.width/2,(frame1[i].Y*sf)+ctx.canvas.height/2)
 	}
 ctx.fill()
-
-
 
 //ctx.fillRect(20,20,5,5)
 
@@ -1541,7 +1542,11 @@ var filetype = "gcode"
 
 g=""
 
-	pins.reverse()
+pins.reverse()
+
+
+//remove duplicate drill holes
+
 
 flip()
 
@@ -1575,13 +1580,13 @@ g+="g4p2\n"
 
 		pass_no = 4
 		pass = 1
-		g+="g0x"+(vias[i][0].X.toFixed(3))+"y"+ (vias[i][0].Y).toFixed(3) + "\n"
+		g+="g0x"+(vias[i][0].X+xmax).toFixed(3)+"y"+ (vias[i][0].Y+ymax).toFixed(3) + "\n"
 
 		while(pass<=pass_no){
 	   g+="g1z-"+ (pass_depth*pass) + "f" + material.plunge + "\n"
 	   g+="g1f" + material.feed + "\n"
 			for(j=0;j<vias[i].length;j++){
-   	   	g+="g1x"+(vias[i][j].X).toFixed(3) +"y"+ (vias[i][j].Y).toFixed(3) + "\n"
+   	   	g+="g1x"+(vias[i][j].X+xmax).toFixed(3) +"y"+ (vias[i][j].Y+ymax).toFixed(3) + "\n"
 			}
 		pass++
    	}
@@ -1589,11 +1594,11 @@ g+="g4p2\n"
 	}
 
    for(i=0;i<pins.length;i++){
-		g+="g0x"+(pins[i][0].X.toFixed(3))+"y"+ (pins[i][0].Y).toFixed(3) + "\n"
+		g+="g0x"+(pins[i][0].X+xmax).toFixed(3)+"y"+ (pins[i][0].Y+ymax).toFixed(3) + "\n"
 	   g+="g1z-"+ (0.2) + "f" + material.plunge + "\n"
 	   g+="g1f" + material.feed + "\n"
 			for(j=1;j<pins[i].length;j++){
-				g+="g1x"+(pins[i][j].X.toFixed(3))+"y"+ (pins[i][j].Y).toFixed(3) + "\n"		
+				g+="g1x"+(pins[i][j].X+xmax).toFixed(3)+"y"+ (pins[i][j].Y+ymax).toFixed(3) + "\n"		
 			}
 		g+="g0z2\n"
 	}
@@ -1606,7 +1611,7 @@ g+="g4p2\n"
 		pass_no = 5
 		pass = 1
 		if(((Math.abs(net[i][j].Y))<21)&&(net[i][j].D==true)){
-			g+="g0x"+(net[i][j].X.toFixed(3))+"y"+ (net[i][j].Y).toFixed(3) + "\n"
+			g+="g0x"+(net[i][j].X+xmax).toFixed(3)+"y"+ (net[i][j].Y+ymax).toFixed(3) + "\n"
 				while(pass<=pass_no){
 	   			g+="g1z-"+ (pass_depth*pass) + "f" + material.plunge + "\n"
 					g+="g0z1\n"
@@ -1622,11 +1627,11 @@ g+="g4p2\n"
 	outlines.reverse()
 
    for(i=0;i<outlines.length;i++){
-		g+="g0x"+(outlines[i][0].X/scale.toFixed(3))+"y"+ (outlines[i][0].Y/scale).toFixed(3) + "\n"
+		g+="g0x"+((outlines[i][0].X/scale)+xmax).toFixed(3)+"y"+ ((outlines[i][0].Y/scale)+ymax).toFixed(3) + "\n"
 	   g+="g1z-"+ (0.2) + "f" + material.plunge + "\n"
 	   g+="g1f" + material.feed + "\n"
 			for(j=1;j<outlines[i].length;j++){
-				g+="g1x"+(outlines[i][j].X/scale.toFixed(3))+"y"+ (outlines[i][j].Y/scale).toFixed(3) + "\n"		
+				g+="g1x"+((outlines[i][j].X/scale)+xmax).toFixed(3)+"y"+ ((outlines[i][j].Y/scale)+ymax).toFixed(3) + "\n"		
 			}
 		g+="g0z2\n"
 	}
@@ -1640,20 +1645,21 @@ g+="g0z2\n"
 //path1[0]={X:0,Y:parseFloat(ymax+tool)}
 //path1.push(path1[0])
 
-g+="g0x"+(path1[0].X.toFixed(3))+"y"+ (path1[0].Y).toFixed(3) + "\n"
+g+="g0x"+(path1[0].X+xmax).toFixed(3)+"y"+ (path1[0].Y+ymax).toFixed(3) + "\n"
 
 while(pass<=pass_no){
    
    g+="g1z-"+ (pass_depth*pass) + "f" + material.plunge + "\n"
    g+="g1f" + material.feed + "\n"
    for(i=1;i<path1.length;i++){
-      g+="g1x"+(path1[i].X).toFixed(3) +"y"+ (path1[i].Y).toFixed(3) + "\n"
+      g+="g1x"+(path1[i].X+xmax).toFixed(3) +"y"+ (path1[i].Y+ymax).toFixed(3) + "\n"
    }
    pass++
 }
 
 g+="g0z5\n"
 g+="m5\n"
+g+="g0x0y0z10\n"
 g+="m30\n"
 
 fabmo.submitJob({
@@ -1769,6 +1775,7 @@ while(pass<=pass_no){
 
 g+="MZ,5\n"
 g+="SO,1,0\n"
+g+="J3,0,0,10\n"
 
 fabmo.submitJob({
    file : g,
