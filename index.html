@@ -94,15 +94,22 @@ units{
 
 #input_undo{
 	right: 30px;
-	top: 50px;
+	top: 6px;
 	width:100px;
-	height:38px;
+	height:37px;
 }
 
 #type{
 	position: absolute;
 	right: 30px;
-	top:   5px;
+	top:   50px;
+	width: 100px;
+}
+
+#part{
+	position: absolute;
+	right: 30px;
+	top:   93px;
 	width: 100px;
 }
 
@@ -112,9 +119,15 @@ units{
 
 <body onload="makeFrame(radius); parts();">
 
-<select id="type" autocomplete="on">
+<select id="type" autocomplete="off">
   <option value="smd">SMD</option>
   <option value="dip">DIP</option>
+</select>
+
+<select id="part" autocomplete="off">
+  <option value="def" selected disabled>Part</option>
+  <option value="res">RESISTOR</option>
+  <option value="led">LED</option>
 </select>
 
 <select id="action" autocomplete="off">
@@ -147,8 +160,8 @@ units{
 
 //TODO
 //
-//connect grid
-//cleanup canvas
+//add parts
+//zoom/pan
 //save configuration
 //
 
@@ -265,8 +278,6 @@ if(radius>0){
 ctx.fillStyle="#8c8cff"
 ctx.strokeStyle="#000"
 ctx.lineWidth="1"
-
-console.log(arduino)
 
 for(i=0;i<arduino.length;i++){
 	ctx.beginPath()
@@ -492,8 +503,6 @@ ctx.lineWidth="1"
 ctx.fillStyle="#fff"
 ctx.strokeStyle="#333"
 
-console.log(net)
-
 for(i=0;i<net.length;i++){
 	for(j=0;j<net[i].length;j++){
 
@@ -596,6 +605,7 @@ ctx.fillText("5V",(-56*sf),(2.54*6*sf)-(1.5*sf));
 ctx.fillText("3.3V",(-57.3*sf),(2.54*5*sf)-(1.5*sf));
 ctx.fillText("RST",(-57.2*sf),(2.54*4*sf)-(1.5*sf));
 ctx.fillText("IOREF",(-58.5*sf),(2.54*3*sf)-(1.5*sf));
+ctx.fillStyle="#bbb"
 ctx.fillText("NC",(-56.5*sf),(2.54*2*sf)-(1.5*sf));
 }
 
@@ -638,7 +648,7 @@ $("#myCanvas").bind('click', function(e) {
 								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
 							}
 						}
-						else if(document.getElementById("type").value=="smd"){
+						else if((document.getElementById("type").value=="smd")&& ((Math.abs(pts[i].Y))<21)){
 							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y-r})
 							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y+r})
 							trace[trace.length-1].push({X:pts[i].X+r,Y:pts[i].Y+r})
@@ -690,7 +700,10 @@ $("#myCanvas").bind('click', function(e) {
 								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
 							}
 						}
-						else if(document.getElementById("type").value=="smd"){
+						else if((document.getElementById("type").value=="smd")&& ((Math.abs(pts[i].Y))<21)){
+
+							console.log((Math.abs(pts[i].Y)))
+
 							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y-r})
 							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y+r})
 							trace[trace.length-1].push({X:pts[i].X+r,Y:pts[i].Y+r})
@@ -771,7 +784,7 @@ $("#myCanvas").bind('click', function(e) {
 
 function undo(){
 
-console.log(net)
+//console.log(net)
 
 if(net.length>0)
 {
@@ -799,11 +812,17 @@ if(seg==1){
 	trace.pop()
 	seg--
 }
+else if(net[0].length==0){
+	seg = 0
+}
 else{
 	trace.pop()
 	trace.pop()
 	seg=1
 }
+
+	console.log(net)
+	console.log(seg)
 
 add_trace()
 
@@ -1266,15 +1285,31 @@ for(i=0;i<frame1.length;i++){
 }
 
 
-//offset
+
 
 var co = new ClipperLib.ClipperOffset(scale*0.4, 0.25)
 //co.ArcTolerance = 1.23
 //co.MiterLimit = 1.6
 co.AddPaths(solution_paths, ClipperLib.JoinType.jtMiter, ClipperLib.EndType.etClosedPolygon, 0.25)
-offset = new ClipperLib.Paths()
-co.Execute(offset, -scale*0.4)
 
+//offset
+
+var no = []
+
+i=1
+while(i<2){
+	offset = new ClipperLib.Paths()
+	co.Execute(offset, (-scale*0.4)*i)
+	i++
+	for(j=0;j<offset.length;j++){
+		no.push(offset[j])
+	}
+
+}
+
+	offset=no
+
+//close
 for(i=0;i<offset.length;i++){
 		offset[i].push(offset[i][0])
 }
@@ -1497,41 +1532,26 @@ $(window).resize(function(){
 
 function make(){
 
+document.getElementById('part').value = "def"
+
 var material = {feed:250,plunge:200}
 var pass_depth = 0.425
 
-var filetype = "sbp"
-
-/*
-g="(coming soon!)\n"
-
-fabmo.submitJob({
-   file : g,
-   filename : 'mill.g',
-   name : "MILL TRACES 1/64",
-   description : (xmax*2) + " x " + (ymax*2) + " x " + "mm" 
-});
-*/
+var filetype = "gcode"
 
 g=""
 
 	pins.reverse()
 
-
-//flip (smd)
-
 flip()
-//
 
 
 if(filetype=="gcode"){
-/////////////////////////////gcode
+
 g+="g21\n"
 g+="g0z5\n"
 g+="m4\n"
 g+="g4p2\n" 
-
-
 
 //drill connect holes
 /*
@@ -1617,9 +1637,8 @@ pass = 1
 
 g+="g0z2\n"
 
-path1.reverse()
-path1[0]={X:0,Y:parseFloat(ymax+tool)}
-path1.push(path1[0])
+//path1[0]={X:0,Y:parseFloat(ymax+tool)}
+//path1.push(path1[0])
 
 g+="g0x"+(path1[0].X.toFixed(3))+"y"+ (path1[0].Y).toFixed(3) + "\n"
 
@@ -1637,6 +1656,12 @@ g+="g0z5\n"
 g+="m5\n"
 g+="m30\n"
 
+fabmo.submitJob({
+   file : g,
+   filename : 'shield.g',
+   name : "Arduino Shield",
+   description : (xmax*2) + " x " + (ymax*2) + " x " + "mm " + "(1/32\" endmill)" 
+});
 
 ////////////////////
 }
@@ -1728,9 +1753,8 @@ g+="PAUSE 3\n"
 pass_no = 4
 pass = 1
 
-path1.reverse()
-path1[0]={X:0,Y:parseFloat(ymax+tool)}
-path1.push(path1[0])
+//path1[0]={X:0,Y:parseFloat(ymax+tool)}
+//path1.push(path1[0])
 
 g+="J2,"+(path1[0].X.toFixed(3))+","+ (path1[0].Y).toFixed(3) + "\n"
 
@@ -1746,18 +1770,19 @@ while(pass<=pass_no){
 g+="MZ,5\n"
 g+="SO,1,0\n"
 
-
-////////////////////
-}
-
-//console.log(g)
-
 fabmo.submitJob({
    file : g,
    filename : 'shield.sbp',
    name : "Arduino Shield",
    description : (xmax*2) + " x " + (ymax*2) + " x " + "mm " + "(1/32\" endmill)" 
 });
+
+////////////////////
+}
+
+//console.log(g)
+
+
 
 	g=""
 
@@ -1813,6 +1838,16 @@ function flip(){
 			}
 		}
 	}
+
+   for(i=0;i<path1.length;i++){	
+		if(path1[i].Y<0){
+			path1[i]={X:path1[i].X,Y:(Math.abs(path1[i].Y))}
+		}
+		else{
+			path1[i]={X:path1[i].X,Y:(0-(path1[i].Y))}	
+		}
+	}
+
 
 }
 
