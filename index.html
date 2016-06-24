@@ -122,7 +122,7 @@ units{
 <select id="type" autocomplete="on">
   <option value="smd">SMD</option>
   <option value="dip">DIP</option>
-  <option value="route">route</option>
+  <option value="route">ROUTE</option>
 </select>
 
 <select id="part" autocomplete="off">
@@ -161,13 +161,13 @@ units{
 
 //TODO
 //
-//remove duplicate drill holes
-//fix multi same node (seg) click
+//fix undo
 //
-//
-//add parts
+//add parts/rotation
 //zoom/pan
-//save configuration
+//load default circuits
+//save
+//schematic view
 //
 
 var g = ""
@@ -594,12 +594,12 @@ ctx.fillText("  2",0,(2.54*13*sf)+(0.8*sf));
 ctx.fillText("  1 TX",0,(2.54*14*sf)+(0.8*sf));
 ctx.fillText("  0 RX",0,(2.54*15*sf)+(0.8*sf));
 
-ctx.fillText("A5",(-56*sf),(2.54*15*sf)+(0.8*sf));
-ctx.fillText("A4",(-56*sf),(2.54*14*sf)+(0.8*sf));
-ctx.fillText("A3",(-56*sf),(2.54*13*sf)+(0.8*sf));
-ctx.fillText("A2",(-56*sf),(2.54*12*sf)+(0.8*sf));
-ctx.fillText("A1",(-56*sf),(2.54*11*sf)+(0.8*sf));
-ctx.fillText("A0",(-56*sf),(2.54*10*sf)+(0.8*sf));
+ctx.fillText("A5",(-56*sf),(2.54*15*sf)+(0.9*sf));
+ctx.fillText("A4",(-56*sf),(2.54*14*sf)+(0.9*sf));
+ctx.fillText("A3",(-56*sf),(2.54*13*sf)+(0.9*sf));
+ctx.fillText("A2",(-56*sf),(2.54*12*sf)+(0.9*sf));
+ctx.fillText("A1",(-56*sf),(2.54*11*sf)+(0.9*sf));
+ctx.fillText("A0",(-56*sf),(2.54*10*sf)+(0.9*sf));
 
 ctx.fillText("VIN",(-56.5*sf),(2.54*9*sf)-(1.6*sf));
 ctx.fillText("GND",(-57.3*sf),(2.54*8*sf)-(1.6*sf));
@@ -996,10 +996,19 @@ function parts(){
 	x = 11.7+1.27
 	//arduino.push([{X:(x+o),Y:25.135},{X:(x+o),Y:22.86},{X:(x+o)-20.3,Y:22.86},{X:(x+o)-20.3,Y:25.135},{X:(x+o),Y:25.135}])
 
+	x = -19.69
+	//SB logo
 
-	//top pins
+	/*
+
+	pin_outlines.push([{X:(x+o),Y:20.32+0.4},{X:(x+o)+(2.54*4),Y:20.32+0.4},{X:(x+o)+(2.54*4),Y:25.4-0.4},{X:(x+o),Y:25.4-0.4},{X:(x+o),Y:25.4-0.4}])
+
+	pins.push([{X:(x+o+2.54)+0.2,Y:20.32+1.27},{X:(x+o+1.27-0.2),Y:20.32+1.27},{X:(x+o+1.27)-0.2,Y:25.4-2.54},{X:(x+o+2.54),Y:20.32+2.54},{X:(x+o+2.54),Y:20.32+2.54+1.27},{X:(x+o+1.27-0.4),Y:20.32+2.54+1.27}])
+
+	*/
+
 	x = -17.8
-
+	//top pins
 	pin_outlines.push([{X:(x+o-0.635+0.2),Y:-20.32-0.4},{X:(x+o-0.635+0.2),Y:-21.86},{X:(x+o)+0.2,Y:-22.86},{X:(x+o)+0.2,Y:-25.4+0.4},{X:(x+o+2.54)+(2.54*9)-0.2,Y:-25.4+0.4},{X:(x+o+2.54)+(2.54*9)-0.2,Y:-22.86},{X:(x+o+3.175)+(2.54*9)-0.4-1.27,Y:-21.86},{X:(x+o+3.175)+(2.54*9)-0.4-1.27,Y:-20.32-0.4},{X:(x+o-0.635+0.3),Y:-20.32-0.4}])
 
 	//pins.push([{X:(x+o+0.635),Y:-20.32},{X:(x+o+0.635),Y:-22.86},{X:(x+o),Y:-22.86},{X:(x+o),Y:-25.4},{X:(x+o+2.54)+(2.54*9),Y:-25.4},{X:(x+o+2.54)+(2.54*9),Y:-22.86},{X:(x+o+3.175)+(2.54*9),Y:-22.86},{X:(x+o+3.175)+(2.54*9),Y:-20.32}])
@@ -1561,8 +1570,24 @@ g=""
 pins.reverse()
 
 
-//remove duplicate drill holes
+//remove duplicate drill ops
 
+for(i=0;i<net.length;i++){
+	for(j=0;j<net[i].length;j++){
+		//console.log(net[i][j])
+		if(net[i][j].D==true){
+			for(k=0;k<net.length;k++){
+				for(l=0;l<net[k].length;l++){
+					if( (net[i][j].X.toFixed(2)==net[k][l].X.toFixed(2)) && (net[i][j].Y.toFixed(2)==net[k][l].Y.toFixed(2)) && (net[k][l].D==true) ){
+						if((i!=k)||(l!=j)){
+							net[k][l].D==false
+						}
+					}
+				}
+			}
+		}
+	}
+}
 
 flip()
 
@@ -1678,12 +1703,14 @@ g+="m5\n"
 g+="g0x0y0z10\n"
 g+="m30\n"
 
+
 fabmo.submitJob({
    file : g,
    filename : 'shield.g',
    name : "Arduino Shield",
    description : (xmax*2) + " x " + (ymax*2) + " x " + "mm " + "(1/32\" endmill)" 
 });
+
 
 ////////////////////
 }
@@ -1800,7 +1827,6 @@ function flip(){
    for(i=0;i<outlines.length;i++){
 		for(j=0;j<outlines[i].length;j++){
 			if((outlines[i][j].Y)<0){
-				console.log(j)
 				outlines[i][j]={X:outlines[i][j].X,Y:(Math.abs(outlines[i][j].Y))}
 			}
 			else{
