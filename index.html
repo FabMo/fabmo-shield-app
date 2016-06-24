@@ -629,6 +629,7 @@ $("#myCanvas").bind('click', function(e) {
 		var r = 0.85
 		var v = 100
 		var drill = false
+		var skip = false
 		if(document.getElementById("type").value=="dip"){
 			drill=true
 		}
@@ -667,7 +668,15 @@ $("#myCanvas").bind('click', function(e) {
 						}	
 				}
 				else if((pts[i].X==net[net.length-1][net[net.length-1].length-1].X) && (pts[i].Y==net[net.length-1][net[net.length-1].length-1].Y)){
-				seg=0
+				skip=true
+						trace.push([])
+						if(seg==1){
+							net.push([])
+							seg = 0
+						}
+						else{
+							seg++	
+						}
 				}
 				else if((document.getElementById('action').value=='route')&&((net[net.length-1].length)>0)){
 
@@ -733,15 +742,15 @@ $("#myCanvas").bind('click', function(e) {
 
 					}
 					}
-
-					if(seg==1){
-						net.push([])	
-						seg = 0
+					if(skip==false){
+						if(seg==1){
+							net.push([])	
+							seg = 0
+						}
+						else{
+							seg++
+						}
 					}
-					else{
-						seg++
-					}
-
 				}
 				else if((document.getElementById('action').value=='resistor')&&(pin==1)){
 
@@ -774,15 +783,8 @@ $("#myCanvas").bind('click', function(e) {
 	else if(document.getElementById('action').value=='end'){
 		//net.push([])
 	}
-	//route()
-
-	
-	//console.log(trace)
 
 	add_trace()
-
-	//draw()
-	
 
 });
 
@@ -842,7 +844,6 @@ else{
 add_trace()
 
 }
-
 
 $("#myCanvas").bind('mousemove', function(e) {
 
