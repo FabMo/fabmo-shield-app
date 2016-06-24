@@ -161,8 +161,6 @@ units{
 
 //TODO
 //
-//fix undo
-//
 //add parts/rotation
 //zoom/pan
 //load default circuits
@@ -663,13 +661,13 @@ $("#myCanvas").bind('click', function(e) {
 							trace[trace.length-1].push({X:pts[i].X+r,Y:pts[i].Y+r})
 							trace[trace.length-1].push({X:pts[i].X+r,Y:pts[i].Y-r})
 							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y-r})
-						}	
+						}
+						else if((pts[i].X==pts[i-1].X) && (pts[i].Y==pts[i-1].Y)){
 
+						}	
 				}
 				else if((pts[i].X==net[net.length-1][net[net.length-1].length-1].X) && (pts[i].Y==net[net.length-1][net[net.length-1].length-1].Y)){
-				//net[net.length-1].pop
-				//skip
-
+				seg=0
 				}
 				else if((document.getElementById('action').value=='route')&&((net[net.length-1].length)>0)){
 
@@ -704,12 +702,7 @@ $("#myCanvas").bind('click', function(e) {
 					trace.push([{X:Cx,Y:Cy},{X:Dx,Y:Dy},{X:Ex,Y:Ey},{X:Fx,Y:Fy},{X:Cx,Y:Cy}])
 
 					trace.push([])
-						if(document.getElementById("type").value=="dip"){
-							for(j=0;j<=v;j++){
-								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
-							}
-						}
-						else if(document.getElementById("type").value=="route"){
+						if((document.getElementById("type").value=="dip")||(document.getElementById("type").value=="route")){
 							for(j=0;j<=v;j++){
 								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
 							}
@@ -733,7 +726,7 @@ $("#myCanvas").bind('click', function(e) {
 						//net[net.length-1].push({X:(pts[i].X),Y:(net[net.length-1][net[net.length-1].length-1].Y)})
 						//net[net.length-1].push({X:(net[net.length-1][net[net.length-1].length-1].X),Y:(pts[i].Y)})
 
-					}
+					}	
 					else{
 						//net[net.length-1].push({X:(net[net.length-1][net[net.length-1].length-1].X),Y:(pts[i].Y)})
 						//net[net.length-1].push({X:(pts[i].X),Y:(net[net.length-1][net[net.length-1].length-1].Y)})
@@ -766,9 +759,7 @@ $("#myCanvas").bind('click', function(e) {
 				else if((document.getElementById('action').value=='resistor')&&(pin==2)){
 
 				}
-			
 		}
-
 	}
 
 	else if(document.getElementById('action').value=='undo'){
@@ -798,51 +789,55 @@ $("#myCanvas").bind('click', function(e) {
 
 function undo(){
 
-console.log(net)
 
-for(i=0;i<net.length;i++){
-
-	//console.log(net[net.length-1][i])
+if(seg==0){
+	seg=1
+	trace.pop()
+}
+else{
+	trace.pop()
+	seg=0
 }
 
+if(net[net.length-1].length==0){
+	trace.pop()		
+}
+
+if(net.length==1){
+	seg=0
+}
+
+console.log(seg)
 
 if(net.length>0)
 {
+
 	if(net[net.length-1].length==0){
 		net.pop()
 		if(net.length==0){
 			net = [[]]
 		}
 	}
-	if(net[net.length-1].length==2){
+	if(net[net.length-1].length>1){
 		net[net.length-1].pop()
+		if(net[net.length-1].length==0){
+		net.pop()
+		}
+		//trace.pop()
 		if(net.length==0){
 			net = [[]]
 		}
 	}
 	else{
 		net[net.length-1].pop()
+		if(net.length==0){
+			net = [[]]
+		}
 	}
 }
 else{
 	net = [[]]
 }
-
-if(seg==1){
-	trace.pop()
-	seg--
-}
-else if(net[0].length==0){
-	seg = 0
-}
-else{
-	trace.pop()
-	trace.pop()
-	seg=1
-}
-
-	//console.log(net)
-	//console.log(seg)
 
 add_trace()
 
