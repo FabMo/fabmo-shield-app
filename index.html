@@ -154,6 +154,7 @@ units{
 
 //TODO
 //
+//ctrl+z
 //add parts/rotation
 //zoom/pan
 //default circuits
@@ -652,9 +653,9 @@ $("#myCanvas").bind('click', function(e) {
 					}
 				}
 		}
-	console.log(net)
-	console.log(trace)
-	console.log(seg)
+	//console.log(net)
+	//console.log(trace)
+	//console.log(seg)
 	add_trace()
 
 });
@@ -705,6 +706,17 @@ else{
 add_trace()
 
 }
+
+
+
+$(document).keydown(function(e){
+  if( e.which === 90 && e.ctrlKey ){
+     undo() 
+  }          
+});
+
+
+
 
 $("#myCanvas").bind('mousemove', function(e) {
 
