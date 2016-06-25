@@ -120,7 +120,7 @@ units{
 
 <body onload="makeFrame(radius); parts();">
 
-<select id="type" autocomplete="one">
+<select id="type" autocomplete="on">
   <option value="smd">SMD</option>
   <option value="dip">DIP</option>
   <option value="route">ROUTE</option>
@@ -373,7 +373,7 @@ ctx.strokeStyle="#ccccff"
 
 ctx.lineWidth="1"
 ctx.strokeStyle="#ffff00"
-ctx.fillStyle="#fff"
+ctx.fillStyle="#ffff00"
 
 for(i=0;i<connect.length;i++){
 	ctx.beginPath()
@@ -397,7 +397,7 @@ for(i=0;i<arduino_pins.length;i++){
 		ctx.lineTo((ctx.canvas.width/2)+(arduino_pins[i][j].X*sf),(ctx.canvas.height/2)+(arduino_pins[i][j].Y*sf))
 	}
 	ctx.fill()
-	ctx.stroke()
+	//ctx.stroke()
 
 }
 
@@ -425,24 +425,43 @@ ctx.strokeStyle="#0000aa"
 	}
 
 ctx.stroke()
-
 	
-	ctx.strokeStyle="#666"
-ctx.fillStyle="#eee"
+ctx.fillStyle="#999"
+ctx.strokeStyle="#999"
+
 ctx.beginPath()
+	
+	if(document.getElementById("type").value=="dip"){
+	ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.85*sf,0,(Math.PI*2) )
+	ctx.fill()
+	}
+	else if(document.getElementById("type").value=="smd"){
+	ctx.moveTo((ctx.canvas.width/2)+((mouseX-0.85)*sf),(ctx.canvas.height/2)+((mouseY-0.85)*sf))
+	ctx.lineTo((ctx.canvas.width/2)+((mouseX-0.85)*sf),(ctx.canvas.height/2)+((mouseY+0.85)*sf))
+	ctx.lineTo((ctx.canvas.width/2)+((mouseX+0.85)*sf),(ctx.canvas.height/2)+((mouseY+0.85)*sf))
+	ctx.lineTo((ctx.canvas.width/2)+((mouseX+0.85)*sf),(ctx.canvas.height/2)+((mouseY-0.85)*sf))
+	ctx.lineTo((ctx.canvas.width/2)+((mouseX-0.85)*sf),(ctx.canvas.height/2)+((mouseY-0.85)*sf))
+	ctx.fill()
+	}
+
+
+ctx.lineWidth="2"
+ctx.beginPath()
+	
 	if((seg==1)&&(line==true)){
 		ctx.lineWidth=0.6*sf
 		ctx.moveTo((ctx.canvas.width/2)+(endX*sf),(ctx.canvas.height/2)+(endY*sf))
 		ctx.lineTo((ctx.canvas.width/2)+(mouseX*sf),(ctx.canvas.height/2)+(mouseY*sf))
 		ctx.moveTo((ctx.canvas.width/2)+(mouseX*sf),(ctx.canvas.height/2)+(mouseY*sf))
+		ctx.fillStyle="#ff0000"
+	}
+	else{
+		ctx.fillStyle="#00ff00"
 	}
 	ctx.stroke()
-	ctx.lineWidth="1"	
-	ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.5*sf,0,(Math.PI*2) )
+	ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.25*sf,0,(Math.PI*2) )
 	ctx.stroke()
-	ctx.fill()	
-
-
+	ctx.fill()
 
 ctx.lineWidth="1"
 ctx.fillStyle="#fff"
@@ -691,7 +710,7 @@ if(net.length==1){
 	seg=0
 }
 
-console.log(seg)
+//console.log(seg)
 
 if(net.length>0)
 {
@@ -723,6 +742,25 @@ else{
 	net = [[]]
 }
 
+console.log(net)
+
+if((net[net.length-1].length==0)&&(net.length>1)){
+endX=(net[net.length-2][net[net.length-2].length-1].X)
+endY=(net[net.length-2][net[net.length-2].length-1].Y)
+}
+else if((net.length==1)&&(net[net.length-1].length==0)){
+
+}
+else if((net.length<1)){
+
+}
+else{
+endX=(net[net.length-1][net[net.length-1].length-1].X)
+endY=(net[net.length-1][net[net.length-1].length-1].Y)
+}
+//console.log(net[net.length-1][net[net.length-1].length-1].X)
+
+
 add_trace()
 
 }
@@ -732,7 +770,7 @@ $("#myCanvas").bind('mousemove', function(e) {
 mouseX=((e.clientX-(10)-(ctx.canvas.width/2))/sf)
 mouseY=((e.clientY-(10)-(ctx.canvas.height/2))/sf)
 
-console.log( (Math.abs(mouseX)) )
+//console.log( (Math.abs(mouseX)) )
 
 if( ((Math.abs(mouseX))<26)&&((Math.abs(mouseY))<22) ){
 	line = true
@@ -751,8 +789,8 @@ mouseY=-10000
 
 
 }
-//draw()
-setTimeout("draw()", 100);
+draw()
+//setTimeout("draw()", 100);
 
 
 });
@@ -1087,7 +1125,7 @@ for(i=24;i<31;i++){
 		vias.push([])
 			nodes.push({X:(x+o),Y:(-24)})
 			for(j=0;j<=25;j++){
-				arduino_pins[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.5),Y:((-24)+Math.cos((Math.PI*2)/25*j)*0.5)})
+				arduino_pins[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.4),Y:((-24)+Math.cos((Math.PI*2)/25*j)*0.4)})
 				vias[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.2),Y:((-24)+Math.cos((Math.PI*2)/25*j)*0.2)})
 			}
 		x = x -2.54
@@ -1100,7 +1138,7 @@ for(i=24;i<31;i++){
 		//nodes.push({X:(x+o+0.635),Y:(-21.73)})
 		nodes.push({X:(x+o),Y:(-24)})
 			for(j=0;j<=25;j++){
-				arduino_pins[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.5),Y:((-24)+Math.cos((Math.PI*2)/25*j)*0.5)})
+				arduino_pins[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.4),Y:((-24)+Math.cos((Math.PI*2)/25*j)*0.4)})
 				vias[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.2),Y:((-24)+Math.cos((Math.PI*2)/25*j)*0.2)})
 			}
 		x = x -2.54
@@ -1113,7 +1151,7 @@ for(i=24;i<31;i++){
 		//nodes.push({X:(x+o),Y:(21.73)})
 			nodes.push({X:(x+o),Y:(24)})
 			for(j=0;j<=25;j++){
-				arduino_pins[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.5),Y:((24)+Math.cos((Math.PI*2)/25*j)*0.5)})
+				arduino_pins[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.4),Y:((24)+Math.cos((Math.PI*2)/25*j)*0.4)})
 				vias[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.2),Y:((24)+Math.cos((Math.PI*2)/25*j)*0.2)})
 			}
 		x = x -2.54
@@ -1126,7 +1164,7 @@ for(i=24;i<31;i++){
 		//nodes.push({X:(x+o-0.79375),Y:(21.73)})
 			nodes.push({X:(x+o),Y:(24)})
 			for(j=0;j<=25;j++){
-				arduino_pins[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.5),Y:((24)+Math.cos((Math.PI*2)/25*j)*0.5)})
+				arduino_pins[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.4),Y:((24)+Math.cos((Math.PI*2)/25*j)*0.4)})
 				vias[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.2),Y:((24)+Math.cos((Math.PI*2)/25*j)*0.2)})
 			}
 		x = x -2.54
