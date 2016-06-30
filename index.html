@@ -136,7 +136,7 @@ depth{
 	left: 12px;
 	top: 62px;
 	width: 180px;
-	height: 320px;
+	height: 350px;
 	background: rgba(76, 175, 80, 0.5);
 	padding: 20px;
 	border-radius: 25px;
@@ -188,11 +188,17 @@ depth{
 <div id="help-div">
 <center><b>setup</b></center>
 <p class="alignleft">
-	origin
+	
+	width
+	<br>height
+	<br>origin
 	<br>grid spacing
 	<br>tool diameter
 <p class="alignright">
-	lower-left
+	
+	<bw id="board_width"> </bw>
+	<br><bh id="board_height"> </bh>
+	<br>lower-left
 	<br>0.1"
 	<br>1/32"
 </p>
@@ -215,10 +221,10 @@ undo trace
 	<br>&#8595;
 	<br>&#8592;
 	<br>&#8594;
-	<br>ctrl + &#8593;
 	<br>ctrl + &#8595;
-	<br>ctrl + &#8592;
+	<br>ctrl + &#8593;
 	<br>ctrl + &#8594;
+	<br>ctrl + &#8592;
 	<br>c
 </p>
 <div style="clear: both;"></div>
@@ -236,7 +242,7 @@ undo trace
 
 //TODO
 //
-//clear all button
+//append setup with board width/height
 //display board dim
 //
 //add parts/rotation
@@ -303,6 +309,9 @@ var yoffsetTop = 0
 var yoffsetBot = 0
 
 function draw(){
+
+document.getElementById('board_width').innerHTML = (((xmax + Math.abs(xmin))/25.4).toFixed(2) + "\"")
+document.getElementById('board_height').innerHTML = (((ymax + Math.abs(ymin))/25.4).toFixed(2) + "\"")
 
 c = document.getElementById("myCanvas")
 ctx = c.getContext("2d")
@@ -798,25 +807,25 @@ $(document).keydown(function(e){
 	if(e.which === 90 && e.ctrlKey){
 		undo() 
 	}
-	else if(e.which === 37 && e.ctrlKey){
+	else if(e.which === 39 && e.ctrlKey){
 		if((document.getElementById("x-left").value)>0){
 			(document.getElementById("x-left").value)--
 			$(document.getElementById("x-left")).trigger("change");
 		} 
 	}
-	else if(e.which === 38 && e.ctrlKey){
+	else if(e.which === 40 && e.ctrlKey){
 		if((document.getElementById("y-top").value)>0){
 			(document.getElementById("y-top").value)--
 			$(document.getElementById("y-top")).trigger("change");
 		} 
 	}
-	else if(e.which === 39 && e.ctrlKey){
+	else if(e.which === 37 && e.ctrlKey){
 		if((document.getElementById("x-right").value)>0){
 			(document.getElementById("x-right").value)--
 			$(document.getElementById("x-right")).trigger("change");
 		} 
 	}
-	else if(e.which === 40 && e.ctrlKey){
+	else if(e.which === 38 && e.ctrlKey){
 		if((document.getElementById("y-bot").value)>0){
 			(document.getElementById("y-bot").value)--
 			$(document.getElementById("y-bot")).trigger("change");
