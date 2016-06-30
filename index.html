@@ -133,10 +133,10 @@ depth{
 #help-div{
 	display:none;
 	position: absolute;
-	left: 10px;
-	top: 50px;
+	left: 12px;
+	top: 62px;
 	width: 180px;
-	height: 300px;
+	height: 320px;
 	background: rgba(76, 175, 80, 0.5);
 	padding: 20px;
 	border-radius: 25px;
@@ -207,6 +207,7 @@ undo trace
 	<br>remove Y-
 	<br>remove X-
 	<br>remove X+
+	<br>clear all
 </p>
 <p class="alignright">
 	ctrl + z
@@ -218,6 +219,7 @@ undo trace
 	<br>ctrl + &#8595;
 	<br>ctrl + &#8592;
 	<br>ctrl + &#8594;
+	<br>c
 </p>
 <div style="clear: both;"></div>
 </div>
@@ -835,6 +837,24 @@ $(document).keydown(function(e){
 	else if(e.which === 40){
 		(document.getElementById("y-bot").value)++
 		$(document.getElementById("y-bot")).trigger("change"); 
+	}
+	else if(e.which === 67){
+		//clear all
+		document.getElementById("y-top").value=0
+		document.getElementById("y-bot").value=0
+		document.getElementById("x-left").value=0
+		document.getElementById("x-right").value=0
+		xmax=27.1
+		xmin=-27.1
+		ymax=26.5
+		ymin=-26.5
+		trace = []
+		net = [[]]
+		line = false
+		seg = 0
+		makeFrame(radius)
+		makeGrid()
+		add_trace()
 	}
           
 });
