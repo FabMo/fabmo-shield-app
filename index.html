@@ -6,7 +6,6 @@
 <head>
 <title>SHIELD</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"/>
-
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/libs/fabmo.js"></script>
     <script type="text/javascript">
@@ -136,7 +135,7 @@ depth{
 	left: 12px;
 	top: 62px;
 	width: 180px;
-	height: 350px;
+	height: 377px;
 	background: rgba(76, 175, 80, 0.5);
 	padding: 20px;
 	border-radius: 25px;
@@ -204,7 +203,9 @@ depth{
 </p>
 <center><b>keyboard shortcuts</b></center>
 <p class="alignleft">
-undo trace
+	clear all
+	<br>help
+	<br>undo trace
 	<br>extend Y+
 	<br>extend Y- 
 	<br>extend X-
@@ -213,10 +214,11 @@ undo trace
 	<br>remove Y-
 	<br>remove X-
 	<br>remove X+
-	<br>clear all
 </p>
 <p class="alignright">
-	ctrl + z
+	c
+	<br>h
+	<br>ctrl + z
 	<br>&#8593;
 	<br>&#8595;
 	<br>&#8592;
@@ -225,7 +227,6 @@ undo trace
 	<br>ctrl + &#8593;
 	<br>ctrl + &#8594;
 	<br>ctrl + &#8592;
-	<br>c
 </p>
 <div style="clear: both;"></div>
 </div>
@@ -863,6 +864,9 @@ $(document).keydown(function(e){
 		makeFrame(radius)
 		makeGrid()
 		add_trace()
+	}
+	else if(e.which === 72){
+		help()
 	}
           
 });
