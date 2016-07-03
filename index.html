@@ -1325,7 +1325,7 @@ document.getElementById('part').value = "def"
 var material = {feed:250,plunge:200}
 var pass_depth = 0.425
 
-var filetype = "gcode"
+var filetype = "sbp"
 
 g=""
 
@@ -1445,37 +1445,39 @@ fabmo.submitJob({
 
 }
 
-if(filetype=="sbp"){
+else if(filetype=="sbp"){
 
-g+="VD,3,1\n"
-g+="MS," + (material.feed/60).toFixed(1) + "," + (material.plunge/60).toFixed(1) + "\n"
-g+="JZ,5\n"
+pass_depth = 0.017
+
+
+g+="MS," + (material.feed/25.4/60).toFixed(1) + "," + (material.plunge/25.4/60).toFixed(1) + "\n"
+g+="JZ,0.2\n"
 g+="SO,1,1\n"
-g+="PAUSE 3\n"   
+g+="PAUSE 1\n"   
 
    for(i=0;i<vias.length;i++){
 
 		pass_no = 4
 		pass = 1
-		g+="J2,"+(vias[i][0].X.toFixed(3))+","+ (vias[i][0].Y).toFixed(3) + "\n"
+		g+="J2,"+((vias[i][0].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((vias[i][0].Y+ymax)/25.4).toFixed(4) + "\n"
 
 		while(pass<=pass_no){
-	   g+="MZ,-"+ (pass_depth*pass) + "\n"
+	   g+="MZ,-"+ (pass_depth*pass).toFixed(4) + "\n"
 			for(j=0;j<vias[i].length;j++){
-   	   	g+="M2,"+(vias[i][j].X).toFixed(3) +","+ (vias[i][j].Y).toFixed(3) + "\n"
+   	   	g+="M2,"+((vias[i][j].X+Math.abs(xmin))/25.4).toFixed(4) +","+ ((vias[i][j].Y+ymax)/25.4).toFixed(4) + "\n"
 			}
 		pass++
    	}
-		g+="MZ,2\n"
+		g+="JZ,0.1\n"
 	}
 
    for(i=0;i<pins.length;i++){
-		g+="J2,"+(pins[i][0].X.toFixed(3))+","+ (pins[i][0].Y).toFixed(3) + "\n"
-	   g+="MZ,-"+ (0.2) + "\n"
+		g+="J2,"+((pins[i][0].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((pins[i][0].Y+ymax)/25.4).toFixed(4) + "\n"
+	   g+="MZ,-"+ (0.007) + "\n"
 			for(j=1;j<pins[i].length;j++){
-				g+="M2,"+(pins[i][j].X.toFixed(3))+","+ (pins[i][j].Y).toFixed(3) + "\n"		
+				g+="M2,"+((pins[i][j].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((pins[i][j].Y+ymax)/25.4).toFixed(4) + "\n"		
 			}
-		g+="JZ,2\n"
+		g+="JZ,0.1\n"
 	}
 
    for(i=0;i<net.length;i++){
@@ -1484,13 +1486,13 @@ g+="PAUSE 3\n"
 		pass_no = 5
 		pass = 1
 		if(net[i][j].D==true){
-			g+="J2,"+(net[i][j].X.toFixed(3))+","+ (net[i][j].Y).toFixed(3) + "\n"
+			g+="J2,"+((net[i][j].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((net[i][j].Y+ymax)/25.4).toFixed(4) + "\n"
 				while(pass<=pass_no){
-	   			g+="MZ,-"+ (pass_depth*pass) + "\n"
-					g+="JZ,1\n"
+	   			g+="MZ,-"+ (pass_depth*pass).toFixed(4) + "\n"
+					g+="JZ,0.05\n"
 					pass++
 				}
-			g+="JZ,2\n"
+			g+="JZ,0.1\n"
 		}
 		}
 	}
@@ -1498,37 +1500,37 @@ g+="PAUSE 3\n"
 	outlines.reverse()
 
    for(i=0;i<outlines.length;i++){
-		g+="J2,"+(outlines[i][0].X/scale.toFixed(3))+","+ (outlines[i][0].Y/scale).toFixed(3) + "\n"
-	   g+="MZ,-"+ (0.2) + "\n"
+		g+="J2,"+((outlines[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+","+ (((outlines[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
+	   g+="MZ,-"+ (0.007) + "\n"
 			for(j=1;j<outlines[i].length;j++){
-				g+="M2,"+(outlines[i][j].X/scale.toFixed(3))+","+ (outlines[i][j].Y/scale).toFixed(3) + "\n"		
+				g+="M2,"+((outlines[i][j].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+","+ (((outlines[i][j].Y/scale)+ymax)/25.4).toFixed(4) + "\n"		
 			}
-		g+="JZ,2\n"
+		g+="JZ,0.1\n"
 	}
 
 pass_no = 4
 pass = 1
 
-g+="J2,"+(path1[0].X.toFixed(3))+","+ (path1[0].Y).toFixed(3) + "\n"
+g+="J2,"+((path1[0].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((path1[0].Y+ymax)/25.4).toFixed(4) + "\n"
 
 while(pass<=pass_no){
    
-   g+="MZ,-"+ (pass_depth*pass) + "\n"
+   g+="MZ,-"+ (pass_depth*pass).toFixed(4) + "\n"
    for(i=1;i<path1.length;i++){
-      g+="M2,"+(path1[i].X).toFixed(3) +","+ (path1[i].Y).toFixed(3) + "\n"
+      g+="M2,"+((path1[i].X+Math.abs(xmin))/25.4).toFixed(4) +","+ ((path1[i].Y+ymax)/25.4).toFixed(4) + "\n"
    }
    pass++
 }
 
-g+="MZ,5\n"
+g+="MZ,0.2\n"
 g+="SO,1,0\n"
-g+="J3," + "0" + "," + (ymax+Math.abs(ymin)) + ",10\n"
+g+="J3," + "0" + "," + ((ymax+Math.abs(ymin)+0.2)/25.4).toFixed(4) + ",0.4\n"
 
 fabmo.submitJob({
    file : g,
    filename : 'shield.sbp',
    name : "Arduino Shield",
-   description : (xmax*2) + " x " + (ymax*2) + " x " + "mm " + "(1/32\" endmill)" 
+	description : (((xmax+Math.abs(xmin))/25.4).toFixed(2)) + " x " + (((ymax+Math.abs(ymin))/25.4).toFixed(2)) + "\" " + "(1/32\" endmill)"  
 });
 
 }
@@ -1542,7 +1544,6 @@ fabmo.submitJob({
 function flip(){
 
    for(i=0;i<outlines.length;i++){
-		//outlines[i].reverse()
 		for(j=0;j<outlines[i].length;j++){
 			if((outlines[i][j].Y)<0){
 				outlines[i][j]={X:outlines[i][j].X,Y:(Math.abs(outlines[i][j].Y))}
