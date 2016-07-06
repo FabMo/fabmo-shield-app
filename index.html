@@ -229,14 +229,14 @@ depth{
 	<br>ctrl + z
 	<br>z
 	<br>mouse wheel
-	<br>&#8593;
-	<br>&#8595;
-	<br>&#8592;
-	<br>&#8594;
-	<br>ctrl + &#8595;
-	<br>ctrl + &#8593;
-	<br>ctrl + &#8594;
-	<br>ctrl + &#8592;
+	<br>up
+	<br>down
+	<br>left
+	<br>right
+	<br>ctrl + down
+	<br>ctrl + up
+	<br>ctrl + right
+	<br>ctrl + left
 </p>
 <div style="clear: both;"></div>
 </div>
@@ -315,9 +315,6 @@ var yo = 0
 
 var seg = 0
 
-var led = []
-var resistor = []
-
 var yoffsetTop = 0
 var yoffsetBot = 0
 
@@ -334,16 +331,47 @@ $("#myCanvas").on('mousewheel',function(e){
 	e.preventDefault()
 });
 
+$("#myCanvas").on("touchmove", function(e){
+
+	if (e.originalEvent.touches.length==1) {
+		//pan
+		if(click==0){
+			x=((e.originalEvent.touches[0].clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)-panX
+			y=((e.originalEvent.touches[0].clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)-panY
+			px=x
+			py=y
+			click=1
+		}
+		else{
+			x=((e.originalEvent.touches[0].clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)
+			y=((e.originalEvent.touches[0].clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)
+			panX=(x-px)
+			panY=(y-py)
+			draw()
+		}
+      
+	}
+	else if (e.originalEvent.touches.length==2) {
+		//zoom
+	}
+
+});
+
+$("#myCanvas").on("touchend", function(e){
+	click = 0
+
+});
+
 function draw(){
 
 if((pan==true)&&(click==0)){
-document.getElementById('myCanvas').style.cursor = 'grab'
+	document.getElementById('myCanvas').style.cursor = 'grab'
 }
 else if((pan==true)&&(click==1)){
-document.getElementById('myCanvas').style.cursor = 'move'
+	document.getElementById('myCanvas').style.cursor = 'move'
 }
 else{
-document.getElementById('myCanvas').style.cursor = 'crosshair'
+	document.getElementById('myCanvas').style.cursor = 'crosshair'
 }
 
 
@@ -359,8 +387,8 @@ ctx.canvas.width = $(window).innerWidth()-30
 sf = ((ctx.canvas.height-(110-(yoffsetTop/sf)-(yoffsetBot/sf)))/(ymax+(Math.abs(ymin)))+zoom)
 
 if(sf<2){
-sf = 2
-zoom = 2-(ctx.canvas.height-(110-(yoffsetTop/sf)-(yoffsetBot/sf)))/(ymax+(Math.abs(ymin)))
+	sf = 2
+	zoom = 2-(ctx.canvas.height-(110-(yoffsetTop/sf)-(yoffsetBot/sf)))/(ymax+(Math.abs(ymin)))
 }
 
 yo=((parseFloat(document.getElementById("y-top").value)*1.27*sf)-(parseFloat(document.getElementById("y-bot").value)*1.27*sf))
@@ -446,7 +474,7 @@ ctx.strokeStyle="#ccccff"
 	for(i=0;i<pins.length;i++){
 		ctx.beginPath()
 		for(j=0;j<pins[i].length;j++){
-		ctx.lineTo((pins[i][j].X*sf)+ctx.canvas.width/2,(pins[i][j].Y*sf)+ctx.canvas.height/2)
+			ctx.lineTo((pins[i][j].X*sf)+ctx.canvas.width/2,(pins[i][j].Y*sf)+ctx.canvas.height/2)
 		}
 		ctx.stroke()
 	}
@@ -457,7 +485,7 @@ ctx.fillStyle="#ffff00"
 
 for(i=0;i<connect.length;i++){
 	ctx.beginPath()
-		ctx.arc(ctx.canvas.width/2+((connect[i].X)*sf),ctx.canvas.height/2+((connect[i].Y)*sf),0.2*sf,0,(Math.PI*2))
+	ctx.arc(ctx.canvas.width/2+((connect[i].X)*sf),ctx.canvas.height/2+((connect[i].Y)*sf),0.2*sf,0,(Math.PI*2))
 	ctx.fill()
 	ctx.stroke()
 }
@@ -484,6 +512,45 @@ ctx.strokeStyle="#0000aa"
 
 ctx.stroke()
 	
+
+
+ctx.lineWidth="1"
+ctx.fillStyle="#fff"
+ctx.strokeStyle="#333"
+
+for(i=0;i<net.length;i++){
+	for(j=0;j<net[i].length;j++){
+
+		ctx.beginPath()
+		if(net[i][j].D==true){
+		ctx.fillStyle="#fff"
+		ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.4*sf,0,(Math.PI*2))
+		}
+		else{
+		//ctx.fillStyle="#00ff00"
+		//ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.2*sf,0,(Math.PI*2))
+		}
+		if( (i==net.length-1) && (j==(net[i].length-1)) ){
+			ctx.beginPath()
+			ctx.fillStyle="#00ff00"
+			ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.25*sf,0,(Math.PI*2))
+		}
+		ctx.fill()
+	}
+	if( (net[i].length==0) && (net.length>1) ){
+		ctx.beginPath()
+		if(seg==1){
+			ctx.fillStyle="#00ff00"
+		}
+		else{
+			ctx.fillStyle="#ff0000"
+		}
+		ctx.arc(ctx.canvas.width/2+((net[i-1][net[i-1].length-1].X)*sf),ctx.canvas.height/2+((net[i-1][net[i-1].length-1].Y)*sf),0.25*sf,0,(Math.PI*2))
+		ctx.fill()		
+	}
+}
+
+
 ctx.fillStyle="#999"
 ctx.strokeStyle="#999"
 
@@ -527,42 +594,6 @@ ctx.beginPath()
 	ctx.stroke()
 	ctx.fill()
 
-}
-
-ctx.lineWidth="1"
-ctx.fillStyle="#fff"
-ctx.strokeStyle="#333"
-
-for(i=0;i<net.length;i++){
-	for(j=0;j<net[i].length;j++){
-
-		ctx.beginPath()
-		if(net[i][j].D==true){
-		ctx.fillStyle="#fff"
-		ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.4*sf,0,(Math.PI*2))
-		}
-		else{
-		//ctx.fillStyle="#00ff00"
-		//ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.2*sf,0,(Math.PI*2))
-		}
-		if( (i==net.length-1) && (j==(net[i].length-1)) ){
-			ctx.beginPath()
-			ctx.fillStyle="#00ff00"
-			ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.25*sf,0,(Math.PI*2))
-		}
-		ctx.fill()
-	}
-	if( (net[i].length==0) && (net.length>1) ){
-		ctx.beginPath()
-		if(seg==1){
-			ctx.fillStyle="#00ff00"
-		}
-		else{
-			ctx.fillStyle="#ff0000"
-		}
-		ctx.arc(ctx.canvas.width/2+((net[i-1][net[i-1].length-1].X)*sf),ctx.canvas.height/2+((net[i-1][net[i-1].length-1].Y)*sf),0.25*sf,0,(Math.PI*2))
-		ctx.fill()		
-	}
 }
 
 ctx.lineWidth="0.6"
@@ -1011,7 +1042,9 @@ $("#myCanvas").on('click', function(e) {
 					}
 				}
 		}
-	add_trace()
+		if(seg==0){
+			add_trace()
+		}
 	}
 
 });
@@ -1036,15 +1069,10 @@ $("#myCanvas").on('mouseup', function(e) {
 
 if(pan==true){
 
-	x = ((e.clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)
-	y = ((e.clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)
-
 	if(click==1){
-		click=0
-		
+		click=0		
 	}
 
-	
 	draw()
 
 }
@@ -1089,7 +1117,9 @@ else{
 	seg=0
 }
 
+
 add_trace()
+
 
 }
 
