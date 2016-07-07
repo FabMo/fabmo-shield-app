@@ -328,14 +328,12 @@ var dist = 0
 var start = 0
 
 $("#myCanvas").on('mousewheel',function(e){
-	e.preventDefault()
 	zoom = parseFloat((zoom+(e.deltaY)).toFixed(3))
 	draw()
-
+	e.preventDefault()
 })
 
 $("#myCanvas").on("touchmove", function(e){
-	e.preventDefault()
 
 	if (e.originalEvent.touches.length==1) {
 		if(click==0){	
@@ -370,7 +368,6 @@ $("#myCanvas").on("touchmove", function(e){
 })
 
 $("#myCanvas").on("touchstart", function(e){
-	e.preventDefault()
 	if (e.originalEvent.touches.length==2) {
 		start = Math.sqrt((e.originalEvent.touches[0].clientX-e.originalEvent.touches[1].clientX) * (e.originalEvent.touches[0].clientX-e.originalEvent.touches[1].clientX) + (e.originalEvent.touches[0].clientY-e.originalEvent.touches[1].clientY) * (e.originalEvent.touches[0].clientY-e.originalEvent.touches[1].clientY))
 
@@ -381,7 +378,6 @@ $("#myCanvas").on("touchstart", function(e){
 
 
 $("#myCanvas").on("touchend", function(e){
-	e.preventDefault()
 	click = 0
 
 });
@@ -933,6 +929,7 @@ ctx.fillText("IOREF",(-58.5*sf)-yoffsetBot,(2.54*3*sf)-(1.6*sf))
 	}
 ctx.fillText("NC",(-56.5*sf)-yoffsetBot,(2.54*2*sf)-(1.6*sf))
 
+//console.log(pan)
 }
 
 $("#myCanvas").on('click', function(e) {
@@ -951,7 +948,7 @@ $("#myCanvas").on('click', function(e) {
 			drill=true
 		}
 		if(document.getElementById("type").value=="route"){
-			r = 0.32
+		r = 0.32
 		}
 	
 		for(i=0;i<pts.length;i++){
