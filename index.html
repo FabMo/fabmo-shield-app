@@ -256,9 +256,10 @@ depth{
 //add parts/rotation
 //pinch/tap - mobile
 //
+//rip up trace
 //add mounting holes
 //default circuits
-//save
+//load/save
 //schematic
 //tool change
 //
@@ -324,18 +325,19 @@ var pan = false
 
 var zoom = 0
 var click = 0
+var dist = 0
+var start = 0
 
 $("#myCanvas").on('mousewheel',function(e){
-	zoom = parseFloat((zoom+(e.deltaY*1)).toFixed(3))
+	zoom = parseFloat((zoom+(e.deltaY)).toFixed(3))
 	draw()
 	e.preventDefault()
-});
+})
 
 $("#myCanvas").on("touchmove", function(e){
 
 	if (e.originalEvent.touches.length==1) {
-		//pan
-		if(click==0){
+		if(click==0){	
 			x=((e.originalEvent.touches[0].clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)-panX
 			y=((e.originalEvent.touches[0].clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)-panY
 			px=x
@@ -352,10 +354,29 @@ $("#myCanvas").on("touchmove", function(e){
       
 	}
 	else if (e.originalEvent.touches.length==2) {
-		//zoom
+		dist = Math.sqrt((e.originalEvent.touches[0].clientX-e.originalEvent.touches[1].clientX) * (e.originalEvent.touches[0].clientX-e.originalEvent.touches[1].clientX) + (e.originalEvent.touches[0].clientY-e.originalEvent.touches[1].clientY) * (e.originalEvent.touches[0].clientY-e.originalEvent.touches[1].clientY))
+
+		if((parseFloat(start/dist))<1){
+			zoom+=0.25
+		}
+		else{
+			zoom+=-0.25
+		}
+		draw()
+		
 	}
 
+})
+
+$("#myCanvas").on("touchstart", function(e){
+	if (e.originalEvent.touches.length==2) {
+		start = Math.sqrt((e.originalEvent.touches[0].clientX-e.originalEvent.touches[1].clientX) * (e.originalEvent.touches[0].clientX-e.originalEvent.touches[1].clientX) + (e.originalEvent.touches[0].clientY-e.originalEvent.touches[1].clientY) * (e.originalEvent.touches[0].clientY-e.originalEvent.touches[1].clientY))
+
+	}
+
+
 });
+
 
 $("#myCanvas").on("touchend", function(e){
 	click = 0
@@ -395,7 +416,7 @@ yo=((parseFloat(document.getElementById("y-top").value)*1.27*sf)-(parseFloat(doc
 
 ctx.translate(panX*sf,yo+panY*sf)
 
-ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height)
 ctx.lineJoin="round"
 
 ctx.fillStyle="#8c8cff"
@@ -424,7 +445,6 @@ for(i=7;i<arduino.length;i++){
 	}
 	ctx.fill()
 	ctx.stroke()
-
 }
 
 ctx.fillStyle="#ccccff"
@@ -450,7 +470,6 @@ ctx.lineWidth="2"
 ctx.strokeStyle="#ff0000"
 
 for(i=0;i<pin_outlines.length;i++){
-
 	ctx.beginPath()
 	for(j=0;j<pin_outlines[i].length;j++){
 		ctx.lineTo((ctx.canvas.width/2)+(pin_outlines[i][j].X*sf),(ctx.canvas.height/2)+(pin_outlines[i][j].Y*sf))
@@ -512,8 +531,6 @@ ctx.strokeStyle="#0000aa"
 
 ctx.stroke()
 	
-
-
 ctx.lineWidth="1"
 ctx.fillStyle="#fff"
 ctx.strokeStyle="#333"
@@ -549,7 +566,6 @@ for(i=0;i<net.length;i++){
 		ctx.fill()		
 	}
 }
-
 
 ctx.fillStyle="#999"
 ctx.strokeStyle="#999"
@@ -631,9 +647,9 @@ if((document.getElementById("help-div").style.display)=='block'){
 	ctx.lineTo((ctx.canvas.width/2)+(xmin*sf),(ctx.canvas.height/2)+(ymax*sf)+(48))
 	ctx.stroke()
 
-	ctx.fillText( ((Math.abs(ymin/25.4))+(ymax/25.4)).toFixed(2)  + "\"",ctx.canvas.width/2+(xmax*sf)+(4.4*sf),ctx.canvas.height/2);
+	ctx.fillText( ((Math.abs(ymin/25.4))+(ymax/25.4)).toFixed(2)  + "\"",ctx.canvas.width/2+(xmax*sf)+(4.4*sf),ctx.canvas.height/2)
 
-	ctx.fillText( ((Math.abs(xmin/25.4))+(xmax/25.4)).toFixed(2)  + "\"",ctx.canvas.width/2,ctx.canvas.height/2+(ymax*sf)+(53));
+	ctx.fillText( ((Math.abs(xmin/25.4))+(xmax/25.4)).toFixed(2)  + "\"",ctx.canvas.width/2,ctx.canvas.height/2+(ymax*sf)+(53))
 
 	ctx.beginPath()
 	ctx.moveTo((ctx.canvas.width/2)+(xmax*sf)+(5*sf),(ctx.canvas.height/2)+(5))
@@ -672,7 +688,7 @@ ctx.fillText("y: "+droY,ctx.canvas.width/2-(103)-(panX*sf),-ctx.canvas.height/2+
 
 var size_font = (12)
 ctx.font = (size_font + "px Arial")
-ctx.fillText("inch",ctx.canvas.width/2-(50)-(panX*sf),-ctx.canvas.height/2+(40)-yo-(panY*sf));
+ctx.fillText("inch",ctx.canvas.width/2-(50)-(panX*sf),-ctx.canvas.height/2+(40)-yo-(panY*sf))
 
 //
 size_font = (1.5*sf)
@@ -1047,12 +1063,11 @@ $("#myCanvas").on('click', function(e) {
 		}
 	}
 
-});
+})
 
 $("#myCanvas").on('mousedown', function(e) {
 
 if(pan==true){
-
 	x = ((e.clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)-panX
 	y = ((e.clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)-panY
 
@@ -1061,9 +1076,8 @@ if(pan==true){
 	py = y
 	click = 1
 	}
-
 }
-});
+})
 
 $("#myCanvas").on('mouseup', function(e) {
 
@@ -1074,13 +1088,10 @@ if(pan==true){
 	}
 
 	draw()
-
 }
-
-});
+})
 
 function undo(){
-
 if(net.length>1){
 
 	if((seg==0)&&(net[net.length-1].length==0)){
@@ -1145,6 +1156,7 @@ if(pan==false){
 		}
 	}
 }
+
 else if((pan==true)&&(click==1)){
 		x=((e.clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)
 		y=((e.clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)
@@ -1154,7 +1166,7 @@ else if((pan==true)&&(click==1)){
 
 draw()
 
-});
+})
 
 
 $(document).keypress(function(e){
@@ -1167,7 +1179,7 @@ $(document).keypress(function(e){
 			}
 			draw()
 	}
-});
+})
 
 
 $(document).keydown(function(e){
@@ -1183,42 +1195,42 @@ $(document).keydown(function(e){
 	else if(e.which === 39 && e.ctrlKey){
 		if((document.getElementById("x-left").value)>0){
 			(document.getElementById("x-left").value)--
-			$(document.getElementById("x-left")).trigger("change");
+			$(document.getElementById("x-left")).trigger("change")
 		} 
 	}
 	else if(e.which === 40 && e.ctrlKey){
 		if((document.getElementById("y-top").value)>0){
 			(document.getElementById("y-top").value)--
-			$(document.getElementById("y-top")).trigger("change");
+			$(document.getElementById("y-top")).trigger("change")
 		} 
 	}
 	else if(e.which === 37 && e.ctrlKey){
 		if((document.getElementById("x-right").value)>0){
 			(document.getElementById("x-right").value)--
-			$(document.getElementById("x-right")).trigger("change");
+			$(document.getElementById("x-right")).trigger("change")
 		} 
 	}
 	else if(e.which === 38 && e.ctrlKey){
 		if((document.getElementById("y-bot").value)>0){
 			(document.getElementById("y-bot").value)--
-			$(document.getElementById("y-bot")).trigger("change");
+			$(document.getElementById("y-bot")).trigger("change")
 		} 
 	}
 	else if(e.which === 37){
 		(document.getElementById("x-left").value)++
-		$(document.getElementById("x-left")).trigger("change"); 
+		$(document.getElementById("x-left")).trigger("change")
 	}
 	else if(e.which === 38){
 		(document.getElementById("y-top").value)++
-		$(document.getElementById("y-top")).trigger("change"); 
+		$(document.getElementById("y-top")).trigger("change")
 	}
 	else if(e.which === 39){
 		(document.getElementById("x-right").value)++
-		$(document.getElementById("x-right")).trigger("change"); 
+		$(document.getElementById("x-right")).trigger("change") 
 	}
 	else if(e.which === 40){
 		(document.getElementById("y-bot").value)++
-		$(document.getElementById("y-bot")).trigger("change"); 
+		$(document.getElementById("y-bot")).trigger("change")
 	}
 	else if(e.which === 67){
 		//clear all
@@ -1246,10 +1258,10 @@ $(document).keydown(function(e){
 	}
 	draw()
           
-});
+})
 
 function help(){
-	$("#help-div").toggle();
+	$("#help-div").toggle()
 	draw()
 }
 
@@ -1660,7 +1672,7 @@ $("#y-bot").on("change", function(){
 
 $(window).resize(function(){
 	draw()
-}); 
+})
 
 function make(){
 
