@@ -255,6 +255,7 @@ depth{
 //
 //add parts/rotation
 //
+//
 //rip up trace
 //add mounting holes
 //default circuits
@@ -476,6 +477,17 @@ for(i=0;i<pin_outlines.length;i++){
 	ctx.fill()
 }
 
+
+if((seg==1)&&(line==true)&&(pan==false)){
+	ctx.beginPath()
+	ctx.strokeStyle="#999"
+	ctx.moveTo((ctx.canvas.width/2)+(endX*sf),(ctx.canvas.height/2)+(endY*sf))
+	ctx.lineTo((ctx.canvas.width/2)+(mouseX*sf),(ctx.canvas.height/2)+(mouseY*sf))
+	ctx.lineWidth=0.8*sf
+	ctx.stroke()
+}
+
+
 ctx.fillStyle="#666"
 
 for(i=0;i<trace.length;i++){
@@ -529,6 +541,7 @@ ctx.strokeStyle="#0000aa"
 	}
 
 ctx.stroke()
+
 	
 ctx.lineWidth="1"
 ctx.fillStyle="#fff"
@@ -589,10 +602,6 @@ if((on_grid==true)&&(pan==false)){
 ctx.beginPath()
 	
 	if((seg==1)&&(line==true)){
-		ctx.lineWidth=0.8*sf
-		ctx.moveTo((ctx.canvas.width/2)+(endX*sf),(ctx.canvas.height/2)+(endY*sf))
-		ctx.lineTo((ctx.canvas.width/2)+(mouseX*sf),(ctx.canvas.height/2)+(mouseY*sf))
-		ctx.moveTo((ctx.canvas.width/2)+(mouseX*sf),(ctx.canvas.height/2)+(mouseY*sf))
 		ctx.fillStyle="#ff0000"
 	}
 	else{
@@ -627,15 +636,21 @@ ctx.font = (size_font + "px Arial")
 
 if((document.getElementById("help-div").style.display)=='block'){
 
-	ctx.lineWidth=(0.2*sf)
-	ctx.strokeStyle="#666"
-	ctx.fillStyle="#fff000"
+	ctx.lineWidth=(0.1*sf)
+	ctx.strokeStyle="#333"
+	ctx.fillStyle="#ffff00"
 
 	ctx.beginPath()
-	ctx.arc(ctx.canvas.width/2+(xmin*sf),ctx.canvas.height/2+(ymax*sf),(0.635*sf),0,(Math.PI*2))
-	ctx.stroke()
+	ctx.arc(ctx.canvas.width/2+(xmin*sf),ctx.canvas.height/2+(ymax*sf),(0.5*sf),0,(Math.PI*2))
+	ctx.moveTo(ctx.canvas.width/2+(xmin*sf),ctx.canvas.height/2+(ymax*sf)+(0.5*sf))
+	ctx.lineTo(ctx.canvas.width/2+(xmin*sf),ctx.canvas.height/2+(ymax*sf)-(0.5*sf))
+	ctx.moveTo(ctx.canvas.width/2+(xmin*sf)+(0.5*sf),ctx.canvas.height/2+(ymax*sf))
+	ctx.lineTo(ctx.canvas.width/2+(xmin*sf)-(0.5*sf),ctx.canvas.height/2+(ymax*sf))
 	ctx.fill()
+	ctx.stroke()
+	//ctx.fill()
 
+		ctx.strokeStyle="#666"
 	ctx.lineWidth="1"
 	ctx.fillStyle="#888"
 
@@ -1112,6 +1127,8 @@ if(net.length>1){
 	else{
 		endX=(net[net.length-1][net[net.length-1].length-1].X)
 		endY=(net[net.length-1][net[net.length-1].length-1].Y)
+		mouseX=endX
+		mouseY=endY
 	}
 }
 else{
@@ -1592,10 +1609,10 @@ function makeGrid(){
 		pts.push({X:-19.685+o+x,Y:21.61+y,PIN:pinNum})
 		//
 		
-		if( (i==19+(parseInt(document.getElementById("y-bot").value))) && (j==0) ){
+		if( (i==19+(parseInt(document.getElementById("y-bot").value))) && (j==(parseInt(document.getElementById("x-left").value))) ){
 			x = x + 2.54+0.635
 		}
-		else if( (i==19+(parseInt(document.getElementById("y-bot").value))) && (j==10) ){
+		else if( (i==19+(parseInt(document.getElementById("y-bot").value))) && (j==(10+(parseInt(document.getElementById("x-left").value)))) ){
 			x = x + 2.54+1.27+0.635
 			j++
 		}
@@ -1705,10 +1722,6 @@ flip()
 
 if(filetype=="gcode"){
 
-g+="g21\n"
-g+="g0z5\n"
-g+="m4\n"
-g+="g4p2\n" 
 
 }
 
