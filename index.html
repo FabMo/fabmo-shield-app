@@ -1153,9 +1153,13 @@ if(pan==true){
 
 	draw()
 }
+
 })
 
 function undo(){
+
+$("#undo").blur()
+
 if(net.length>1){
 
 	if((seg==0)&&(net[net.length-1].length==0)){
@@ -1352,7 +1356,9 @@ $(document).keydown(function(e){
 })
 
 function help(){
+	$("#help").blur()
 	$("#help-div").toggle()
+
 	draw()
 }
 
@@ -1758,6 +1764,9 @@ $("#x-right").on("change", function(){
 	}
 	else if((document.getElementById("board").value)=="blank"){
 		xmax=12.7+(parseFloat(document.getElementById("x-right").value)*2.54)
+		if(xmax<2.54){
+			xmax=2.54
+		}
 	}
 	makeFrame(radius)
 	makeGrid()
@@ -1771,6 +1780,9 @@ $("#x-left").on("change", function(){
 	}
 	else if((document.getElementById("board").value)=="blank"){
 		xmin=-12.7-(parseFloat(document.getElementById("x-left").value)*2.54)
+		if(xmin>-2.54){
+			xmin=-2.54
+		}
 	}
 	makeFrame(radius)
 	makeGrid()
@@ -1779,6 +1791,8 @@ $("#x-left").on("change", function(){
 })
 
 $("#board").on("change", function(){
+
+$("#board").blur()
 
 if(document.getElementById("board").value=="arduino"){
 	xmin = -27.1
@@ -1826,6 +1840,9 @@ $("#y-top").on("change", function(){
 	}
 	else if((document.getElementById("board").value)=="blank"){
 		ymin=-12.7-(parseFloat(document.getElementById("y-top").value)*2.54)
+			if(ymin>-2.54){
+				ymin=-2.54
+			}
 	}
 	makeFrame(radius)
 	makeGrid()
@@ -1848,6 +1865,9 @@ $("#y-bot").on("change", function(){
 	}
 	else if((document.getElementById("board").value)=="blank"){
 		ymax=12.7+(parseFloat(document.getElementById("y-bot").value)*2.54)
+			if(ymax<2.54){
+				ymax=2.54
+			}
 	}
 	makeFrame(radius)
 	makeGrid()
