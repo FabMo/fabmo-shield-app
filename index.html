@@ -495,20 +495,17 @@ for(i=0;i<grid.length;i++){
 	ctx.stroke()
 }
 
-
-
-
 ctx.fillStyle="#666"
 ctx.lineWidth="2"
 ctx.strokeStyle="#ff0000"
 if((document.getElementById("board").value)=="arduino"){
-for(i=0;i<pin_outlines.length;i++){
-	ctx.beginPath()
-	for(j=0;j<pin_outlines[i].length;j++){
-		ctx.lineTo((ctx.canvas.width/2)+(pin_outlines[i][j].X*sf),(ctx.canvas.height/2)+(pin_outlines[i][j].Y*sf))
+	for(i=0;i<pin_outlines.length;i++){
+		ctx.beginPath()
+		for(j=0;j<pin_outlines[i].length;j++){
+			ctx.lineTo((ctx.canvas.width/2)+(pin_outlines[i][j].X*sf),(ctx.canvas.height/2)+(pin_outlines[i][j].Y*sf))
+		}
+		ctx.fill()
 	}
-	ctx.fill()
-}
 }
 
 if((seg==1)&&(line==true)&&(pan==false)&&	(document.getElementById("type").value!="resistor")){
@@ -2122,6 +2119,7 @@ if((document.getElementById("board").value)=="arduino"){
    for(i=0;i<pins.length;i++){
 		g+="J2,"+((pins[i][0].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((pins[i][0].Y+ymax)/25.4).toFixed(4) + "\n"
 	   g+="MZ,-"+ (0.007) + "\n"
+		g+="PAUSE 0.1\n"
 			for(j=1;j<pins[i].length;j++){
 				g+="M2,"+((pins[i][j].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((pins[i][j].Y+ymax)/25.4).toFixed(4) + "\n"		
 			}
@@ -2153,6 +2151,7 @@ if((document.getElementById("board").value)=="arduino"){
    for(i=0;i<outlines.length;i++){
 		g+="J2,"+((outlines[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+","+ (((outlines[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
 	   g+="MZ,-"+ (0.007) + "\n"
+		g+="PAUSE 0.1\n"
 			for(j=1;j<outlines[i].length;j++){
 				g+="M2,"+((outlines[i][j].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+","+ (((outlines[i][j].Y/scale)+ymax)/25.4).toFixed(4) + "\n"		
 			}
