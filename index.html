@@ -260,9 +260,12 @@ depth{
 
 //TODO
 //
-//rip up trace
-//add mounting holes
+//add device class
+//
 //default circuits
+//
+//delete part/trace
+//add mounting holes
 //load/save
 //schematic
 //tool change
@@ -508,12 +511,12 @@ for(i=0;i<pin_outlines.length;i++){
 }
 }
 
-if((seg==1)&&(line==true)&&(pan==false)){
+if((seg==1)&&(line==true)&&(pan==false)&&	(document.getElementById("type").value!="resistor")){
 	ctx.beginPath()
 	ctx.strokeStyle="#999"
 	ctx.moveTo((ctx.canvas.width/2)+(endX*sf),(ctx.canvas.height/2)+(endY*sf))
 	ctx.lineTo((ctx.canvas.width/2)+(mouseX*sf),(ctx.canvas.height/2)+(mouseY*sf))
-	ctx.lineWidth=0.8*sf
+	ctx.lineWidth=0.6*sf
 	ctx.stroke()
 }
 
@@ -689,9 +692,11 @@ ctx.beginPath()
 	}
 
 	ctx.stroke()
+
 	ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.25*sf,0,(Math.PI*2) )
 	ctx.lineWidth=0.4*sf
 	ctx.stroke()
+
 	ctx.fill()
 
 }
@@ -1060,6 +1065,8 @@ $("#myCanvas").on('click', function(e) {
 
 				if((document.getElementById("type").value=="resistor")||(document.getElementById("type").value=="battery")){
 
+					//seg=0
+
 					if(document.getElementById("type").value=="resistor"){
 						temp2 = resistor
 							if(pad==0){
@@ -1079,7 +1086,11 @@ $("#myCanvas").on('click', function(e) {
 					origin={X:(pts[i].X),Y:(pts[i].Y)}
 
 					for(j=0;j<resistor.length;j++){
-
+					if(seg==1){
+						//net.push([])
+						//seg=0
+					}
+					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill,T:"res"})
 					temp.push([])
 						resistor[j].reverse()
 						for(k=0;k<resistor[j].length;k++){
@@ -1097,6 +1108,10 @@ $("#myCanvas").on('click', function(e) {
 						}						
 						pad=2
 						add_trace()
+						net.push([])
+
+						//console.log(net)
+
 					}
 					else if(pad==2){
 						pad=0
@@ -1251,22 +1266,42 @@ function undo(){
 temp=[]
 pad=0
 
+console.log(net)
+
 $("#undo").blur()
 
 if(net.length>1){
 
 	if((seg==0)&&(net[net.length-1].length==0)){
 		net.pop()
+		if(net[net.length-1][0].T=="res"){
+			pkgOutlines.pop()
+			net[net.length-1].pop()
+
+		}
+		else{
 		net[net.length-1].pop()
+		}
 		trace.pop()
 		trace.pop()
 	}
-
+	
+	else if((net[net.length-1].length==0)&&(net[net.length-2].length==3)){
+		pkgOutlines.pop()
+		net.pop()
+		net[net.length-1].pop()
+		net[net.length-1].pop()
+		trace.pop()
+		trace.pop()
+		seg=0
+	
+	}
+	
 	else{
+
 		net[net.length-1].pop()
 		trace.pop()
 	}
-
 	if((net[net.length-1].length==0)){
 		endX=(net[net.length-2][net[net.length-2].length-1].X)
 		endY=(net[net.length-2][net[net.length-2].length-1].Y)
@@ -1290,7 +1325,10 @@ if(seg==0){
 else{
 	seg=0
 }
-
+if((net[net.length-1].length==1)&&((net[net.length-1][0].T=="res"))){
+	net[net.length-1].pop()
+	seg=0
+}
 
 add_trace()
 
