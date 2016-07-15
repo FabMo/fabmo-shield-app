@@ -172,6 +172,7 @@ depth{
   <option value="battery">Battery</option>
   -->
   <option value="dip">Pad (DIP)</option>
+  <option value="hole">Hole (0.1"&#8960;)</option>
   <option value="smd">Pad (SMD)</option>
   <option value="route">Route</option>
   <option value="resistor">SMD (1206)</option>
@@ -262,10 +263,11 @@ depth{
 //
 //add device class
 //
+//bug (change type after first click 1206)
+//
 //default circuits
 //
 //delete part/trace
-//add mounting holes
 //load/save
 //schematic
 //tool change
@@ -288,6 +290,7 @@ var endX
 var endY
 var line = true
 var xpos = 0
+var hole = []
 
 var o = -5.7135
 var c
@@ -610,7 +613,9 @@ for(i=0;i<net.length;i++){
 		else{
 			ctx.fillStyle="#ff0000"
 		}
+
 		ctx.arc(ctx.canvas.width/2+((net[i-1][net[i-1].length-1].X)*sf),ctx.canvas.height/2+((net[i-1][net[i-1].length-1].Y)*sf),0.25*sf,0,(Math.PI*2))
+
 		ctx.fill()		
 	}
 }
@@ -633,6 +638,17 @@ for(i=0;i<temp.length;i++){
 	ctx.fill()
 }
 
+ctx.strokeStyle="#fff"
+ctx.fillStyle="#fff"
+ctx.lineWidth=0.8*sf
+for(i=0;i<hole.length;i++){
+	ctx.beginPath()
+	for(j=0;j<hole[i].length;j++){
+		ctx.lineTo((ctx.canvas.width/2+(hole[i][j].X*sf)),(ctx.canvas.height/2+(hole[i][j].Y*sf)))
+	}
+	ctx.fill()
+	ctx.stroke()
+}
 
 
 ctx.lineWidth=0.1*sf
@@ -1119,21 +1135,32 @@ $("#myCanvas").on('click', function(e) {
 				//pads
 				if((document.getElementById("type").value!="resistor") && (document.getElementById("type").value!="part") &&(document.getElementById("type").value!="battery")){ 
 
+				if(document.getElementById("type").value=="hole"){
+						hole.push([])
+
+							for(j=0;j<=v;j++){
+								hole[hole.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*0.9),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*0.9)})
+								}
+				draw()
+				}
+				//else{
+
 				if(((net[net.length-1].length)==0) && ((document.getElementById("type").value=="route") || (document.getElementById("type").value=="dip")||(document.getElementById("type").value=="smd")) ){
 					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill})
 
 						trace.push([])
 						
 						if(document.getElementById("type").value=="dip"){
-							for(j=0;j<v;j++){
+							for(j=0;j<=v;j++){
 								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
 							}
 						}
 						else if(document.getElementById("type").value=="route"){
-							for(j=0;j<v;j++){
+							for(j=0;j<=v;j++){
 								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
 							}
 						}
+
 						else if((document.getElementById("type").value=="smd")){
 							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y-r})
 							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y+r})
@@ -1160,7 +1187,7 @@ $("#myCanvas").on('click', function(e) {
 						trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/4*j)*0.1),Y:((pts[i].Y)+Math.cos((Math.PI*2)/4*j)*0.1)})
 					}
 				}
-				else if((net[net.length-1].length)>0){
+				else if(((net[net.length-1].length)>0) && (document.getElementById("type").value!="hole")){
 
 							var Ax = net[net.length-1][net[net.length-1].length-1].X
 							var Ay = net[net.length-1][net[net.length-1].length-1].Y
@@ -1194,10 +1221,11 @@ $("#myCanvas").on('click', function(e) {
 
 					trace.push([])
 						if((document.getElementById("type").value=="dip")||(document.getElementById("type").value=="route")){
-							for(j=0;j<v;j++){
+							for(j=0;j<=v;j++){
 								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
 							}
 						}
+
 						else if((document.getElementById("type").value=="smd")){
 
 							trace[trace.length-1].push({X:pts[i].X-r,Y:pts[i].Y-r})
@@ -1210,6 +1238,9 @@ $("#myCanvas").on('click', function(e) {
 
 					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill})
 					}
+
+	//}
+
 					if(skip==false){
 						if(seg==1){
 							net.push([])	
@@ -1495,6 +1526,7 @@ $(document).keydown(function(e){
 			ymax=12.7
 			ymin=-12.7
 		}
+		hole=[]
 		pkgOutlines = []
 		trace = []
 		pad = 0
@@ -1525,29 +1557,33 @@ function help(){
 
 function makeFrame(radius) {
 
-
-
+if(document.getElementById("board").value=="arduino"){
+	var fo = 0
+}
+else{
+	fo = 0.2
+}
 frame1=[]
 path1=[]
 
 for (i=0;i<=verts;i++) {
    if(i<=25){
-      frame1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
+      frame1.push({X:((xmax+fo-radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymax+fo-radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
       
       path1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})
    }
    else if((i>25)&&(i<=50)){
-      frame1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
+      frame1.push({X:((xmax+fo-radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymin-fo+radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
       
       path1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))}) 
    }
    else if((i>50)&&(i<=75)){
-      frame1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
+      frame1.push({X:((xmin-fo+radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymin-fo+radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
       
       path1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})     
    }
    else if((i>75)&&(i<=100)){
-      frame1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
+      frame1.push({X:((xmin-fo+radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymax+fo-radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
       
       path1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})  
            
@@ -2128,6 +2164,22 @@ if((document.getElementById("board").value)=="arduino"){
 
 
 }
+
+	for(i=0;i<hole.length;i++){
+
+		pass_no = 4
+		pass = 1
+		g+="J2,"+((hole[i][0].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((hole[i][0].Y+ymax)/25.4).toFixed(4) + "\n"
+
+		while(pass<=pass_no){
+	   g+="MZ,-"+ (pass_depth*pass).toFixed(4) + "\n"
+			for(j=0;j<hole[i].length;j++){
+   	   	g+="M2,"+((hole[i][j].X+Math.abs(xmin))/25.4).toFixed(4) +","+ ((hole[i][j].Y+ymax)/25.4).toFixed(4) + "\n"
+			}
+		pass++
+   	}
+		g+="JZ,0.1\n"
+	}
 
    for(i=0;i<net.length;i++){
 		
