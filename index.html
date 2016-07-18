@@ -2001,6 +2001,19 @@ $("#board").on("change", function(){
 
 $("#board").blur()
 
+hole=[]
+pkgOutlines = []
+trace = []
+pad = 0
+net = [[]]
+temp = []
+zoom = 0
+panX = 0
+panY = 0
+line = false
+seg = 0
+
+
 if(document.getElementById("board").value=="arduino"){
 	xmin = -27.1
 	ymin = -26.5 
