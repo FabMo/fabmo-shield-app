@@ -171,17 +171,17 @@ depth{
   <!--
   <option value="battery">Battery</option>
   -->
-  <option value="dip">Pad (DIP)</option>
-  <option value="hole">Hole (0.1"&#8960;)</option>
-  <option value="smd">Pad (SMD)</option>
-  <option value="route">Route</option>
+  <option value="dip">pad (DIP)</option>
+  <option value="hole">hole (0.1"&#8960;)</option>
+  <option value="smd">pad (SMD)</option>
+  <option value="route">route</option>
   <option value="resistor">SMD (1206)</option>
 
 </select>
 
 <select id="board" autocomplete="on">
   <option value="arduino" selected>Arduino</option>
-  <option value="blank">Blank</option>
+  <option value="blank">blank</option>
 </select>
 
 
@@ -366,6 +366,8 @@ $("#myCanvas").on('mousewheel',function(e){
 
 $("#myCanvas").on("touchmove", function(e){
 
+	e.preventDefault()
+
 	if (e.originalEvent.touches.length==1) {
 		if(click==0){	
 			x=((e.originalEvent.touches[0].clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)-panX
@@ -399,6 +401,7 @@ $("#myCanvas").on("touchmove", function(e){
 })
 
 $("#myCanvas").on("touchstart", function(e){
+
 	if (e.originalEvent.touches.length==2) {
 		start = Math.sqrt((e.originalEvent.touches[0].clientX-e.originalEvent.touches[1].clientX) * (e.originalEvent.touches[0].clientX-e.originalEvent.touches[1].clientX) + (e.originalEvent.touches[0].clientY-e.originalEvent.touches[1].clientY) * (e.originalEvent.touches[0].clientY-e.originalEvent.touches[1].clientY))
 
@@ -409,8 +412,8 @@ $("#myCanvas").on("touchstart", function(e){
 
 
 $("#myCanvas").on("touchend", function(e){
-	click = 0
 
+	click = 0
 });
 
 function draw(){
@@ -1511,6 +1514,7 @@ $(document).keydown(function(e){
 		document.getElementById("y-bot").value=0
 		document.getElementById("x-left").value=0
 		document.getElementById("x-right").value=0
+
 		if(document.getElementById("board").value=="arduino"){
 			xmax=27.1
 			xmin=-27.1
@@ -1523,6 +1527,7 @@ $(document).keydown(function(e){
 			ymax=12.7
 			ymin=-12.7
 		}
+
 		hole=[]
 		pkgOutlines = []
 		trace = []
@@ -1537,10 +1542,13 @@ $(document).keydown(function(e){
 		makeFrame(radius)
 		makeGrid()
 		add_trace()
+
 	}
+
 	else if(e.which === 72){
 		help()
 	}
+
 	draw()
           
 })
@@ -1894,8 +1902,6 @@ if((document.getElementById("board").value)=="arduino"){
 		}
 		else if( ((i==(parseInt(document.getElementById("y-bot").value)+18)) || (i==(parseInt(document.getElementById("y-bot").value)+19))) && (j>0+(parseInt(document.getElementById("x-left").value))) && (j<20+(parseInt(document.getElementById("x-left").value)))){
 
-//document.getElementById("board").value=="arduino"
-
 			if((j==11)&&(i==(parseInt(document.getElementById("y-bot").value)+18))){
 				pinNum=0
 			}
@@ -2172,7 +2178,6 @@ if((document.getElementById("board").value)=="arduino"){
 		g+="JZ,0.1\n"
 	}
 
-
 }
 
 	for(i=0;i<hole.length;i++){
@@ -2234,7 +2239,6 @@ while(pass<=pass_no){
    }
    pass++
 }
-
 
 
 g+="JZ,0.2\n"
