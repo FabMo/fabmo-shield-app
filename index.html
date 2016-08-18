@@ -104,15 +104,11 @@
    
 <input id="x-right" type="number" value="0" autocomplete="off" step="1" min="0"/>
 <input id="x-left" type="number" value="0" autocomplete="off" step="1" min="0"/>
-
 <input id="y-top" type="number" value="0" autocomplete="off" step="1" min="0"/>
 <input id="y-bot" type="number" value="0" autocomplete="off" step="1" min="0"/>
-
 <input id="input_radius" type="number" value="2" autocomplete="off" step="0.1" min="0"/>   
 
 </body>
-
-
 
 <script>
 
@@ -145,15 +141,15 @@ var ymax = 25.4  	//27.1
 var radius = 0.75
 var tool = parseFloat(document.getElementById("input_tool").value/2)
 var scale = 100
-var mouseX=-25.3985
-var mouseY= 24.15
+var mouseX=-25.4
+var mouseY= 24.1
 var endX
 var endY
 var line = true
 var xpos = 0
 var hole = []
 
-var o = -5.7135
+var o = -5.7135  //x display offset 
 var c
 var ctx
 var sf = 1
@@ -666,7 +662,7 @@ ctx.fillStyle="#777"
 ctx.translate( (ctx.canvas.width/2)-xo,ctx.canvas.height/2)
 
 if((document.getElementById("board").value)=="arduino"){
-	var droX= ((((parseFloat(mouseX)+25.3985+(parseInt(document.getElementById('x-left').value)*2.54))/25.4)).toFixed(1))
+	var droX= ((((parseFloat(mouseX)+25.4-2.54+(parseInt(document.getElementById('x-left').value)*2.54))/25.4)).toFixed(1))
 	var droY= (Math.abs((parseFloat(mouseY)-24.15-(parseInt(document.getElementById('y-bot').value)*2.54))/25.4).toFixed(1))
 }
 else if((document.getElementById("board").value)=="blank"){
