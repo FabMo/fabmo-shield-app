@@ -5,159 +5,13 @@
 <html lang="en"> 
 <head>
 <title>SHIELD</title>
+<link href="css/style.css" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"/>
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/jquery.mousewheel.min.js"></script>
 <script src="js/libs/fabmo.min.js"></script>
 <script src="js/clipper.js"></script>
 
-<style>
-
-body{
-	background:#eee;
-
-}
-
-#myCanvas{
-   cursor: crosshair;
-}
-
-input{
-	position: absolute;
-	width: 72px;
-	height: 24px;
-}
-
-#input_submit{
-	right: 30px;
-	bottom: 30px;
-	width:100px;
-	height:100px;
-}
-
-#input_depth{
-	display: none;
-	position: absolute;
-	right: 30px;
-	bottom: 150px;
-	width: 92px;
-}
-
-depth{
-	display: none;
-	position: absolute;
-	right: 60px;
-	bottom: 184px;
-	font-family: arial;
-	font-size: 16px;
-	color: #333;
-}
-
-#input_tool{
-	display: none;
-	position: absolute;
-	right: 30px;
-	bottom: 200px;
-	width: 92px;
-}
-
-#input_radius{
-	display: none;
-}
-
-#undo{
-	right: 10px;
-	top: 60px;
-	width:175px;
-	height:37px;
-}
-
-#type{
-	position: absolute;
-	right: 10px;
-	top:   105px;
-	width: 175px;
-	height: 37px;
-}
-
-#x-right{
-	display: none;
-	position: absolute;
-	right: 30px;
-	top:   50%;
-	width: 83px;
-	height: 25px;
-}
-
-#x-left{
-	display: none;
-	position: absolute;
-	left: 30px;
-	top:   50%;
-	width: 83px;
-	height: 25px;
-}
-
-#y-top{
-	display: none;
-	position: absolute;
-	right: 13%;
-	top:   10px;
-	width: 83px;
-	height: 25px;
-}
-
-#y-bot{
-	display: none;
-	position: absolute;
-	right: 13%;
-	bottom: 20px;
-	width: 83px;
-	height: 25px;
-}
-
-#help{
-	position: absolute;
-	left: 10px;
-	top: 10px;
-	width: 37px;
-	height: 37px;
-}
-
-#board{
-	position: absolute;
-	left: 10px;
-	top: 60px;
-	width: 120px;
-	height: 37px;
-}
-
-#help-div{
-	display:none;
-	position: absolute;
-	left: 8px;
-	top: 62px;
-	width: 190px;
-	height: 420px;
-	background: rgba(76, 175, 80, 0.5);
-	padding: 20px;
-	border-radius: 25px;
-	color: #fff;
-	font-size: 15px;
-	font-family: arial;
-}
-
-.alignleft {
-	float: left;
-}
-.alignright {
-	float: right;
-}
-.aligncenter {
- 	text-align: center; }
-}
-
-</style>
 </head>
 
 <body onload="makeFrame(radius); parts();">
@@ -172,12 +26,16 @@ depth{
   <option value="smd">pad (SMD)</option>
   <option value="route">route</option>
   <option value="resistor">SMD (1206)</option>
-
 </select>
 
 <select id="board" autocomplete="on">
   <option value="arduino" selected>Arduino</option>
   <option value="blank">blank</option>
+</select>
+
+<select id="side" autocomplete="on">
+  <option value="top" selected>top</option>
+  <option value="back">back</option>
 </select>
 
 <input id="help" type="submit" value="?" onclick="help()"/>
@@ -252,12 +110,15 @@ depth{
 
 <input id="input_radius" type="number" value="2" autocomplete="off" step="0.1" min="0"/>   
 
+</body>
+
+
+
 <script>
 
 //TODO
 //
 //undo hole
-//flip toggle (for cutting back of board)
 //
 //add device class
 //
@@ -501,7 +362,12 @@ for(i=0;i<grid.length;i++){
 	ctx.stroke()
 }
 
-ctx.fillStyle="#666"
+if(document.getElementById('side').value=="top"){
+	ctx.fillStyle="#666"
+}
+else{
+	ctx.fillStyle="#888"
+}
 ctx.lineWidth="2"
 ctx.strokeStyle="#ff0000"
 if((document.getElementById("board").value)=="arduino"){
@@ -523,7 +389,14 @@ if((seg==1)&&(line==true)&&(pan==false)&&	(document.getElementById("type").value
 	ctx.stroke()
 }
 
-ctx.fillStyle="#666"
+
+
+if(document.getElementById('side').value=="top"){
+	ctx.fillStyle="#666"
+}
+else{
+	ctx.fillStyle="#888"
+}
 
 for(i=0;i<trace.length;i++){
 	ctx.beginPath()
@@ -2136,7 +2009,9 @@ for(i=0;i<net.length;i++){
 	}
 }
 
-flip()
+	if(document.getElementById('side').value=="top"){
+		flip()
+	}
 
 if(filetype=="gcode"){
 
@@ -2274,7 +2149,9 @@ fabmo.submitJob({
 
 	g=""
 
-	flip()
+	if(document.getElementById('side').value=="top"){
+		flip()
+	}
 
 }
 
@@ -2349,6 +2226,6 @@ function flip(){
 
 </script>
 
-</body>
+
 </html>
 

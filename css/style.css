@@ -1,0 +1,154 @@
+
+body{
+	background:#eee;
+
+}
+
+#myCanvas{
+   cursor: crosshair;
+}
+
+input{
+	position: absolute;
+	width: 72px;
+	height: 24px;
+}
+
+#input_submit{
+	right: 30px;
+	bottom: 30px;
+	width:100px;
+	height:100px;
+}
+
+#input_depth{
+	display: none;
+	position: absolute;
+	right: 30px;
+	bottom: 150px;
+	width: 92px;
+}
+
+depth{
+	display: none;
+	position: absolute;
+	right: 60px;
+	bottom: 184px;
+	font-family: arial;
+	font-size: 16px;
+	color: #333;
+}
+
+#input_tool{
+	display: none;
+	position: absolute;
+	right: 30px;
+	bottom: 200px;
+	width: 92px;
+}
+
+#input_radius{
+	display: none;
+}
+
+#undo{
+	right: 10px;
+	top: 60px;
+	width:175px;
+	height:37px;
+}
+
+#type{
+	position: absolute;
+	right: 10px;
+	top:   105px;
+	width: 175px;
+	height: 37px;
+}
+
+#x-right{
+	display: none;
+	position: absolute;
+	right: 30px;
+	top:   50%;
+	width: 83px;
+	height: 25px;
+}
+
+#x-left{
+	display: none;
+	position: absolute;
+	left: 30px;
+	top:   50%;
+	width: 83px;
+	height: 25px;
+}
+
+#y-top{
+	display: none;
+	position: absolute;
+	right: 13%;
+	top:   10px;
+	width: 83px;
+	height: 25px;
+}
+
+#y-bot{
+	display: none;
+	position: absolute;
+	right: 13%;
+	bottom: 20px;
+	width: 83px;
+	height: 25px;
+}
+
+#help{
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	width: 37px;
+	height: 37px;
+}
+
+#board{
+	position: absolute;
+	left: 10px;
+	top: 60px;
+	width: 120px;
+	height: 37px;
+}
+
+#side{
+	position: absolute;
+	left: 10px;
+	top: 105px;
+	width: 120px;
+	height: 37px;
+}
+
+
+#help-div{
+	display:none;
+	position: absolute;
+	left: 8px;
+	top: 62px;
+	width: 190px;
+	height: 420px;
+	background: rgba(76, 175, 80, 0.5);
+	padding: 20px;
+	border-radius: 25px;
+	color: #fff;
+	font-size: 15px;
+	font-family: arial;
+}
+
+.alignleft {
+	float: left;
+}
+.alignright {
+	float: right;
+}
+.aligncenter {
+ 	text-align: center; }
+}
+
