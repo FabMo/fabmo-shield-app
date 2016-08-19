@@ -1,26 +1,27 @@
 <!DOCTYPE html>
 
-<! jward 2016 >
+<! 
+	jward 2016 
+>
 
 <html lang="en"> 
 <head>
-<title>SHIELD</title>
-<link href="css/style.css" rel="stylesheet">
-<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"/>
-<script src="js/jquery-1.11.2.min.js"></script>
-<script src="js/jquery.mousewheel.min.js"></script>
-<script src="js/libs/fabmo.min.js"></script>
-<script src="js/clipper.js"></script>
-
+	<title>SHIELD</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"/>
+	<link href="css/style.css" rel="stylesheet">
+	<script src="js/libs/jquery-1.11.2.min.js"></script>
+	<script src="js/libs/jquery.mousewheel.min.js"></script>
+	<script src="js/libs/fabmo.min.js"></script>
+	<script src="js/libs/clipper.js"></script>
+	<script src="js/draw.js"></script>
+	<script src="js/parts.js"></script>
+	<script src="js/make.js"></script>
 </head>
 
 <body onload="makeFrame(radius); parts();">
 
 <select id="type" autocomplete="on" data-resistor="resistor">
   <option value="part" selected disabled>&#43;</option>
-  <!--
-  <option value="battery">Battery</option>
-  -->
   <option value="dip">pad (DIP)</option>
   <option value="hole">hole (0.1"&#8960;)</option>
   <option value="smd">pad (SMD)</option>
@@ -39,13 +40,9 @@
 </select>
 
 <input id="help" type="submit" value="?" onclick="help()"/>
-
 <input id="input_tool" type="number" value="0.79" autocomplete="on" step="0.01"/>
-
 <input id="input_depth" type="number" value="1.7" autocomplete="on" step="0.1" min="0"/>
-
 <input id="input_submit" type="submit" value="SUBMIT&#x00A;JOB" onclick="make()"/>
-
 <input id="undo" type="submit" value="UNDO" onclick="undo()"/>
 
 <canvas id="myCanvas"></canvas>
@@ -128,7 +125,7 @@
 //tool change
 //
 
-var fabmo = new FabMoDashboard();
+var fabmo = new FabMoDashboard()
 
 var g = ""
 var frame1 = []
@@ -182,7 +179,6 @@ var origin = {X:0,Y:0}
 
 var xo = 0
 var yo = 0
-
 var seg = 0
 
 var yoffsetTop = 0
@@ -201,19 +197,20 @@ var pkgOutlines = []
 var temp = []
 var temp2
 
+var batteryOutline
 var resistor=[ 
 	[ {X:1,Y:0.85},{X:-0.85,Y:0.85},{X:-0.85,Y:-0.85},{X:0.85,Y:-0.85},{X:0.85,Y:0.85} ],
 	[ {X:3.39,Y:0.85},{X:1.69,Y:0.85},{X:1.69,Y:-0.85},{X:3.39,Y:-0.85},{X:3.39,Y:0.85} ] 
 ]
-
-//1206
 var resistorOutline=[{X:-0.254,Y:-0.76},{X:2.794,Y:-0.76},{X:2.794,Y:0.76},{X:-0.254,Y:0.76},{X:-0.254,Y:-0.76}]
-
 var battery=[ 
 	[ {X:-0.85,Y:-0.85},{X:0.85,Y:-0.85},{X:0.85,Y:0.85},{X:-0.85,Y:0.85},{X:-0.85,Y:-0.85} ],
 	[ {X:3.39,Y:-0.85},{X:3.39,Y:0.85},{X:1.69,Y:0.85},{X:1.69,Y:-0.85},{X:3.39,Y:-0.85} ] 
 ]
-var batteryOutline
+
+$(window).resize(function(){
+	draw()
+})
 
 $("#myCanvas").on('mousewheel',function(e){
 	e.preventDefault()
@@ -265,662 +262,12 @@ $("#myCanvas").on("touchstart", function(e){
 	}
 
 
-});
-
+})
 
 $("#myCanvas").on("touchend", function(e){
-
 	click = 0
-});
+})
 
-function draw(){
-
-if((pan==true)&&(click==0)){
-	document.getElementById('myCanvas').style.cursor = 'grab'
-	document.getElementById('myCanvas').style.cursor = '-webkit-grab'
-}
-else if((pan==true)&&(click==1)){
-	document.getElementById('myCanvas').style.cursor = 'move'
-}
-else{
-	document.getElementById('myCanvas').style.cursor = 'crosshair'
-}
-
-
-document.getElementById('board_width').innerHTML = (((xmax + Math.abs(xmin))/25.4).toFixed(2) + "\"")
-document.getElementById('board_height').innerHTML = (((ymax + Math.abs(ymin))/25.4).toFixed(2) + "\"")
-
-c = document.getElementById("myCanvas")
-ctx = c.getContext("2d")
-
-ctx.canvas.height = $(window).innerHeight()-30
-ctx.canvas.width = $(window).innerWidth()-30
-
-sf = ((ctx.canvas.height-(110-(yoffsetTop/sf)-(yoffsetBot/sf)))/(ymax+(Math.abs(ymin)))+zoom)
-
-if(sf<2){
-	sf = 2
-	zoom = 2-(ctx.canvas.height-(110-(yoffsetTop/sf)-(yoffsetBot/sf)))/(ymax+(Math.abs(ymin)))
-}
-
-yo=((parseFloat(document.getElementById("y-top").value)*1.27*sf)-(parseFloat(document.getElementById("y-bot").value)*1.27*sf))
-
-ctx.translate(panX*sf,yo+panY*sf)
-
-ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height)
-ctx.lineJoin="round"
-
-ctx.fillStyle="#8c8cff"
-ctx.strokeStyle="#000"
-ctx.lineWidth="1"
-
-if((document.getElementById("board").value)=="arduino"){
-
-for(i=0;i<arduino.length;i++){
-	ctx.beginPath()
-	for(j=0;j<arduino[i].length;j++){
-		ctx.lineTo((ctx.canvas.width/2)+(arduino[i][j].X*sf),(ctx.canvas.height/2)+(arduino[i][j].Y*sf))
-	}
-	ctx.stroke()
-	ctx.fill()
-}
-
-ctx.fillStyle="#aaa"
-for(i=7;i<arduino.length;i++){
-	ctx.beginPath()
-
-	if(i==7){
-		ctx.fillStyle="#bbb"
-	}
-
-	for(j=0;j<arduino[i].length;j++){
-		ctx.lineTo((ctx.canvas.width/2)+(arduino[i][j].X*sf),(ctx.canvas.height/2)+(arduino[i][j].Y*sf))
-	}
-	ctx.fill()
-	ctx.stroke()
-}
-
-}//
-
-ctx.fillStyle="#ccccff"
-ctx.beginPath()
-	for(i=0;i<frame1.length;i++){
-		ctx.lineTo((frame1[i].X*sf)+ctx.canvas.width/2,(frame1[i].Y*sf)+ctx.canvas.height/2)
-	}
-ctx.fill()
-		ctx.strokeStyle="#fff"
-		ctx.lineWidth=0.7
-for(i=0;i<grid.length;i++){
-	ctx.beginPath()
-	for(j=0;j<grid[i].length;j++){
-		ctx.lineTo((ctx.canvas.width/2)+(grid[i][j].X*sf),(ctx.canvas.height/2)+(grid[i][j].Y*sf))
-	}
-	ctx.stroke()
-}
-
-if(document.getElementById('side').value=="top"){
-	ctx.fillStyle="#666"
-}
-else{
-	ctx.fillStyle="#888"
-}
-ctx.lineWidth="2"
-ctx.strokeStyle="#ff0000"
-if((document.getElementById("board").value)=="arduino"){
-	for(i=0;i<pin_outlines.length;i++){
-		ctx.beginPath()
-		for(j=0;j<pin_outlines[i].length;j++){
-			ctx.lineTo((ctx.canvas.width/2)+(pin_outlines[i][j].X*sf),(ctx.canvas.height/2)+(pin_outlines[i][j].Y*sf))
-		}
-		ctx.fill()
-	}
-}
-
-if((seg==1)&&(line==true)&&(pan==false)&&	(document.getElementById("type").value!="resistor")){
-	ctx.beginPath()
-	ctx.strokeStyle="#999"
-	ctx.moveTo((ctx.canvas.width/2)+(endX*sf),(ctx.canvas.height/2)+(endY*sf))
-	ctx.lineTo((ctx.canvas.width/2)+(mouseX*sf),(ctx.canvas.height/2)+(mouseY*sf))
-	ctx.lineWidth=0.6*sf
-	ctx.stroke()
-}
-
-
-
-if(document.getElementById('side').value=="top"){
-	ctx.fillStyle="#666"
-}
-else{
-	ctx.fillStyle="#888"
-}
-
-for(i=0;i<trace.length;i++){
-	ctx.beginPath()
-	for(j=0;j<trace[i].length;j++){
-		ctx.lineTo((ctx.canvas.width/2+(trace[i][j].X*sf)),(ctx.canvas.height/2+(trace[i][j].Y*sf)))
-	}
-	ctx.fill()
-}
-
-//
-if((document.getElementById("board").value)=="arduino"){
-
-ctx.lineWidth=0.4*sf
-ctx.strokeStyle="#ccccff"
-
-	for(i=0;i<pins.length;i++){
-		ctx.beginPath()
-		for(j=0;j<pins[i].length;j++){
-			ctx.lineTo((pins[i][j].X*sf)+ctx.canvas.width/2,(pins[i][j].Y*sf)+ctx.canvas.height/2)
-		}
-		ctx.stroke()
-	}
-
-
-
-ctx.lineWidth="1"
-ctx.strokeStyle="#ffff00"
-ctx.fillStyle="#ffff00"
-
-for(i=0;i<connect.length;i++){
-	ctx.beginPath()
-	ctx.arc(ctx.canvas.width/2+((connect[i].X)*sf),ctx.canvas.height/2+((connect[i].Y)*sf),0.2*sf,0,(Math.PI*2))
-	ctx.fill()
-	ctx.stroke()
-}
-
-	ctx.lineWidth="1"
-	ctx.strokeStyle="#000"
-	ctx.fillStyle="#fff"
-
-for(i=0;i<arduino_pins.length;i++){
-		ctx.beginPath()
-	for(j=0;j<arduino_pins[i].length;j++){
-		ctx.lineTo((ctx.canvas.width/2)+(arduino_pins[i][j].X*sf),(ctx.canvas.height/2)+(arduino_pins[i][j].Y*sf))
-	}
-	ctx.fill()
-}
-
-}//
-
-ctx.beginPath()
-ctx.lineWidth="2"
-ctx.strokeStyle="#0000aa"
-
-	for(i=0;i<frame1.length;i++){
-		ctx.lineTo((frame1[i].X*sf)+ctx.canvas.width/2,(frame1[i].Y*sf)+ctx.canvas.height/2)
-	}
-
-ctx.stroke()
-
-	
-ctx.lineWidth="1"
-ctx.fillStyle="#fff"
-ctx.strokeStyle="#333"
-
-for(i=0;i<net.length;i++){
-	for(j=0;j<net[i].length;j++){
-
-		ctx.beginPath()
-		if(net[i][j].D==true){
-			ctx.fillStyle="#fff"
-			ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.4*sf,0,(Math.PI*2))
-		}
-		else{
-			//ctx.fillStyle="#00ff00"
-			//ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.2*sf,0,(Math.PI*2))
-		}
-		if( (i==net.length-1) && (j==(net[i].length-1)) ){
-			ctx.beginPath()
-			ctx.fillStyle="#00ff00"
-			ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.25*sf,0,(Math.PI*2))
-		}
-		ctx.fill()
-	}
-	if( (net[i].length==0) && (net.length>1) ){
-		ctx.beginPath()
-		if(seg==1){
-			ctx.fillStyle="#00ff00"
-		}
-		else{
-			ctx.fillStyle="#ff0000"
-		}
-
-		ctx.arc(ctx.canvas.width/2+((net[i-1][net[i-1].length-1].X)*sf),ctx.canvas.height/2+((net[i-1][net[i-1].length-1].Y)*sf),0.25*sf,0,(Math.PI*2))
-
-		ctx.fill()		
-	}
-}
-
-if(pad==0){
-ctx.fillStyle="#666"
-}
-else if((document.getElementById("type").value)=="resistor"){
-	
-ctx.fillStyle="#999"
-
-}
-
-for(i=0;i<temp.length;i++){
-	
-	ctx.beginPath()
-	for(j=0;j<temp[i].length;j++){
-		ctx.lineTo((ctx.canvas.width/2+(temp[i][j].X*sf)),(ctx.canvas.height/2+(temp[i][j].Y*sf)))
-	}
-	ctx.fill()
-}
-
-ctx.strokeStyle="#fff"
-ctx.fillStyle="#fff"
-ctx.lineWidth=0.8*sf
-for(i=0;i<hole.length;i++){
-	ctx.beginPath()
-	for(j=0;j<hole[i].length;j++){
-		ctx.lineTo((ctx.canvas.width/2+(hole[i][j].X*sf)),(ctx.canvas.height/2+(hole[i][j].Y*sf)))
-	}
-	ctx.fill()
-	ctx.stroke()
-}
-
-
-ctx.lineWidth=0.1*sf
-ctx.fillStyle="rgba(255, 255, 0, 0.45)"
-ctx.strokeStyle="rgba(200, 200, 0, 0.6)"
-
-for(i=0;i<pkgOutlines.length;i++){
-	ctx.beginPath()
-		for(j=0;j<pkgOutlines[i].length;j++){
-			ctx.lineTo((ctx.canvas.width/2)+(pkgOutlines[i][j].X*sf),(ctx.canvas.height/2)+(pkgOutlines[i][j].Y*sf))
-		}
-	ctx.fill()
-	ctx.stroke()
-}
-
-if(((document.getElementById("type").value)=="resistor")&&(pad==1)){
-	ctx.fillStyle="#fff"
-	ctx.beginPath()
-	ctx.arc(ctx.canvas.width/2+(origin.X*sf),ctx.canvas.height/2+(origin.Y*sf),0.15*sf,0,(Math.PI*2))
-	ctx.fill()
-}
-
-ctx.fillStyle="#999"
-ctx.strokeStyle="#999"
-
-ctx.beginPath()
-
-if((on_grid==true)&&(pan==false)){
-	
-	if(document.getElementById("type").value=="dip"){
-		ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.85*sf,0,(Math.PI*2) )
-		ctx.fill()
-	}
-	else if(document.getElementById("type").value=="smd"){
-		ctx.moveTo((ctx.canvas.width/2)+((mouseX-0.85)*sf),(ctx.canvas.height/2)+((mouseY-0.85)*sf))
-		ctx.lineTo((ctx.canvas.width/2)+((mouseX-0.85)*sf),(ctx.canvas.height/2)+((mouseY+0.85)*sf))
-		ctx.lineTo((ctx.canvas.width/2)+((mouseX+0.85)*sf),(ctx.canvas.height/2)+((mouseY+0.85)*sf))
-		ctx.lineTo((ctx.canvas.width/2)+((mouseX+0.85)*sf),(ctx.canvas.height/2)+((mouseY-0.85)*sf))
-		ctx.lineTo((ctx.canvas.width/2)+((mouseX-0.85)*sf),(ctx.canvas.height/2)+((mouseY-0.85)*sf))
-		ctx.fill()
-	}
-
-ctx.beginPath()
-	
-	if((seg==1)&&(line==true)){
-		ctx.fillStyle="#ff0000"
-	}
-	else{
-		ctx.fillStyle="#00ff00"
-	}
-
-	if(on_grid==false){
-		ctx.fillStyle="#FFA500"
-	}
-
-	ctx.stroke()
-
-	ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.25*sf,0,(Math.PI*2) )
-	ctx.lineWidth=0.4*sf
-	ctx.stroke()
-
-	ctx.fill()
-
-}
-
-ctx.lineWidth="0.6"
-ctx.strokeStyle="#000"
-
-for(i=0;i<outlines.length;i++){
-	ctx.beginPath()
-	for(j=0;j<outlines[i].length;j++){
-		ctx.lineTo(((ctx.canvas.width/2)+(outlines[i][j].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(outlines[i][j].Y/scale*sf)).toFixed(3))
-	}
-	ctx.stroke()
-}
-
-var size_font = (14)
-ctx.font = (size_font + "px Arial")
-
-if(((document.getElementById("help-div").style.display)=='block')||(document.getElementById("board").value=="blank")){
-
-if((document.getElementById("help-div").style.display)=='block'){
-	ctx.lineWidth=(0.1*sf)
-	ctx.strokeStyle="#333"
-	ctx.fillStyle="#ffff00"
-
-	ctx.beginPath()
-	ctx.arc(ctx.canvas.width/2+(xmin*sf),ctx.canvas.height/2+(ymax*sf),(0.5*sf),0,(Math.PI*2))
-	ctx.moveTo(ctx.canvas.width/2+(xmin*sf),ctx.canvas.height/2+(ymax*sf)+(0.5*sf))
-	ctx.lineTo(ctx.canvas.width/2+(xmin*sf),ctx.canvas.height/2+(ymax*sf)-(0.5*sf))
-	ctx.moveTo(ctx.canvas.width/2+(xmin*sf)+(0.5*sf),ctx.canvas.height/2+(ymax*sf))
-	ctx.lineTo(ctx.canvas.width/2+(xmin*sf)-(0.5*sf),ctx.canvas.height/2+(ymax*sf))
-	ctx.fill()
-	ctx.stroke()
-
-}
-
-	ctx.strokeStyle="#666"
-	ctx.lineWidth="1"
-	ctx.fillStyle="#888"
-
-	ctx.beginPath()
-	ctx.moveTo((ctx.canvas.width/2)+(34),(ctx.canvas.height)-10-yo-(panY*sf))
-	ctx.lineTo((ctx.canvas.width/2)+(xmax*sf),(ctx.canvas.height)-yo-10-(panY*sf))
-	ctx.moveTo((ctx.canvas.width/2)-(3),(ctx.canvas.height)-10-yo-(panY*sf))
-	ctx.lineTo((ctx.canvas.width/2)+(xmin*sf),(ctx.canvas.height)-10-yo-(panY*sf))
-	ctx.stroke()
-
-	ctx.fillText( ((Math.abs(ymin/25.4))+(ymax/25.4)).toFixed(2)  + "\"",ctx.canvas.width/2+(xmax*sf)+(4.4*sf),ctx.canvas.height/2)
-	ctx.fillText( ((Math.abs(xmin/25.4))+(xmax/25.4)).toFixed(2)  + "\"",ctx.canvas.width/2,(ctx.canvas.height)-6-yo-(panY*sf))
-
-	ctx.beginPath()
-	ctx.moveTo((ctx.canvas.width/2)+(xmax*sf)+(5*sf),(ctx.canvas.height/2)+(5))
-	ctx.lineTo((ctx.canvas.width/2)+(xmax*sf)+(5*sf),(ctx.canvas.height/2)+(ymax*sf))
-	ctx.moveTo((ctx.canvas.width/2)+(xmax*sf)+(5*sf),(ctx.canvas.height/2)-(15))
-	ctx.lineTo((ctx.canvas.width/2)+(xmax*sf)+(5*sf),(ctx.canvas.height/2)+(ymin*sf))
-	ctx.stroke()
-
-	ctx.beginPath()
-	ctx.arc(ctx.canvas.width/2+(xmax*sf)+(5*sf),(ctx.canvas.height/2)+(ymax*sf),(0.3*sf),0,(Math.PI*2))
-	ctx.fill()
-
-	ctx.beginPath()
-	ctx.arc(ctx.canvas.width/2+(xmax*sf)+(5*sf),(ctx.canvas.height/2)+(ymin*sf),(0.3*sf),0,(Math.PI*2))
-	ctx.fill()
-
-	ctx.beginPath()
-	ctx.arc((ctx.canvas.width/2)+(xmax*sf),(ctx.canvas.height)-10-yo-(panY*sf),(0.3*sf),0,(Math.PI*2))
-	ctx.fill()
-
-	ctx.beginPath()
-	ctx.arc((ctx.canvas.width/2)+(xmin*sf),(ctx.canvas.height)-10-yo-(panY*sf),(0.3*sf),0,(Math.PI*2))
-	ctx.fill()
-}
-
-size_font = (17)
-ctx.font = (size_font + "px Arial")
-ctx.fillStyle="#777"
-ctx.translate( (ctx.canvas.width/2)-xo,ctx.canvas.height/2)
-
-if((document.getElementById("board").value)=="arduino"){
-	var droX= ((((parseFloat(mouseX)+25.4-2.54+(parseInt(document.getElementById('x-left').value)*2.54))/25.4)).toFixed(1))
-	var droY= (Math.abs((parseFloat(mouseY)-24.15-(parseInt(document.getElementById('y-bot').value)*2.54))/25.4).toFixed(1))
-}
-else if((document.getElementById("board").value)=="blank"){
-	droX=((((parseFloat(mouseX)+11.43+(parseInt(document.getElementById('x-left').value)*2.54))/25.4)).toFixed(1))
-	droY=(Math.abs((parseFloat(mouseY)-11.43-(parseInt(document.getElementById('y-bot').value)*2.54))/25.4).toFixed(1))
-}
-
-ctx.fillText("x: "+droX,ctx.canvas.width/2-(103)-(panX*sf),-ctx.canvas.height/2+(15)-yo-(panY*sf))
-ctx.fillText("y: "+droY,ctx.canvas.width/2-(103)-(panX*sf),-ctx.canvas.height/2+(40)-yo-(panY*sf))
-
-var size_font = (12)
-ctx.font = (size_font + "px Arial")
-ctx.fillText("inch",ctx.canvas.width/2-(50)-(panX*sf),-ctx.canvas.height/2+(40)-yo-(panY*sf))
-
-//
-size_font = (1.5*sf)
-ctx.font = (size_font + "px Arial")
-
-ctx.translate(((-11.45+o)*sf)+(1.5*sf)+xo,-27*sf)
-
-ctx.rotate(-Math.PI/2);
-
-yoffsetTop = (parseFloat(document.getElementById("y-top").value)*2.54*sf)
-yoffsetBot = (parseFloat(document.getElementById("y-bot").value)*2.54*sf)
-
-if((document.getElementById("board").value)=="arduino"){
-
-ctx.fillStyle="#ff00ff"
-	if(pinNum==15){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText(" SCL",yoffsetTop,(-5.06*sf)-(sf*1.1))
-	if(pinNum==16){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText(" SDA",yoffsetTop,(-2.54*sf)-(sf*1.1))
-	if(pinNum==17){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText(" AREF",yoffsetTop,0-(sf*1.1))
-	if(pinNum==18){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText(" GND",yoffsetTop,(2.54*sf)-(sf*1.1))
-	if(pinNum==19){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText(" 13",yoffsetTop,(2.54*2*sf)-(sf*1.1))
-	if(pinNum==20){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText(" 12",yoffsetTop,(2.54*3*sf)-(sf*1.1))
-	if(pinNum==21){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("~11",yoffsetTop,(2.54*4*sf)-(sf*1.1))
-	if(pinNum==22){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("~10",yoffsetTop,(2.54*5*sf)-(sf*1.1))
-	if(pinNum==23){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("  9",yoffsetTop,(2.54*6*sf)-(sf*1.1))
-	if(pinNum==24){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("  8",yoffsetTop,(2.54*7*sf)-(sf*1.1))
-	if(pinNum==25){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("  7",yoffsetTop,(2.54*8*sf)+(0.8*sf))
-	if(pinNum==26){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("~6",yoffsetTop,(2.54*9*sf)+(0.8*sf))
-	if(pinNum==27){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("~5",yoffsetTop,(2.54*10*sf)+(0.8*sf))
-	if(pinNum==28){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("  4",yoffsetTop,(2.54*11*sf)+(0.8*sf))
-	if(pinNum==29){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("~3",yoffsetTop,(2.54*12*sf)+(0.8*sf))
-	if(pinNum==30){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("  2",yoffsetTop,(2.54*13*sf)+(0.8*sf))
-	if(pinNum==31){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("  1 TX",yoffsetTop,(2.54*14*sf)+(0.8*sf))
-	if(pinNum==32){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("  0 RX",yoffsetTop,(2.54*15*sf)+(0.8*sf))
-
-
-	if(pinNum==14){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("A5",(-56*sf)-yoffsetBot,(2.54*15*sf)+(0.9*sf))
-	if(pinNum==13){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("A4",(-56*sf)-yoffsetBot,(2.54*14*sf)+(0.9*sf))
-	if(pinNum==12){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("A3",(-56*sf)-yoffsetBot,(2.54*13*sf)+(0.9*sf))
-	if(pinNum==11){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("A2",(-56*sf)-yoffsetBot,(2.54*12*sf)+(0.9*sf))
-	if(pinNum==10){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("A1",(-56*sf)-yoffsetBot,(2.54*11*sf)+(0.9*sf))
-	if(pinNum==9){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("A0",(-56*sf)-yoffsetBot,(2.54*10*sf)+(0.9*sf))
-
-	if(pinNum==8){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("VIN",(-56.5*sf)-yoffsetBot,(2.54*9*sf)-(1.6*sf))
-	if(pinNum==7){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("GND",(-57.3*sf)-yoffsetBot,(2.54*8*sf)-(1.6*sf))
-	if(pinNum==6){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("GND",(-57.3*sf)-yoffsetBot,(2.54*7*sf)-(1.6*sf))
-	if(pinNum==5){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("5V",(-56*sf)-yoffsetBot,(2.54*6*sf)-(1.6*sf))
-	if(pinNum==4){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("3.3V",(-57.3*sf)-yoffsetBot,(2.54*5*sf)-(1.6*sf))
-	if(pinNum==3){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("RST",(-57.2*sf)-yoffsetBot,(2.54*4*sf)-(1.6*sf))
-	if(pinNum==2){
-		ctx.fillStyle="#000"
-	}
-	else{
-		ctx.fillStyle="#ff00ff"
-	}
-ctx.fillText("IOREF",(-58.5*sf)-yoffsetBot,(2.54*3*sf)-(1.6*sf))
-	if(pinNum==1){
-		ctx.fillStyle="#888"
-	}
-	else{
-		ctx.fillStyle="#bbb"
-	}
-ctx.fillText("NC",(-56.5*sf)-yoffsetBot,(2.54*2*sf)-(1.6*sf))
-}
-
-}
 
 $("#myCanvas").on('click', function(e) {
 
@@ -928,12 +275,11 @@ $("#myCanvas").on('click', function(e) {
 	y = (((e.clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)-panY)
 
 		if(pan==false){
-
-		var d = 0.3
-		var r = 0.85
-		var v = 50
-		var drill = false
-		var skip = false
+			var d = 0.3
+			var r = 0.85
+			var v = 50
+			var drill = false
+			var skip = false
 		if(document.getElementById("type").value=="dip"){
 			drill=true
 		}
@@ -949,8 +295,6 @@ $("#myCanvas").on('click', function(e) {
 				endY=pts[i].Y
 
 				if((document.getElementById("type").value=="resistor")||(document.getElementById("type").value=="battery")){
-
-					//seg=0
 
 					if(document.getElementById("type").value=="resistor"){
 						temp2 = resistor
@@ -994,16 +338,13 @@ $("#myCanvas").on('click', function(e) {
 						pad=2
 						add_trace()
 						net.push([])
-
 						//console.log(net)
-
 					}
 					else if(pad==2){
 						pad=0
 					}
 	
 				}
-
 				//pads
 				if((document.getElementById("type").value!="resistor") && (document.getElementById("type").value!="part") &&(document.getElementById("type").value!="battery")){ 
 
@@ -1128,8 +469,10 @@ $("#myCanvas").on('click', function(e) {
 			add_trace()
 		}
 	}
-
 })
+
+
+
 
 $("#myCanvas").on('mousedown', function(e) {
 
@@ -1158,87 +501,15 @@ if(pan==true){
 
 })
 
-function undo(){
 
-temp=[]
-pad=0
-
-console.log(net)
-
-$("#undo").blur()
-
-if(net.length>1){
-
-	if((seg==0)&&(net[net.length-1].length==0)){
-		net.pop()
-		if(net[net.length-1][0].T=="res"){
-			pkgOutlines.pop()
-			net[net.length-1].pop()
-
-		}
-		else{
-		net[net.length-1].pop()
-		}
-		trace.pop()
-		trace.pop()
-	}
-	
-	else if((net[net.length-1].length==0)&&(net[net.length-2].length==3)){
-		pkgOutlines.pop()
-		net.pop()
-		net[net.length-1].pop()
-		net[net.length-1].pop()
-		trace.pop()
-		trace.pop()
-		seg=0
-	
-	}
-	
-	else{
-
-		net[net.length-1].pop()
-		trace.pop()
-	}
-	if((net[net.length-1].length==0)){
-		endX=(net[net.length-2][net[net.length-2].length-1].X)
-		endY=(net[net.length-2][net[net.length-2].length-1].Y)
-	}
-	else{
-		endX=(net[net.length-1][net[net.length-1].length-1].X)
-		endY=(net[net.length-1][net[net.length-1].length-1].Y)
-		mouseX=endX
-		mouseY=endY
-	}
-}
-else{
-	trace.pop()
-	net = [[]]
-	seg = 1
-}
-
-if(seg==0){
-	seg=1
-}
-else{
-	seg=0
-}
-if((net[net.length-1].length==1)&&((net[net.length-1][0].T=="res"))){
-	net[net.length-1].pop()
-	seg=0
-}
-
-add_trace()
-
-
-}
 
 $("#myCanvas").on('mousemove', function(e) {
 
-mouseX=((e.clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)-panX
-mouseY=((e.clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)-panY
+	mouseX=((e.clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)-panX
+	mouseY=((e.clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)-panY
 	
-if(pan==false){
-	for(i=0;i<pts.length;i++){
+	if(pan==false){
+		for(i=0;i<pts.length;i++){
 		if(((Math.abs(mouseX-pts[i].X))<=1.27) && ((Math.abs(mouseY-pts[i].Y))<=1.27)){
 			mouseX=pts[i].X
 			mouseY=pts[i].Y
@@ -1254,49 +525,18 @@ if(pan==false){
 		}
 	}
 	add()
-}
+	}
 
-else if((pan==true)&&(click==1)){
+	else if((pan==true)&&(click==1)){
 		x=((e.clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)
 		y=((e.clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)
 		panX=(x-px)
 		panY=(y-py)
-}
+	}
 
-draw()
+	draw()
 
 })
-
-
-function add(){
-	if((temp2!=undefined)&&(pad==1)){
-
-	var deltaX = mouseX - origin.X
-	var deltaY = mouseY - origin.Y
-	var angle = (Math.atan2(deltaY, deltaX))
-
-	//console.log(angle)
-		
-	angle = ((Math.round(angle/(Math.PI/2)))*(Math.PI/2))
-
-		for(j=0;j<pkgOutlines[pkgOutlines.length-1].length;j++){
-			pkgOutlines[pkgOutlines.length-1][j]={X:(((resistorOutline[j].X)*(Math.cos(angle)))-((resistorOutline[j].Y)*(Math.sin(angle)))),Y:(((resistorOutline[j].Y)*(Math.cos(angle)))+((resistorOutline[j].X)*(Math.sin(angle))))}
-
-			pkgOutlines[pkgOutlines.length-1][j]={X:(pkgOutlines[pkgOutlines.length-1][j].X+origin.X),Y:(pkgOutlines[pkgOutlines.length-1][j].Y+origin.Y)}
-		}
-
-		for(j=0;j<temp.length;j++){
-			for(k=0;k<temp[j].length;k++){
-
-				temp[j][k]={X:(((temp2[j][k].X)*(Math.cos(angle)))-((temp2[j][k].Y)*(Math.sin(angle)))),Y:(((temp2[j][k].Y)*(Math.cos(angle)))+((temp2[j][k].X)*(Math.sin(angle))))}
-
-				temp[j][k]={X:(temp[j][k].X+origin.X).toFixed(2),Y:(temp[j][k].Y+origin.Y).toFixed(2)}
-
-			}
-		}
-
-	}
-}
 
 $(document).keypress(function(e){
 	if(e.which===32){		
@@ -1425,69 +665,9 @@ $(document).keydown(function(e){
 function help(){
 	$("#help").blur()
 	$("#help-div").toggle()
-
 	draw()
 }
 
-function makeFrame(radius) {
-
-if(document.getElementById("board").value=="arduino"){
-	var fo = 0
-}
-else{
-	fo = 0.2
-}
-frame1=[]
-path1=[]
-
-for (i=0;i<=verts;i++) {
-   if(i<=25){
-      frame1.push({X:((xmax+fo-radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymax+fo-radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
-      
-      path1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})
-   }
-   else if((i>25)&&(i<=50)){
-      frame1.push({X:((xmax+fo-radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymin-fo+radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
-      
-      path1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))}) 
-   }
-   else if((i>50)&&(i<=75)){
-      frame1.push({X:((xmin-fo+radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymin-fo+radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
-      
-      path1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})     
-   }
-   else if((i>75)&&(i<=100)){
-      frame1.push({X:((xmin-fo+radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymax+fo-radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
-      
-      path1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})  
-           
-      if(i==100){
-      	frame1.push(frame1[0])
-      	path1.push(path1[0])
-      }      
-   }   
-}
-
-if(radius==0){
-	frame1=[]
-	frame1.push({X:xmax,Y:ymax})
-	frame1.push({X:xmax,Y:ymin})
-	frame1.push({X:xmin,Y:ymin})
-	frame1.push({X:xmin,Y:ymax})
-	frame1.push({X:xmax,Y:ymax})
-}
-
-else if(radius+tool<=0){
-	path1=[]
-	path1.push({X:-xmax-tool,Y:-ymax-tool})
-	path1.push({X:-xmax-tool,Y:-ymin+tool})
-	path1.push({X:-xmin+tool,Y:-ymin+tool})
-	path1.push({X:-xmin+tool,Y:-ymax-tool})
-	path1.push({X:-xmax-tool,Y:-ymax-tool})
-}
-	frame1.reverse()
-	draw()
-}
 
 
 if(document.getElementById("board").value=="blank"){
@@ -1496,347 +676,6 @@ if(document.getElementById("board").value=="blank"){
 	xmax = 12.7 
 	ymax = 12.7
 	radius = 1.27
-}
-
-
-function parts(){
-
-	arduino.push( [{X:-34+o,Y:-26.5},{X:31+o,Y:-26.5},{X:31+o,Y:-13.5},{X:34+o,Y:-10.5},{X:34+o,Y:21.5},{X:31+o,Y:24.5},{X:31+o,Y:26.5},{X:-34+o,Y:26.5},{X:-34+o,Y:22.5}] )
-
-	arduino.push([])
-	arduino.push([])
-	arduino.push([])
-	arduino.push([])
-
-	arduino.push( [{X:-34+o,Y:13.5},{X:-34+o,Y:-5.5}] )
-	arduino.push( [{X:-34+o,Y:-17.5},{X:-34+o,Y:-26.5}] )
-	arduino.push( [{X:-40+o,Y:-17.5},{X:-23+o,Y:-17.5},{X:-23+o,Y:-5.5},{X:-40+o,Y:-5.5},{X:-40+o,Y:-17.5}] )
-	arduino.push( [{X:-35+o,Y:13.5},{X:-22+o,Y:13.5},{X:-22+o,Y:22.5},{X:-35+o,Y:22.5},{X:-35+o,Y:13.5}] )
-
-	makeGrid()	
-
-	x = -17.8
-	//top pins
-	pin_outlines.push([{X:(x+o-0.635+0.42),Y:-20.32-0.42},{X:(x+o-0.635+0.42),Y:-21.86},{X:(x+o)+0.42,Y:-22.86},{X:(x+o)+0.42,Y:-25.4+0.4},{X:(x+o+2.54)+(2.54*9)-0.4,Y:-25.4+0.4},{X:(x+o+2.54)+(2.54*9)-0.4,Y:-23.6},{X:(x+o+3.175)+(2.54*9)-0.42-1.27,Y:-22.86},{X:(x+o+3.175)+(2.54*9)-0.42-1.27,Y:-20.32-0.42},{X:(x+o-0.635+0.42),Y:-20.32-0.42}])
-
-	x = x + 2.54	
-
-	for(i=0;i<9;i++){
-		pins.push([{X:(x+o-0.635),Y:-20.32},{X:(x+o-0.635),Y:-21.86},{X:(x+o),Y:-22.86},{X:(x+o),Y:-25.4}])
-	x = x + 2.54
-	}
-
-	x = 9.505
-	
-	pin_outlines.push([{X:(x+o+0.42),Y:-20.32-0.2},{X:(x+o+0.42),Y:-25.4+0.4},{X:(x+o+2.54*8-0.42),Y:-25.4+0.4},{X:(x+o+2.54*8-0.42),Y:-20.32-0.4},{X:(x+o+0.42),Y:-20.32-0.4}])
-
-	x = x + 2.54
-	for(i=0;i<7;i++){
-		pins.push([{X:(x+o),Y:-20.32},{X:(x+o),Y:-25.4}])
-	x = x + 2.54
-	}
-	//bottom pins
-
-	x = 29.825
-
-	pin_outlines.push([{X:(x+o)-0.42,Y:20.32+0.4},{X:(x+o)-0.42,Y:25.4-0.4},{X:(x+o-2.54*6)+0.42,Y:25.4-0.4},{X:(x+o-2.54*6)+0.42,Y:20.32+0.4},{X:(x+o)+0.42,Y:20.32+0.4}])
-
-	x = x - 2.54
-	for(i=0;i<5;i++){
-		pins.push([{X:(x+o),Y:20.32},{X:(x+o),Y:25.4}])
-	x = x - 2.54
-	}
-
-	x = 12.06
-
-	pin_outlines.push([{X:(x+o)-0.42,Y:20.32+0.4},{X:(x+o)-0.42,Y:25.4-0.4},{X:(x+o-2.54*8)+0.42,Y:25.4-0.4},{X:(x+o-2.54*8)+0.42,Y:20.32+0.4},{X:(x+o)-0.42,Y:20.32+0.4}])
-
-	x = x - 2.54
-	for(i=0;i<7;i++){
-		pins.push([{X:(x+o),Y:20.32},{X:(x+o),Y:25.4}])	
-	x = x - 2.54
-	}
-
-
-x=-17.10
-for(i=0;i<10;i++){
-	connect.push({X:(x+o),Y:(-21.61)})
-	x = x +2.54
-}
-
-x=10.84
-for(i=10;i<18;i++){
-	connect.push({X:(x+o),Y:(-21.61)})
-	x = x +2.54
-}
-
-x=28.575
-for(i=18;i<24;i++){
-	connect.push({X:(x+o),Y:(21.61)})
-	x = x -2.54
-}
-
-x=10.84
-for(i=24;i<31;i++){
-	connect.push({X:(x+o),Y:(21.61)})
-	x = x -2.54
-}
-
-	var x = 28.575
-	for(i=0;i<8;i++){
-		arduino_pins.push([])
-		vias.push([])
-			nodes.push({X:(x+o),Y:(-24)})
-			for(j=0;j<=25;j++){
-				arduino_pins[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.45),Y:((-24.15)+Math.cos((Math.PI*2)/25*j)*0.45)})
-				vias[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.1),Y:((-24.15)+Math.cos((Math.PI*2)/25*j)*0.1)})
-			}
-		x = x -2.54
-	}
-
-	x = 6.34
-	for(i=8;i<18;i++){
-		arduino_pins.push([])
-		vias.push([])
-		nodes.push({X:(x+o),Y:(-24)})
-			for(j=0;j<=25;j++){
-				arduino_pins[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.45),Y:((-24.15)+Math.cos((Math.PI*2)/25*j)*0.45)})
-				vias[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.1),Y:((-24.15)+Math.cos((Math.PI*2)/25*j)*0.1)})
-			}
-		x = x -2.54
-	}
-
-	var x = 28.575
-	for(i=18;i<24;i++){
-		arduino_pins.push([])
-		vias.push([])
-			nodes.push({X:(x+o),Y:(24)})
-			for(j=0;j<=25;j++){
-				arduino_pins[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.45),Y:((24.15)+Math.cos((Math.PI*2)/25*j)*0.45)})
-				vias[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.1),Y:((24.15)+Math.cos((Math.PI*2)/25*j)*0.1)})
-			}
-		x = x -2.54
-	}
-
-	var x = 10.84
-	for(i=24;i<32;i++){
-		arduino_pins.push([])
-		vias.push([])
-			nodes.push({X:(x+o),Y:(24)})
-			for(j=0;j<=25;j++){
-				arduino_pins[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.45),Y:((24.15)+Math.cos((Math.PI*2)/25*j)*0.45)})
-				vias[i].push({X:((x+o)+Math.sin((Math.PI*2)/25*j)*0.1),Y:((24.15)+Math.cos((Math.PI*2)/25*j)*0.1)})
-			}
-		x = x -2.54
-	}
-
-draw()
-route()
-
-}
-
-function add_trace(){
-
-var traces = []
-
-//console.log(trace)
-
-if((document.getElementById("board").value)=="arduino"){
-
-for(i=0;i<pin_outlines.length;i++){
-	traces.push([])
-	for(j=0;j<pin_outlines[i].length;j++){
-		traces[traces.length-1].push({X:parseInt(pin_outlines[i][j].X*scale),Y:parseInt(pin_outlines[i][j].Y*scale)})
-	}
-}
-
-}//
-
-for(i=0;i<trace.length;i++){
-	traces.push([])
-	for(j=0;j<trace[i].length;j++){
-		traces[traces.length-1].push({X:parseInt(trace[i][j].X*scale),Y:parseInt(trace[i][j].Y*scale)})
-	}
-}
-
-//console.log(traces)
-
-/*
-var simple_paths = ClipperLib.Clipper.SimplifyPolygons(traces, ClipperLib.PolyFillType.pftNonZero)
-
-var cleandelta = 0.2; // 0.1 should be the appropriate delta in different cases
-traces = ClipperLib.JS.Clean(simple_paths, cleandelta * scale)
-*/
-
-var cpr = new ClipperLib.Clipper()
-cpr.AddPaths(traces, ClipperLib.PolyType.ptSubject, true)
-
-var solution_paths = new ClipperLib.Paths();
-cpr.Execute(ClipperLib.ClipType.ctUnion, solution_paths, ClipperLib.PolyFillType.pftNonZero, ClipperLib.PolyFillType.pftNonZero);
-
-for(i=0;i<solution_paths.length;i++){
-		solution_paths[i].reverse()
-		solution_paths[i].push(solution_paths[i][0])
-}
-
-solution_paths.push([])
-for(i=0;i<frame1.length;i++){
-	solution_paths[solution_paths.length-1].push({X:parseInt(frame1[i].X*scale),Y:parseInt(frame1[i].Y*scale)})
-}
-
-var co = new ClipperLib.ClipperOffset(scale*0.4, 0.25)
-//co.ArcTolerance = 1.23
-//co.MiterLimit = 0.7
-co.AddPaths(solution_paths, ClipperLib.JoinType.jtMiter, ClipperLib.EndType.etClosedPolygon, 0.25)
-
-var oset = []
-
-i=1
-var td = 0.39
-
-while(i<3){
-	offset = new ClipperLib.Paths()
-	co.Execute(offset, (-scale*td)*i)
-	i++
-	for(j=0;j<offset.length;j++){
-		oset.push(offset[j])
-	}
-}
-
-	offset=oset
-
-for(i=0;i<offset.length;i++){
-		offset[i].push(offset[i][0])
-}
-	outlines = offset
-
-draw()
-
-}
-
-function route(){
-
-for(i=0;i<frame1.length;i++){
-	outlines.push({X:parseInt(frame1[i].X*scale),Y:parseInt(frame1[i].Y*scale)})
-}
-	outlines = [outlines]
-
-for(i=0;i<pin_outlines.length;i++){
-	outlines.push([])
-	pin_outlines[i].reverse()
-	for(j=0;j<pin_outlines[i].length;j++){
-		outlines[outlines.length-1].push({X:parseInt(pin_outlines[i][j].X*scale),Y:parseInt(pin_outlines[i][j].Y*scale)})
-	}
-}
-
-var co = new ClipperLib.ClipperOffset(-scale*0.4, 0.25)
-co.AddPaths(outlines, ClipperLib.JoinType.jtMiter, ClipperLib.EndType.etClosedPolygon)
-offset = new ClipperLib.Paths()
-co.Execute(offset, -scale*0.4)
-
-for(i=0;i<offset.length;i++){
-		offset[i].push(offset[i][0])
-}
-
-add_trace()
-
-}
-
-function makeGrid(){
-	pts = []
-	grid = []
-
-if((document.getElementById("board").value)=="arduino"){
-	pinNum = 0
-
-	y=2.54+(parseInt(document.getElementById("y-bot").value)*2.54)
-
-	for(i=0;i<20+(parseInt(document.getElementById("y-top").value))+(parseInt(document.getElementById("y-bot").value));i++){
-
-		x=0-(parseInt(document.getElementById("x-left").value)*2.54)
-	for(j=0;j<20+(parseInt(document.getElementById("x-right").value))+(parseInt(document.getElementById("x-left").value));j++){
-
-		//
-		if( ((i==(parseInt(document.getElementById("y-bot").value))) || (i==(parseInt(document.getElementById("y-bot").value)+1))) && (j>4+(parseInt(document.getElementById("x-left").value))) & (j<20+(parseInt(document.getElementById("x-left").value)))){
-			if(j==13){
-				k=pinNum
-				pinNum=0
-			}
-			else if(j==14){
-				pinNum=k+1
-			}
-			else{
-				pinNum++
-			}
-		}
-		else if( ((i==(parseInt(document.getElementById("y-bot").value)+18)) || (i==(parseInt(document.getElementById("y-bot").value)+19))) && (j>0+(parseInt(document.getElementById("x-left").value))) && (j<20+(parseInt(document.getElementById("x-left").value)))){
-
-			if((j==11)&&(i==(parseInt(document.getElementById("y-bot").value)+18))){
-				pinNum=0
-			}
-			else{
-				k++
-				pinNum=k
-			}
-		}
-		else{
-			k=14
-			pinNum=0
-		}
-		if(j>0){
-		pts.push({X:-19.685+o+x,Y:21.61+y,PIN:pinNum})
-		}
-		//
-		
-		if( (i==19+(parseInt(document.getElementById("y-bot").value))) && (j==(parseInt(document.getElementById("x-left").value))) ){
-			x = x + 2.54+0.635
-		}
-		else if( (i==19+(parseInt(document.getElementById("y-bot").value))) && (j==(10+(parseInt(document.getElementById("x-left").value)))) ){
-			x = x + 2.54+1.27+0.635
-			j++
-		}
-		else{
-			x = x+2.54
-		}
-
-	}
-		y = y-2.54
-	}
-
-	y = 3.79
-	for(i=0;i<20+(parseInt(document.getElementById("y-top").value))+(parseInt(document.getElementById("y-bot").value));i++){
-		grid.push([{X:-19.685+2.54-(parseInt(document.getElementById("x-left").value)*2.54)+o,Y:25.4+2.54+(parseInt(document.getElementById("y-bot").value)*2.54)-y},{X:29.845-2.54+o+1.27+(parseFloat(document.getElementById("x-right").value)*2.54),Y:25.4+2.54+(parseInt(document.getElementById("y-bot").value)*2.54)-y}])
-		y = y + 2.54
-	}
-
-	x = 0
-	for(i=0;i<19+(parseInt(document.getElementById("x-right").value))+(parseInt(document.getElementById("x-left").value));i++){
-		grid.push([{X:-19.685+2.54-(parseInt(document.getElementById("x-left").value)*2.54)+o+x,Y:21.61+2.54+(parseInt(document.getElementById("y-bot").value)*2.54)},{X:-19.685+2.54-(parseInt(document.getElementById("x-left").value)*2.54)+o+x,Y:-21.61-2.54-(parseInt(document.getElementById("y-top").value)*2.54)}])
-		x = x + 2.54
-	}	
-
-	}//
-	else if(document.getElementById("board").value=="blank"){
-	
-		for(i=0;i<(Math.round(((Math.abs(ymin))+ymax)/2.54));i++){
-			for(j=0;j<(Math.round(((Math.abs(xmin))+xmax)/2.54));j++){
-				pts.push({X:(xmin+1.27+(j*2.54)),Y:(ymax-1.27-(i*2.54))})
-			}
-		}
-
-	//grid
-
-	for(i=0;i<(Math.round(((Math.abs(ymin))+ymax)/2.54));i++){
-		grid.push([{X:xmin+1.27,Y:(ymax-1.27-(i*2.54))},{X:xmax-1.27,Y:(ymax-1.27-(i*2.54))}])
-	}
-
-	for(i=0;i<(Math.round(((Math.abs(xmin))+xmax)/2.54));i++){
-		grid.push([{X:(xmin+1.27+(i*2.54)),Y:(ymax-1.27)},{X:(xmin+1.27+(i*2.54)),Y:(ymin+1.27)}])
-	}
-		
-
-	}
-
 }
 
 
@@ -1975,250 +814,8 @@ $("#y-bot").on("change", function(){
 
 })
 
-$(window).resize(function(){
-	draw()
-})
-
-function make(){
-
-var material = {feed:250,plunge:200}
-var pass_depth = 0.425
-var filetype = "sbp"
-
-g=""
-
-pins.reverse()
-
-for(i=0;i<net.length;i++){
-	for(j=0;j<net[i].length;j++){
-		if(net[i][j].D==true){
-			for(k=0;k<net.length;k++){
-				for(l=0;l<net[k].length;l++){
-					if( (net[i][j].X.toFixed(2)==net[k][l].X.toFixed(2)) && (net[i][j].Y.toFixed(2)==net[k][l].Y.toFixed(2)) && (net[k][l].D==true) ){
-						if((i!=k)||(l!=j)){
-							net[k][l].D=false
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-	if(document.getElementById('side').value=="top"){
-		flip()
-	}
-
-if(filetype=="gcode"){
 
 
-}
-
-else if(filetype=="sbp"){
-
-pass_depth = 0.0175
-
-g+="MS," + (material.feed/25.4/60).toFixed(1) + "," + (material.plunge/25.4/60).toFixed(1) + "\n"
-g+="JZ,0.2\n"
-g+="SO,1,1\n"
-g+="PAUSE 1\n"   
-
-
-if((document.getElementById("board").value)=="arduino"){
-
-   for(i=0;i<vias.length;i++){
-
-		pass_no = 4
-		pass = 1
-		g+="J2,"+((vias[i][0].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((vias[i][0].Y+ymax)/25.4).toFixed(4) + "\n"
-
-		while(pass<=pass_no){
-	   g+="MZ,-"+ (pass_depth*pass).toFixed(4) + "\n"
-			for(j=0;j<vias[i].length;j++){
-   	   	g+="M2,"+((vias[i][j].X+Math.abs(xmin))/25.4).toFixed(4) +","+ ((vias[i][j].Y+ymax)/25.4).toFixed(4) + "\n"
-			}
-		pass++
-   	}
-		g+="JZ,0.1\n"
-	}
-
-   for(i=0;i<pins.length;i++){
-		g+="J2,"+((pins[i][0].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((pins[i][0].Y+ymax)/25.4).toFixed(4) + "\n"
-	   g+="MZ,-"+ (0.007) + "\n"
-		g+="PAUSE 0.1\n"
-			for(j=1;j<pins[i].length;j++){
-				g+="M2,"+((pins[i][j].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((pins[i][j].Y+ymax)/25.4).toFixed(4) + "\n"		
-			}
-		g+="JZ,0.1\n"
-	}
-
-}
-
-	for(i=0;i<hole.length;i++){
-
-		pass_no = 4
-		pass = 1
-		g+="J2,"+((hole[i][0].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((hole[i][0].Y+ymax)/25.4).toFixed(4) + "\n"
-
-		while(pass<=pass_no){
-	   g+="MZ,-"+ (pass_depth*pass).toFixed(4) + "\n"
-			for(j=0;j<hole[i].length;j++){
-   	   	g+="M2,"+((hole[i][j].X+Math.abs(xmin))/25.4).toFixed(4) +","+ ((hole[i][j].Y+ymax)/25.4).toFixed(4) + "\n"
-			}
-		pass++
-   	}
-		g+="JZ,0.1\n"
-	}
-
-   for(i=0;i<net.length;i++){
-		
-   	for(j=0;j<net[i].length;j++){
-		pass_no = 5
-		pass = 1
-		if(net[i][j].D==true){
-			g+="J2,"+((net[i][j].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((net[i][j].Y+ymax)/25.4).toFixed(4) + "\n"
-				while(pass<=pass_no){
-	   			g+="MZ,-"+ (pass_depth*pass).toFixed(4) + "\n"
-					g+="JZ,0.05\n"
-					pass++
-				}
-			g+="JZ,0.1\n"
-		}
-		}
-	}
-
-	outlines.reverse()
-
-   for(i=0;i<outlines.length;i++){
-		g+="J2,"+((outlines[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+","+ (((outlines[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
-	   g+="MZ,-"+ (0.007) + "\n"
-		g+="PAUSE 0.1\n"
-			for(j=1;j<outlines[i].length;j++){
-				g+="M2,"+((outlines[i][j].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+","+ (((outlines[i][j].Y/scale)+ymax)/25.4).toFixed(4) + "\n"		
-			}
-		g+="JZ,0.1\n"
-	}
-
-pass_no = 4
-pass = 1
-
-
-g+="J2,"+((path1[0].X+Math.abs(xmin))/25.4).toFixed(4)+","+ ((path1[0].Y+ymax)/25.4).toFixed(4) + "\n"
-
-while(pass<=pass_no){
-   
-   g+="MZ,-"+ (pass_depth*pass).toFixed(4) + "\n"
-   for(i=1;i<path1.length;i++){
-      g+="M2,"+((path1[i].X+Math.abs(xmin))/25.4).toFixed(4) +","+ ((path1[i].Y+ymax)/25.4).toFixed(4) + "\n"
-   }
-   pass++
-}
-
-
-g+="JZ,0.2\n"
-g+="SO,1,0\n"
-if((document.getElementById("board").value)=="arduino"){
-	g+="J3," + "0" + "," + ((ymax+Math.abs(ymin)+0.2)/25.4).toFixed(4) + ",0.4\n"
-}
-if((document.getElementById("board").value)=="blank"){
-	g+="J3," + ((xmax+Math.abs(xmin)+0.2)/25.4).toFixed(4) + "," + "0" + ",0.4\n"
-}
-
-if((document.getElementById("board").value)=="arduino"){
-	var jobFile = 'shield.sbp'
-	var jobName = 'Arduino Shield'
-}
-else if((document.getElementById("board").value)=="blank"){
-	jobFile = 'pcb.sbp'
-	jobName = 'PCB'
-}
-
-fabmo.submitJob({
-   file : g,
-   filename : jobFile,
-   name : jobName,
-	description : (((xmax+Math.abs(xmin))/25.4).toFixed(2)) + " x " + (((ymax+Math.abs(ymin))/25.4).toFixed(2)) + "\" " + "(1/32\" endmill)"  
-});
-
-
-}
-
-	g=""
-
-	if(document.getElementById('side').value=="top"){
-		flip()
-	}
-
-}
-
-function flip(){
-
-   for(i=0;i<outlines.length;i++){
-		for(j=0;j<outlines[i].length;j++){
-			if((outlines[i][j].Y)<0){
-				outlines[i][j]={X:outlines[i][j].X,Y:(Math.abs(outlines[i][j].Y))}
-			}
-			else{
-				outlines[i][j]={X:outlines[i][j].X,Y:(0-(outlines[i][j].Y))}	
-			}
-		}
-	}
-
-   for(i=0;i<pins.length;i++){
-		for(j=0;j<pins[i].length;j++){
-			if(pins[i][j].Y<0){
-				pins[i][j].Y=Math.abs(pins[i][j].Y)
-			}
-			else{
-				pins[i][j].Y=(0-pins[i][j].Y)	
-			}
-		}
-	}
-
-   for(i=0;i<vias.length;i++){
-		for(j=0;j<vias[i].length;j++){
-			if(vias[i][j].Y<0){
-				vias[i][j].Y=Math.abs(vias[i][j].Y)
-			}
-			else{
-				vias[i][j].Y=(0-vias[i][j].Y)	
-			}
-		}
-	}
-
-   for(i=0;i<hole.length;i++){
-		for(j=0;j<hole[i].length;j++){
-			if(hole[i][j].Y<0){
-				hole[i][j].Y=Math.abs(hole[i][j].Y)
-			}
-			else{
-				hole[i][j].Y=(0-hole[i][j].Y)	
-			}
-		}
-	}
-
-
-   for(i=0;i<net.length;i++){
-		for(j=0;j<net[i].length;j++){
-			if(net[i][j].Y<0){
-				net[i][j].Y=Math.abs(net[i][j].Y)
-			}
-			else{
-				net[i][j].Y=(0-net[i][j].Y)	
-			}
-		}
-	}
-
-   for(i=0;i<path1.length;i++){	
-		if(path1[i].Y<0){
-			path1[i]={X:path1[i].X,Y:(Math.abs(path1[i].Y))}
-		}
-		else{
-			path1[i]={X:path1[i].X,Y:(0-(path1[i].Y))}	
-		}
-	}
-
-}
 
 </script>
 
