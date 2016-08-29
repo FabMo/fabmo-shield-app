@@ -360,15 +360,10 @@ $("#myCanvas").on('click', function(e) {
 				if((document.getElementById("type").value!="resistor") && (document.getElementById("type").value!="part") &&(document.getElementById("type").value!="battery")){ 
 
 				if(document.getElementById("type").value=="hole"){
-						//hole.push([])
-						//trace.push([])
-						//console.log(net)
-						//net.push([{X:(pts[i].X),Y:(pts[i].Y)}])
-
-							//for(j=0;j<=v;j++){
-								//hole[hole.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*0.9),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*0.9)})
-								//}
-				//draw()
+					hole.push([])
+					for(j=0;j<=v;j++){
+						hole[hole.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*0.9),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*0.9)})
+					}
 				}
 
 				if(((net[net.length-1].length)==0) && (document.getElementById("type").value!="resistor") ){

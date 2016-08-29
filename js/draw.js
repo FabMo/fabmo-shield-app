@@ -180,7 +180,7 @@ ctx.stroke()
 	
 ctx.lineWidth="1"
 ctx.fillStyle="#fff"
-ctx.strokeStyle="#333"
+ctx.strokeStyle="#999"
 
 for(i=0;i<net.length;i++){
 	for(j=0;j<net[i].length;j++){
@@ -191,9 +191,12 @@ for(i=0;i<net.length;i++){
 			ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.4*sf,0,(Math.PI*2))
 		}
 		else if(net[i][j].D=="hole"){
-			//alert("hi")
-			ctx.fillStyle="#8c8cff"
+			ctx.fillStyle="#fff"
 			ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),1.27*sf,0,(Math.PI*2))
+			ctx.moveTo(ctx.canvas.width/2+((net[i][j].X-0.8)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf))
+			ctx.lineTo(ctx.canvas.width/2+((net[i][j].X+0.8)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf))
+			ctx.moveTo(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y-0.8)*sf))
+			ctx.lineTo(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y+0.8)*sf))
 		}
 		if( (i==net.length-1) && (j==(net[i].length-1)) ){
 			ctx.beginPath()
@@ -203,8 +206,12 @@ for(i=0;i<net.length;i++){
 				ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.25*sf,0,(Math.PI*2))
 			}
 			else if(net[i][j].D=="hole"){
-				ctx.fillStyle="#8c8cff"			
+				ctx.fillStyle="#fff"			
 				ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),1.27*sf,0,(Math.PI*2))
+				ctx.moveTo(ctx.canvas.width/2+((net[i][j].X-0.8)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf))
+				ctx.lineTo(ctx.canvas.width/2+((net[i][j].X+0.8)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf))
+				ctx.moveTo(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y-0.8)*sf))
+				ctx.lineTo(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y+0.8)*sf))
 			}
 			else if((document.getElementById("type").value=="dip")&&(net[i][j].D==true)){
 				ctx.fillStyle="#fff"			
@@ -212,6 +219,7 @@ for(i=0;i<net.length;i++){
 			}
 		}
 		ctx.fill()
+		ctx.stroke()
 	}
 	if( (net[i].length==0) && (net.length>1) ){
 		ctx.beginPath()
@@ -224,7 +232,7 @@ for(i=0;i<net.length;i++){
 
 		if((document.getElementById("type").value=="route")&&(seg>0)){
 			//ctx.fillStyle="#fff000"
-			ctx.arc(ctx.canvas.width/2+((net[i-1][net[i-1].length-1].X)*sf),ctx.canvas.height/2+((net[i-1][net[i-1].length-1].Y)*sf),0.25*sf,0,(Math.PI*2))
+			//ctx.arc(ctx.canvas.width/2+((net[i-1][net[i-1].length-1].X)*sf),ctx.canvas.height/2+((net[i-1][net[i-1].length-1].Y)*sf),0.25*sf,0,(Math.PI*2))
 		}
 
 		ctx.fill()		
@@ -255,7 +263,7 @@ ctx.lineWidth=0.8*sf
 for(i=0;i<hole.length;i++){
 	ctx.beginPath()
 	for(j=0;j<hole[i].length;j++){
-		ctx.lineTo((ctx.canvas.width/2+(hole[i][j].X*sf)),(ctx.canvas.height/2+(hole[i][j].Y*sf)))
+		//ctx.lineTo((ctx.canvas.width/2+(hole[i][j].X*sf)),(ctx.canvas.height/2+(hole[i][j].Y*sf)))
 	}
 	ctx.fill()
 	ctx.stroke()
