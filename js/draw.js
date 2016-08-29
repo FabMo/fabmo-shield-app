@@ -257,18 +257,19 @@ for(i=0;i<temp.length;i++){
 	ctx.fill()
 }
 
+/*
 ctx.strokeStyle="#fff"
 ctx.fillStyle="#fff"
 ctx.lineWidth=0.8*sf
 for(i=0;i<hole.length;i++){
 	ctx.beginPath()
 	for(j=0;j<hole[i].length;j++){
-		//ctx.lineTo((ctx.canvas.width/2+(hole[i][j].X*sf)),(ctx.canvas.height/2+(hole[i][j].Y*sf)))
+		ctx.lineTo((ctx.canvas.width/2+(hole[i][j].X*sf)),(ctx.canvas.height/2+(hole[i][j].Y*sf)))
 	}
 	ctx.fill()
 	ctx.stroke()
 }
-
+*/
 
 ctx.lineWidth=0.1*sf
 ctx.fillStyle="rgba(255, 255, 0, 0.45)"
@@ -300,11 +301,16 @@ if((on_grid==true)&&(pan==false)){
 	if(document.getElementById("type").value=="dip"){
 		ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.85*sf,0,(Math.PI*2) )
 		ctx.fill()
+		ctx.beginPath()
+		ctx.fillStyle="#fff"
+		ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.4*sf,0,(Math.PI*2) )
+		ctx.fill()	
 	}
 	else if(document.getElementById("type").value=="hole"){
 		ctx.fillStyle="#eee"
 		ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),1.27*sf,0,(Math.PI*2) )
 		ctx.fill()
+		ctx.stroke()
 	}
 	else if(document.getElementById("type").value=="smd"){
 		ctx.moveTo((ctx.canvas.width/2)+((mouseX-0.85)*sf),(ctx.canvas.height/2)+((mouseY-0.85)*sf))
