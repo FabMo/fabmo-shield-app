@@ -44,7 +44,7 @@ pass_depth = 0.0175
 g+="MS," + (material.feed/25.4/60).toFixed(1) + "," + (material.plunge/25.4/60).toFixed(1) + "\n"
 g+="JZ,0.2\n"
 g+="SO,1,1\n"
-g+="PAUSE 1\n"   
+g+="PAUSE 5\n"   
 
 
 if((document.getElementById("board").value)=="arduino"){

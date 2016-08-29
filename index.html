@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 
-<! 
-	jward 2016 
->
+<! jward 2016 >
 
 <html lang="en"> 
 <head>
@@ -22,8 +20,8 @@
 
 <select id="type" autocomplete="on" data-resistor="resistor">
   <option value="part" selected disabled>&#43;</option>
-  <option value="dip">pad (DIP)</option>
   <option value="hole">hole (0.1"&#8960;)</option>
+  <option value="dip">pad (DIP)</option>
   <option value="smd">pad (SMD)</option>
   <option value="route">route</option>
   <option value="resistor">SMD (1206)</option>
@@ -268,6 +266,15 @@ $("#myCanvas").on("touchend", function(e){
 	click = 0
 })
 
+$("#type").on('change', function(e) {
+
+if(document.getElementById("type").value=="route"){
+	seg=0
+	trace.push([])
+	net.push([])
+}
+
+})
 
 $("#myCanvas").on('click', function(e) {
 
@@ -350,6 +357,9 @@ $("#myCanvas").on('click', function(e) {
 
 				if(document.getElementById("type").value=="hole"){
 						hole.push([])
+						trace.push([])
+						console.log(net)
+						//net.push([{X:(pts[i].X),Y:(pts[i].Y)}])
 
 							for(j=0;j<=v;j++){
 								hole[hole.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*0.9),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*0.9)})
@@ -428,8 +438,12 @@ $("#myCanvas").on('click', function(e) {
 	
 							var Fx = Bx + (-(d)*PNABx)
 							var Fy = By + (-(d)*PNABy)
-					
-					trace.push([{X:Cx,Y:Cy},{X:Dx,Y:Dy},{X:Ex,Y:Ey},{X:Fx,Y:Fy},{X:Cx,Y:Cy}])
+					if(document.getElementById("type").value=="route"){
+						trace.push([{X:Cx,Y:Cy},{X:Dx,Y:Dy},{X:Ex,Y:Ey},{X:Fx,Y:Fy},{X:Cx,Y:Cy}])
+					}
+					else{
+						trace.push([])
+					}
 
 					trace.push([])
 						if((document.getElementById("type").value=="dip")||(document.getElementById("type").value=="route")){
@@ -465,9 +479,9 @@ $("#myCanvas").on('click', function(e) {
 
 				}
 		}
-		if(seg==0){
+		//if(seg==0){
 			add_trace()
-		}
+		//}
 	}
 })
 

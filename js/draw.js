@@ -102,7 +102,7 @@ if((document.getElementById("board").value)=="arduino"){
 	}
 }
 
-if((seg==1)&&(line==true)&&(pan==false)&&	(document.getElementById("type").value!="resistor")){
+if((seg==1)&&(line==true)&&(pan==false) &&	(document.getElementById("type").value=="route")){
 	ctx.beginPath()
 	ctx.strokeStyle="#999"
 	ctx.moveTo((ctx.canvas.width/2)+(endX*sf),(ctx.canvas.height/2)+(endY*sf))
@@ -141,8 +141,6 @@ ctx.strokeStyle="#ccccff"
 		}
 		ctx.stroke()
 	}
-
-
 
 ctx.lineWidth="1"
 ctx.strokeStyle="#ffff00"
@@ -199,7 +197,14 @@ for(i=0;i<net.length;i++){
 		if( (i==net.length-1) && (j==(net[i].length-1)) ){
 			ctx.beginPath()
 			ctx.fillStyle="#00ff00"
-			ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.25*sf,0,(Math.PI*2))
+			if(document.getElementById("type").value=="route"){
+				//ctx.fillStyle="#fff000"			
+				ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.25*sf,0,(Math.PI*2))
+			}
+			else if((document.getElementById("type").value=="dip")&&(net[i][j].D==true)){
+				ctx.fillStyle="#fff"			
+				ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.4*sf,0,(Math.PI*2))
+			}
 		}
 		ctx.fill()
 	}
@@ -212,7 +217,10 @@ for(i=0;i<net.length;i++){
 			ctx.fillStyle="#ff0000"
 		}
 
-		ctx.arc(ctx.canvas.width/2+((net[i-1][net[i-1].length-1].X)*sf),ctx.canvas.height/2+((net[i-1][net[i-1].length-1].Y)*sf),0.25*sf,0,(Math.PI*2))
+		if(document.getElementById("type").value=="route"){
+			//ctx.fillStyle="#fff000"
+			ctx.arc(ctx.canvas.width/2+((net[i-1][net[i-1].length-1].X)*sf),ctx.canvas.height/2+((net[i-1][net[i-1].length-1].Y)*sf),0.25*sf,0,(Math.PI*2))
+		}
 
 		ctx.fill()		
 	}
@@ -290,6 +298,8 @@ if((on_grid==true)&&(pan==false)){
 	}
 
 ctx.beginPath()
+
+	
 	
 	if((seg==1)&&(line==true)){
 		ctx.fillStyle="#ff0000"
@@ -304,11 +314,16 @@ ctx.beginPath()
 
 	ctx.stroke()
 
-	ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.25*sf,0,(Math.PI*2) )
-	ctx.lineWidth=0.4*sf
-	ctx.stroke()
+	if((document.getElementById("type").value=="dip")||(document.getElementById("type").value=="smd")){
+		//ctx.fillStyle="#ffff00"
+	}
+	if(document.getElementById("type").value=="route"){
+		ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.25*sf,0,(Math.PI*2) )
+		ctx.lineWidth=0.4*sf
+		ctx.stroke()
+		ctx.fill()
+	}
 
-	ctx.fill()
 
 }
 
