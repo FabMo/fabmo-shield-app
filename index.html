@@ -290,8 +290,12 @@ $("#myCanvas").on('click', function(e) {
 		if(document.getElementById("type").value=="dip"){
 			drill=true
 		}
-		if(document.getElementById("type").value=="route"){
+		else if(document.getElementById("type").value=="route"){
 			r = 0.32
+		}
+		else if(document.getElementById("type").value=="hole"){
+			r = 1.27
+			drill="hole"
 		}
 	
 		for(i=0;i<pts.length;i++){
@@ -356,23 +360,28 @@ $("#myCanvas").on('click', function(e) {
 				if((document.getElementById("type").value!="resistor") && (document.getElementById("type").value!="part") &&(document.getElementById("type").value!="battery")){ 
 
 				if(document.getElementById("type").value=="hole"){
-						hole.push([])
-						trace.push([])
-						console.log(net)
+						//hole.push([])
+						//trace.push([])
+						//console.log(net)
 						//net.push([{X:(pts[i].X),Y:(pts[i].Y)}])
 
-							for(j=0;j<=v;j++){
-								hole[hole.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*0.9),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*0.9)})
-								}
-				draw()
+							//for(j=0;j<=v;j++){
+								//hole[hole.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*0.9),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*0.9)})
+								//}
+				//draw()
 				}
 
-				if(((net[net.length-1].length)==0) && ((document.getElementById("type").value=="route") || (document.getElementById("type").value=="dip")||(document.getElementById("type").value=="smd")) ){
+				if(((net[net.length-1].length)==0) && (document.getElementById("type").value!="resistor") ){
 					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill})
 
 						trace.push([])
 						
 						if(document.getElementById("type").value=="dip"){
+							for(j=0;j<=v;j++){
+								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
+							}
+						}
+						else if(document.getElementById("type").value=="hole"){
 							for(j=0;j<=v;j++){
 								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
 							}
@@ -409,7 +418,7 @@ $("#myCanvas").on('click', function(e) {
 						trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/4*j)*0.1),Y:((pts[i].Y)+Math.cos((Math.PI*2)/4*j)*0.1)})
 					}
 				}
-				else if(((net[net.length-1].length)>0) && (document.getElementById("type").value!="hole")){
+				else if(((net[net.length-1].length)>0)){
 
 							var Ax = net[net.length-1][net[net.length-1].length-1].X
 							var Ay = net[net.length-1][net[net.length-1].length-1].Y
@@ -447,6 +456,11 @@ $("#myCanvas").on('click', function(e) {
 
 					trace.push([])
 						if((document.getElementById("type").value=="dip")||(document.getElementById("type").value=="route")){
+							for(j=0;j<=v;j++){
+								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
+							}
+						}
+						else if(document.getElementById("type").value=="hole"){
 							for(j=0;j<=v;j++){
 								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
 							}

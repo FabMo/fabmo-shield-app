@@ -190,9 +190,10 @@ for(i=0;i<net.length;i++){
 			ctx.fillStyle="#fff"
 			ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.4*sf,0,(Math.PI*2))
 		}
-		else{
-			//ctx.fillStyle="#00ff00"
-			//ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.2*sf,0,(Math.PI*2))
+		else if(net[i][j].D=="hole"){
+			//alert("hi")
+			ctx.fillStyle="#8c8cff"
+			ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),1.27*sf,0,(Math.PI*2))
 		}
 		if( (i==net.length-1) && (j==(net[i].length-1)) ){
 			ctx.beginPath()
@@ -200,6 +201,10 @@ for(i=0;i<net.length;i++){
 			if(document.getElementById("type").value=="route"){
 				//ctx.fillStyle="#fff000"			
 				ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.25*sf,0,(Math.PI*2))
+			}
+			else if(net[i][j].D=="hole"){
+				ctx.fillStyle="#8c8cff"			
+				ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),1.27*sf,0,(Math.PI*2))
 			}
 			else if((document.getElementById("type").value=="dip")&&(net[i][j].D==true)){
 				ctx.fillStyle="#fff"			
@@ -217,7 +222,7 @@ for(i=0;i<net.length;i++){
 			ctx.fillStyle="#ff0000"
 		}
 
-		if(document.getElementById("type").value=="route"){
+		if((document.getElementById("type").value=="route")&&(seg>0)){
 			//ctx.fillStyle="#fff000"
 			ctx.arc(ctx.canvas.width/2+((net[i-1][net[i-1].length-1].X)*sf),ctx.canvas.height/2+((net[i-1][net[i-1].length-1].Y)*sf),0.25*sf,0,(Math.PI*2))
 		}
