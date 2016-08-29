@@ -213,7 +213,7 @@ for(i=0;i<net.length;i++){
 				ctx.moveTo(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y-0.8)*sf))
 				ctx.lineTo(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y+0.8)*sf))
 			}
-			else if((document.getElementById("type").value=="dip")&&(net[i][j].D==true)){
+			else if(net[i][j].D==true){
 				ctx.fillStyle="#fff"			
 				ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.4*sf,0,(Math.PI*2))
 			}
@@ -299,6 +299,11 @@ if((on_grid==true)&&(pan==false)){
 	
 	if(document.getElementById("type").value=="dip"){
 		ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.85*sf,0,(Math.PI*2) )
+		ctx.fill()
+	}
+	else if(document.getElementById("type").value=="hole"){
+		ctx.fillStyle="#eee"
+		ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),1.27*sf,0,(Math.PI*2) )
 		ctx.fill()
 	}
 	else if(document.getElementById("type").value=="smd"){
