@@ -126,6 +126,14 @@ depth{
 	height: 37px;
 }
 
+#file{
+	position: absolute;
+	right: 30px;
+	bottom: 150px;
+	width: 100px;
+	height: 37px;
+}
+
 
 #help-div{
 	display:none;

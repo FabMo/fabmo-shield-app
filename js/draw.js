@@ -724,14 +724,14 @@ function undo(){
 		trace.pop()
 	}
 	if((net[net.length-1].length==0)){
-		endX=(net[net.length-2][net[net.length-2].length-1].X)
-		endY=(net[net.length-2][net[net.length-2].length-1].Y)
+		//endX=(net[net.length-2][net[net.length-2].length-1].X)
+		//endY=(net[net.length-2][net[net.length-2].length-1].Y)
 	}
 	else{
 		endX=(net[net.length-1][net[net.length-1].length-1].X)
 		endY=(net[net.length-1][net[net.length-1].length-1].Y)
-		mouseX=endX
-		mouseY=endY
+		//mouseX=endX
+		//mouseY=endY
 	}
 	}
 	else{
