@@ -313,6 +313,7 @@ if((on_grid==true)&&(pan==false)){
 		ctx.stroke()
 	}
 	else if(document.getElementById("type").value=="smd"){
+		//ctx.fillStyle="#fff"
 		ctx.moveTo((ctx.canvas.width/2)+((mouseX-0.85)*sf),(ctx.canvas.height/2)+((mouseY-0.85)*sf))
 		ctx.lineTo((ctx.canvas.width/2)+((mouseX-0.85)*sf),(ctx.canvas.height/2)+((mouseY+0.85)*sf))
 		ctx.lineTo((ctx.canvas.width/2)+((mouseX+0.85)*sf),(ctx.canvas.height/2)+((mouseY+0.85)*sf))
@@ -336,12 +337,12 @@ ctx.beginPath()
 		ctx.fillStyle="#FFA500"
 	}
 
-	ctx.stroke()
+	//ctx.stroke()
 
 	if((document.getElementById("type").value=="dip")||(document.getElementById("type").value=="smd")){
 		//ctx.fillStyle="#ffff00"
 	}
-	if(document.getElementById("type").value=="route"){
+	if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="resistor")){
 		ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.25*sf,0,(Math.PI*2) )
 		ctx.lineWidth=0.4*sf
 		ctx.stroke()
