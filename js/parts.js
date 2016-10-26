@@ -1,8 +1,5 @@
 
 
-
-
-
 function parts(){
 
 	arduino.push( [{X:-34+o,Y:-26.5},{X:31+o,Y:-26.5},{X:31+o,Y:-13.5},{X:34+o,Y:-10.5},{X:34+o,Y:21.5},{X:31+o,Y:24.5},{X:31+o,Y:26.5},{X:-34+o,Y:26.5},{X:-34+o,Y:22.5}] )
@@ -223,6 +220,8 @@ draw()
 ////
 
 function add(){
+	//console.log(pad);
+
 	if((temp2!=undefined)&&(pad==1)){
 
 	var deltaX = mouseX - origin.X
@@ -344,7 +343,8 @@ else if(radius+tool<=0){
 	draw()
 }
 
-////
+//
+//
 
 function makeGrid(){
 	pts = []

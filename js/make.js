@@ -1,10 +1,7 @@
 
-
-
-
 function make(){
 
-var material = {feed:250,plunge:200}  //mm/min
+var material = {feed:150,plunge:100}  //mm/min
 var pass_depth = 0.425
 
 var filetype = ""
@@ -54,7 +51,7 @@ for(i=0;i<net.length;i++){
 	else if(filetype=="gcode"){
 		g+="g0z0.2\n"
 		g+="m3\n"
-		g+="g4p10\n"
+		g+="g4p3\n"
 	}   
 
 	if((document.getElementById("board").value)=="arduino"){
