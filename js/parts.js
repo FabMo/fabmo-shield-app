@@ -1,4 +1,4 @@
-
+var outlineA = []
 
 function parts(){
 
@@ -140,81 +140,73 @@ route()
 
 function add_trace(){
 
-var traces = []
+	var traces = []
 
-//console.log(trace)
-
-if((document.getElementById("board").value)=="arduino"){
-
-for(i=0;i<pin_outlines.length;i++){
-	traces.push([])
-	for(j=0;j<pin_outlines[i].length;j++){
-		traces[traces.length-1].push({X:parseInt(pin_outlines[i][j].X*scale),Y:parseInt(pin_outlines[i][j].Y*scale)})
+	if((document.getElementById("board").value)=="arduino"){
+		for(i=0;i<pin_outlines.length;i++){
+			traces.push([])
+			for(j=0;j<pin_outlines[i].length;j++){
+				traces[traces.length-1].push({X:parseInt(pin_outlines[i][j].X*scale),Y:parseInt(pin_outlines[i][j].Y*scale)})
+			}
+		}
 	}
-}
 
-}//
-
-for(i=0;i<trace.length;i++){
-	traces.push([])
-	for(j=0;j<trace[i].length;j++){
-		traces[traces.length-1].push({X:parseInt(trace[i][j].X*scale),Y:parseInt(trace[i][j].Y*scale)})
+	for(i=0;i<trace.length;i++){
+		traces.push([])
+		for(j=0;j<trace[i].length;j++){
+			traces[traces.length-1].push({X:parseInt(trace[i][j].X*scale),Y:parseInt(trace[i][j].Y*scale)})
+		}
 	}
-}
 
-//console.log(traces)
+	var cpr = new ClipperLib.Clipper()
+	cpr.AddPaths(traces, ClipperLib.PolyType.ptSubject, true)
 
-/*
-var simple_paths = ClipperLib.Clipper.SimplifyPolygons(traces, ClipperLib.PolyFillType.pftNonZero)
+	var solution_paths = new ClipperLib.Paths();
+	cpr.Execute(ClipperLib.ClipType.ctUnion, solution_paths, ClipperLib.PolyFillType.pftNonZero, ClipperLib.PolyFillType.pftNonZero);
 
-var cleandelta = 0.2; // 0.1 should be the appropriate delta in different cases
-traces = ClipperLib.JS.Clean(simple_paths, cleandelta * scale)
-*/
-
-var cpr = new ClipperLib.Clipper()
-cpr.AddPaths(traces, ClipperLib.PolyType.ptSubject, true)
-
-var solution_paths = new ClipperLib.Paths();
-cpr.Execute(ClipperLib.ClipType.ctUnion, solution_paths, ClipperLib.PolyFillType.pftNonZero, ClipperLib.PolyFillType.pftNonZero);
-
-for(i=0;i<solution_paths.length;i++){
+	for(i=0;i<solution_paths.length;i++){
 		solution_paths[i].reverse()
 		solution_paths[i].push(solution_paths[i][0])
-}
-
-solution_paths.push([])
-for(i=0;i<frame1.length;i++){
-	solution_paths[solution_paths.length-1].push({X:parseInt(frame1[i].X*scale),Y:parseInt(frame1[i].Y*scale)})
-}
-
-var co = new ClipperLib.ClipperOffset(scale*0.4, 0.25)
-//co.ArcTolerance = 1.23
-//co.MiterLimit = 0.7
-co.AddPaths(solution_paths, ClipperLib.JoinType.jtMiter, ClipperLib.EndType.etClosedPolygon, 0.25)
-
-var oset = []
-
-i=1
-var td = 0.39
-
-while(i<3){
-	offset = new ClipperLib.Paths()
-	co.Execute(offset, (-scale*td)*i)
-	i++
-	for(j=0;j<offset.length;j++){
-		oset.push(offset[j])
 	}
-}
+
+	solution_paths.push([])
+	for(i=0;i<frame1.length;i++){
+		solution_paths[solution_paths.length-1].push({X:parseInt(frame1[i].X*scale),Y:parseInt(frame1[i].Y*scale)})
+	}
+
+	var co = new ClipperLib.ClipperOffset(scale*0.4, 0.25)
+	//co.ArcTolerance = 1.23
+	//co.MiterLimit = 0.7
+	co.AddPaths(solution_paths, ClipperLib.JoinType.jtMiter, ClipperLib.EndType.etClosedPolygon, 0.25)
+
+	var oset = []
+
+	i=1
+	var toolOffset = 0.39
+
+	while(i<3){
+		//if(i==1){
+		//	toolOffset = 0.2
+		//}
+		//else{
+		//	toolOffset = 0.39
+		//}
+		offset = new ClipperLib.Paths()
+		co.Execute(offset, (-scale*toolOffset)*i)
+		i++
+		for(j=0;j<offset.length;j++){
+			oset.push(offset[j])
+		}
+	}
 
 	offset=oset
 
-for(i=0;i<offset.length;i++){
+	for(i=0;i<offset.length;i++){
 		offset[i].push(offset[i][0])
-}
+	}
 	outlines = offset
 
-draw()
-
+	draw()
 }
 
 ////
@@ -255,29 +247,30 @@ function add(){
 
 function route(){
 
-for(i=0;i<frame1.length;i++){
-	outlines.push({X:parseInt(frame1[i].X*scale),Y:parseInt(frame1[i].Y*scale)})
-}
+	for(i=0;i<frame1.length;i++){
+		outlines.push({X:parseInt(frame1[i].X*scale),Y:parseInt(frame1[i].Y*scale)})
+	}
 	outlines = [outlines]
 
-for(i=0;i<pin_outlines.length;i++){
-	outlines.push([])
-	pin_outlines[i].reverse()
-	for(j=0;j<pin_outlines[i].length;j++){
-		outlines[outlines.length-1].push({X:parseInt(pin_outlines[i][j].X*scale),Y:parseInt(pin_outlines[i][j].Y*scale)})
+	for(i=0;i<pin_outlines.length;i++){
+		outlines.push([])
+		pin_outlines[i].reverse()
+		for(j=0;j<pin_outlines[i].length;j++){
+			outlines[outlines.length-1].push({X:parseInt(pin_outlines[i][j].X*scale),Y:parseInt(pin_outlines[i][j].Y*scale)})
+		}
 	}
-}
 
-var co = new ClipperLib.ClipperOffset(-scale*0.4, 0.25)
-co.AddPaths(outlines, ClipperLib.JoinType.jtMiter, ClipperLib.EndType.etClosedPolygon)
-offset = new ClipperLib.Paths()
-co.Execute(offset, -scale*0.4)
+	var co = new ClipperLib.ClipperOffset(-scale*0.4, 0.25)
+	co.AddPaths(outlines, ClipperLib.JoinType.jtMiter, ClipperLib.EndType.etClosedPolygon)
+	offset = new ClipperLib.Paths()
+	co.Execute(offset, -scale*0.4)
 
-for(i=0;i<offset.length;i++){
+	
+	for(i=0;i<offset.length;i++){
 		offset[i].push(offset[i][0])
-}
+	}
 
-add_trace()
+	add_trace()
 
 }
 
@@ -353,80 +346,103 @@ function makeGrid(){
 if((document.getElementById("board").value)=="arduino"){
 	pinNum = 0
 
-	y=2.54+(parseInt(document.getElementById("y-bot").value)*2.54)
+	if((document.getElementById("grid").value)=="0.05"){
+		var space = 1.27
+		var rows = 39
+		var columns = 37
+		var multiply = 2
+		pinNum=0
 
-	for(i=0;i<20+(parseInt(document.getElementById("y-top").value))+(parseInt(document.getElementById("y-bot").value));i++){
+		y=2.54+(parseInt(document.getElementById("y-bot").value*multiply)*space)
 
-		x=0-(parseInt(document.getElementById("x-left").value)*2.54)
-	for(j=0;j<20+(parseInt(document.getElementById("x-right").value))+(parseInt(document.getElementById("x-left").value));j++){
-
-		//
-		if( ((i==(parseInt(document.getElementById("y-bot").value))) || (i==(parseInt(document.getElementById("y-bot").value)+1))) && (j>4+(parseInt(document.getElementById("x-left").value))) & (j<20+(parseInt(document.getElementById("x-left").value)))){
-			if(j==13){
-				k=pinNum
-				pinNum=0
+		for(i=0;i<rows+(parseInt(document.getElementById("y-top").value*multiply))+(parseInt(document.getElementById("y-bot").value*multiply));i++){
+			x=2.54-(parseInt(document.getElementById("x-left").value*multiply)*space)
+			for(j=0;j<columns+(parseInt(document.getElementById("x-right").value*multiply))+(parseInt(document.getElementById("x-left").value*multiply));j++){
+				pts.push({X:-19.685+o+x,Y:21.61+y,PIN:pinNum})
+				x+=space
 			}
-			else if(j==14){
-				pinNum=k+1
-			}
-			else{
-				pinNum++
-			}
-		}
-		else if( ((i==(parseInt(document.getElementById("y-bot").value)+18)) || (i==(parseInt(document.getElementById("y-bot").value)+19))) && (j>0+(parseInt(document.getElementById("x-left").value))) && (j<20+(parseInt(document.getElementById("x-left").value)))){
-
-			if((j==11)&&(i==(parseInt(document.getElementById("y-bot").value)+18))){
-				pinNum=0
-			}
-			else{
-				k++
-				pinNum=k
-			}
-		}
-		else{
-			k=14
-			pinNum=0
-		}
-		if(j>0){
-		pts.push({X:-19.685+o+x,Y:21.61+y,PIN:pinNum})
-		}
-		//
+			y-=space
+		}		
 		
-		if( (i==19+(parseInt(document.getElementById("y-bot").value))) && (j==(parseInt(document.getElementById("x-left").value))) ){
-			x = x + 2.54+0.635
-		}
-		else if( (i==19+(parseInt(document.getElementById("y-bot").value))) && (j==(10+(parseInt(document.getElementById("x-left").value)))) ){
-			x = x + 2.54+1.27+0.635
-			j++
-		}
-		else{
-			x = x+2.54
-		}
-
 	}
-		y = y-2.54
+	else{
+		var space = 2.54
+		var rows = 20
+		var columns = 19
+		var multiply = 1
 	}
 
+
+	if((document.getElementById("grid").value)=="0.1"){
+
+		y=space+(parseInt(document.getElementById("y-bot").value)*space)
+
+		for(i=0;i<rows+(parseInt(document.getElementById("y-top").value))+(parseInt(document.getElementById("y-bot").value));i++){
+			x=0-(parseInt(document.getElementById("x-left").value)*space)
+			for(j=0;j<rows+(parseInt(document.getElementById("x-right").value))+(parseInt(document.getElementById("x-left").value));j++){
+				if( ((i==(parseInt(document.getElementById("y-bot").value))) || (i==(parseInt(document.getElementById("y-bot").value)+1))) && (j>4+(parseInt(document.getElementById("x-left").value))) & (j<20+(parseInt(document.getElementById("x-left").value)))){
+					if(j==13){
+						k=pinNum
+						pinNum=0
+					}
+					else if(j==14){
+						pinNum=k+1
+					}
+					else{
+						pinNum++
+					}
+				}
+				else if( ((i==(parseInt(document.getElementById("y-bot").value)+18)) || (i==(parseInt(document.getElementById("y-bot").value)+19))) && (j>0+(parseInt(document.getElementById("x-left").value))) && (j<20+(parseInt(document.getElementById("x-left").value)))){
+					if((j==11)&&(i==(parseInt(document.getElementById("y-bot").value)+18))){
+						pinNum=0
+					}
+					else{
+						k++
+						pinNum=k
+					}
+				}
+				else{
+					k=14
+					pinNum=0
+				}
+				if(j>0){
+					pts.push({X:-19.685+o+x,Y:21.61+y,PIN:pinNum})
+				}
+				if( (i==19+(parseInt(document.getElementById("y-bot").value))) && (j==(parseInt(document.getElementById("x-left").value))) ){
+					x = x + space+0.635
+				}
+				else if( (i==19+(parseInt(document.getElementById("y-bot").value))) && (j==(10+(parseInt(document.getElementById("x-left").value)))) ){
+					x = x + space+1.27+0.635
+					j++
+				}
+				else{
+					x = x+space
+				}
+
+			}
+		y = y-space
+		}
+	}
 	y = 3.79
-	for(i=0;i<20+(parseInt(document.getElementById("y-top").value))+(parseInt(document.getElementById("y-bot").value));i++){
-		grid.push([{X:-19.685+2.54-(parseInt(document.getElementById("x-left").value)*2.54)+o,Y:25.4+2.54+(parseInt(document.getElementById("y-bot").value)*2.54)-y},{X:29.845-2.54+o+1.27+(parseFloat(document.getElementById("x-right").value)*2.54),Y:25.4+2.54+(parseInt(document.getElementById("y-bot").value)*2.54)-y}])
-		y = y + 2.54
+		for(i=0;i<rows+(parseInt(document.getElementById("y-top").value)*multiply)+(parseInt(document.getElementById("y-bot").value)*multiply);i++){
+			grid.push([{X:-19.685+2.54-(parseInt(document.getElementById("x-left").value)*2.54)+o,Y:25.4+2.54+(parseInt(document.getElementById("y-bot").value)*2.54)-y},{X:29.845-2.54+o+1.27+(parseFloat(document.getElementById("x-right").value)*2.54),Y:25.4+2.54+(parseInt(document.getElementById("y-bot").value)*2.54)-y}])
+			y = y + space
+		}
+		x = 0
+		for(i=0;i<columns+(parseInt(document.getElementById("x-right").value*multiply))+(parseInt(document.getElementById("x-left").value)*multiply);i++){
+			grid.push([{X:-19.685+2.54-(parseInt(document.getElementById("x-left").value)*2.54)+o+x,Y:21.61+2.54+(parseInt(document.getElementById("y-bot").value)*2.54)},{X:-19.685+2.54-(parseInt(document.getElementById("x-left").value)*2.54)+o+x,Y:-21.61-2.54-(parseInt(document.getElementById("y-top").value)*2.54)}])
+			x = x + space
+		}	
 	}
-
-	x = 0
-	for(i=0;i<19+(parseInt(document.getElementById("x-right").value))+(parseInt(document.getElementById("x-left").value));i++){
-		grid.push([{X:-19.685+2.54-(parseInt(document.getElementById("x-left").value)*2.54)+o+x,Y:21.61+2.54+(parseInt(document.getElementById("y-bot").value)*2.54)},{X:-19.685+2.54-(parseInt(document.getElementById("x-left").value)*2.54)+o+x,Y:-21.61-2.54-(parseInt(document.getElementById("y-top").value)*2.54)}])
-		x = x + 2.54
-	}	
-
-	}//
 	else if(document.getElementById("board").value=="blank"){
-	
+
+	if((document.getElementById("grid").value)=="0.1"){	
 		for(i=0;i<(Math.round(((Math.abs(ymin))+ymax)/2.54));i++){
 			for(j=0;j<(Math.round(((Math.abs(xmin))+xmax)/2.54));j++){
 				pts.push({X:(xmin+1.27+(j*2.54)),Y:(ymax-1.27-(i*2.54))})
 			}
 		}
+	}
 
 	//grid
 
@@ -437,9 +453,27 @@ if((document.getElementById("board").value)=="arduino"){
 	for(i=0;i<(Math.round(((Math.abs(xmin))+xmax)/2.54));i++){
 		grid.push([{X:(xmin+1.27+(i*2.54)),Y:(ymax-1.27)},{X:(xmin+1.27+(i*2.54)),Y:(ymin+1.27)}])
 	}
-		
+
+		if((document.getElementById("grid").value)=="0.05"){
+
+			for(i=0;i<(Math.round(((Math.abs(ymin))+ymax)/1.27))-1;i++){
+				for(j=0;j<(Math.round(((Math.abs(xmin))+xmax)/1.27))-1;j++){
+					pts.push({X:(xmin+1.27+(j*1.27)),Y:(ymax-1.27-(i*1.27))})
+				}
+			}
+
+
+			for(i=0;i<(Math.round(((Math.abs(ymin))+ymax)/2.54));i++){
+				grid.push([{X:xmin+1.27,Y:(ymax-(i*2.54))},{X:xmax-1.27,Y:(ymax-(i*2.54))}])
+			}
+			for(i=0;i<(Math.round(((Math.abs(xmin))+xmax)/2.54));i++){
+				grid.push([{X:(xmin+(i*2.54)),Y:(ymax-1.27)},{X:(xmin+(i*2.54)),Y:(ymin+1.27)}])
+			}	
+		}
 
 	}
+
+	draw()
 
 }
 

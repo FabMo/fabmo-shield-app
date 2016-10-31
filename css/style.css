@@ -15,8 +15,18 @@ input{
 }
 
 #input_submit{
-	right: 30px;
-	bottom: 30px;
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+	width:100px;
+	height:100px;
+}
+
+#input_save{
+	position: absolute;
+	display: none;
+	left: 10px;
+	bottom: 10px;
 	width:100px;
 	height:100px;
 }
@@ -52,9 +62,10 @@ depth{
 }
 
 #undo{
+	position: absolute;
 	right: 10px;
 	top: 60px;
-	width:175px;
+	width:155px;
 	height:37px;
 }
 
@@ -62,7 +73,7 @@ depth{
 	position: absolute;
 	right: 10px;
 	top:   105px;
-	width: 175px;
+	width: 155px;
 	height: 37px;
 }
 
@@ -106,7 +117,7 @@ depth{
 	position: absolute;
 	left: 10px;
 	top: 14px;
-	width: 37px;
+	width: 120px;
 	height: 37px;
 }
 
@@ -126,10 +137,27 @@ depth{
 	height: 37px;
 }
 
+#grid{
+	position: absolute;
+	left: 10px;
+	top: 150px;
+	width: 120px;
+	height: 37px;
+}
+
+#project{
+	display: none;
+	position: absolute;
+	left: 10px;
+	bottom: 130px;
+	width: 100px;
+	height: 37px;
+}
+
 #file{
 	position: absolute;
-	right: 30px;
-	bottom: 150px;
+	right: 10px;
+	bottom: 130px;
 	width: 100px;
 	height: 37px;
 }

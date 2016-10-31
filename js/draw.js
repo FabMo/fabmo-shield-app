@@ -68,7 +68,8 @@ function draw(){
 		}
 	}
 
-ctx.fillStyle="#ccccff"
+//ctx.fillStyle="#ccccff"
+ctx.fillStyle="rgba(204, 204, 255, 0.7)"
 ctx.beginPath()
 	for(i=0;i<frame1.length;i++){
 		ctx.lineTo((frame1[i].X*sf)+ctx.canvas.width/2,(frame1[i].Y*sf)+ctx.canvas.height/2)
@@ -132,8 +133,8 @@ for(i=0;i<trace.length;i++){
 if((document.getElementById("board").value)=="arduino"){
 
 ctx.lineWidth=0.4*sf
-ctx.strokeStyle="#ccccff"
-
+//ctx.strokeStyle="#ccccff"
+ctx.strokeStyle="rgba(204, 204, 255, 0.7)"
 	for(i=0;i<pins.length;i++){
 		ctx.beginPath()
 		for(j=0;j<pins[i].length;j++){
@@ -427,13 +428,21 @@ ctx.font = (size_font + "px Arial")
 ctx.fillStyle="#777"
 ctx.translate( (ctx.canvas.width/2)-xo,ctx.canvas.height/2)
 
+	if((document.getElementById("grid").value)=="0.05"){
+		var space = 1.27
+	}
+	else{
+		var space=2.54
+	}
+
+
 if((document.getElementById("board").value)=="arduino"){
-	var droX= ((((parseFloat(mouseX)+25.4-2.54+(parseInt(document.getElementById('x-left').value)*2.54))/25.4)).toFixed(1))
-	var droY= (Math.abs((parseFloat(mouseY)-24.15-(parseInt(document.getElementById('y-bot').value)*2.54))/25.4).toFixed(1))
+	var droX= ((((parseFloat(mouseX)+25.4-2.54+(parseInt(document.getElementById('x-left').value)*space))/25.4)).toFixed(2))
+	var droY= (Math.abs((parseFloat(mouseY)-24.15-(parseInt(document.getElementById('y-bot').value)*space))/25.4).toFixed(2))
 }
 else if((document.getElementById("board").value)=="blank"){
-	droX=((((parseFloat(mouseX)+11.43+(parseInt(document.getElementById('x-left').value)*2.54))/25.4)).toFixed(1))
-	droY=(Math.abs((parseFloat(mouseY)-11.43-(parseInt(document.getElementById('y-bot').value)*2.54))/25.4).toFixed(1))
+	droX=((((parseFloat(mouseX)+11.43+(parseInt(document.getElementById('x-left').value)*space))/25.4)).toFixed(2))
+	droY=(Math.abs((parseFloat(mouseY)-11.43-(parseInt(document.getElementById('y-bot').value)*space))/25.4).toFixed(2))
 }
 
 ctx.fillText("x: "+droX,ctx.canvas.width/2-(103)-(panX*sf),-ctx.canvas.height/2+(15)-yo-(panY*sf))
