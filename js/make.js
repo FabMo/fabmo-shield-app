@@ -1,10 +1,10 @@
 
 function make(){
 
-var material = {feed:150,plunge:100}  //mm/min
-var pass_depth = 0.425
+	var material = {feed:150,plunge:100}  //mm/min
+	var pass_depth = 0.425
 
-var filetype = ""
+	var filetype = ""
 
 	if((document.getElementById("file").value)=="gcode"){
 		filetype = "gcode"
@@ -13,34 +13,35 @@ var filetype = ""
 		filetype = "sbp"
 	}
 
-var plunge = (material.plunge/25.4).toFixed(0)
-var feed = (material.feed/25.4).toFixed(0)
+	var plunge = (material.plunge/25.4).toFixed(0)
+	var feed = (material.feed/25.4).toFixed(0)
 
-g=""
+	g=""
 
-pins.reverse()
+	pins.reverse()
 
-for(i=0;i<net.length;i++){
-	for(j=0;j<net[i].length;j++){
-		if(net[i][j].D==true){
-			for(k=0;k<net.length;k++){
-				for(l=0;l<net[k].length;l++){
-					if( (net[i][j].X.toFixed(2)==net[k][l].X.toFixed(2)) && (net[i][j].Y.toFixed(2)==net[k][l].Y.toFixed(2)) && (net[k][l].D==true) ){
-						if((i!=k)||(l!=j)){
-							net[k][l].D=false
+	for(i=0;i<net.length;i++){
+		for(j=0;j<net[i].length;j++){
+			if(net[i][j].D==true){
+				for(k=0;k<net.length;k++){
+					for(l=0;l<net[k].length;l++){
+						if( (net[i][j].X.toFixed(2)==net[k][l].X.toFixed(2)) && (net[i][j].Y.toFixed(2)==net[k][l].Y.toFixed(2)) && (net[k][l].D==true) ){
+							if((i!=k)||(l!=j)){
+								net[k][l].D=false
+							}
 						}
 					}
 				}
 			}
 		}
 	}
-}
 
 	if(document.getElementById('side').value=="top"){
 		flip()
 	}
 
 	pass_depth = 0.0175
+	var tabs = true
 
 	if(filetype=="sbp"){
 		g+="MS," + (material.feed/25.4/60).toFixed(1) + "," + (material.plunge/25.4/60).toFixed(1) + "\n"
@@ -202,7 +203,42 @@ for(i=0;i<net.length;i++){
 			while(pass<=pass_no){   
 	   		g+="MZ,-"+ (pass_depth*pass).toFixed(4) + "\n"
 	   	for(i=1;i<path1.length;i++){
-	   	   g+="M2,"+((path1[i].X+Math.abs(xmin))/25.4).toFixed(4) +","+ ((path1[i].Y+ymax)/25.4).toFixed(4) + "\n"
+				//tabs
+				if(((i==path1.length-1)||(i==path1.length-51))&&(pass>pass_no-2)){
+					if(i==path1.length-1){
+						g+="M2,"+(((path1[i].X+Math.abs(xmin))/25.4)-0.2).toFixed(4) +","+ (((path1[i].Y+ymax)/25.4)).toFixed(4) + "\n"
+						g+="JZ,-"+(pass_depth*(pass_no-1.5)).toFixed(4)+"\n"
+						g+="M2,"+(((path1[i].X+Math.abs(xmin))/25.4)-0.1).toFixed(4) +","+ (((path1[i].Y+ymax)/25.4)).toFixed(4) + "\n"
+					}
+					else if(i==path1.length-51){
+						g+="M2,"+(((path1[i].X+Math.abs(xmin))/25.4)+0.2).toFixed(4) +","+ (((path1[i].Y+ymax)/25.4)).toFixed(4) + "\n"
+						g+="JZ,-"+(pass_depth*(pass_no-1.5)).toFixed(4)+"\n"
+						g+="M2,"+(((path1[i].X+Math.abs(xmin))/25.4)+0.1).toFixed(4) +","+ (((path1[i].Y+ymax)/25.4)).toFixed(4) + "\n"
+					}
+					g+="MZ,-"+ (pass_depth*pass).toFixed(4) + "\n"
+	   	   	g+="M2,"+((path1[i].X+Math.abs(xmin))/25.4).toFixed(4) +","+ ((path1[i].Y+ymax)/25.4).toFixed(4) + "\n"
+					
+				}
+				else if(((i==path1.length-26)||(i==path1.length-76))&&(pass>pass_no-2)){
+					if(i==path1.length-26){
+						g+="M2,"+(((path1[i].X+Math.abs(xmin))/25.4)).toFixed(4) +","+ (((path1[i].Y+ymax)/25.4)+0.2).toFixed(4) + "\n"
+						g+="JZ,-"+(pass_depth*(pass_no-1.5)).toFixed(4)+"\n"
+						g+="M2,"+(((path1[i].X+Math.abs(xmin))/25.4)).toFixed(4) +","+ (((path1[i].Y+ymax)/25.4)+0.1).toFixed(4) + "\n"
+					}
+					else if(i==path1.length-76){
+						g+="M2,"+(((path1[i].X+Math.abs(xmin))/25.4)).toFixed(4) +","+ (((path1[i].Y+ymax)/25.4)-0.2).toFixed(4) + "\n"
+						g+="JZ,-"+(pass_depth*(pass_no-1.5)).toFixed(4) + "\n"
+						g+="M2,"+(((path1[i].X+Math.abs(xmin))/25.4)).toFixed(4) +","+ (((path1[i].Y+ymax)/25.4)-0.1).toFixed(4) + "\n"
+					}
+					g+="MZ,-"+ (pass_depth*pass).toFixed(4) + "\n"
+	   	   	g+="M2,"+((path1[i].X+Math.abs(xmin))/25.4).toFixed(4) +","+ ((path1[i].Y+ymax)/25.4).toFixed(4) + "\n"
+					
+				}
+				//
+				else{
+	   	   	g+="M2,"+((path1[i].X+Math.abs(xmin))/25.4).toFixed(4) +","+ ((path1[i].Y+ymax)/25.4).toFixed(4) + "\n"
+				}
+	   	   
 			}
    		pass++
 		}
@@ -212,7 +248,42 @@ for(i=0;i<net.length;i++){
 			while(pass<=pass_no){   
 	   		g+="g1z-"+ (pass_depth*pass).toFixed(4) + "f" + plunge + "\n"
 	   	for(i=1;i<path1.length;i++){
-	   	   g+="g1x"+((path1[i].X+Math.abs(xmin))/25.4).toFixed(4) +"y"+ ((path1[i].Y+ymax)/25.4).toFixed(4) + "f" + feed + "\n"
+				//tabs
+				if(((i==path1.length-1)||(i==path1.length-51))&&(pass>pass_no-2)){
+					if(i==path1.length-1){
+						g+="g1x"+(((path1[i].X+Math.abs(xmin))/25.4)-0.2).toFixed(4) +"y"+ (((path1[i].Y+ymax)/25.4)).toFixed(4) + "f" + feed + "\n"
+						g+="g0z-"+(pass_depth*(pass_no-1.5)).toFixed(4)+"\n"
+						g+="g1x"+(((path1[i].X+Math.abs(xmin))/25.4)-0.1).toFixed(4) +"y"+ (((path1[i].Y+ymax)/25.4)).toFixed(4) + "f" + feed + "\n"
+					}
+					else if(i==path1.length-51){
+						g+="g1x"+(((path1[i].X+Math.abs(xmin))/25.4)+0.2).toFixed(4) +"y"+ (((path1[i].Y+ymax)/25.4)).toFixed(4) + "f" + feed + "\n"
+						g+="g0z-"+(pass_depth*(pass_no-1.5)).toFixed(4)+"\n"
+						g+="g1x"+(((path1[i].X+Math.abs(xmin))/25.4)+0.1).toFixed(4) +"y"+ (((path1[i].Y+ymax)/25.4)).toFixed(4) + "f" + feed + "\n"
+					}
+					g+="g1z-"+ (pass_depth*pass).toFixed(4) + "f" + plunge + "\n"
+	   	   	g+="g1x"+((path1[i].X+Math.abs(xmin))/25.4).toFixed(4) +"y"+ ((path1[i].Y+ymax)/25.4).toFixed(4) + "f" + feed + "\n"
+					
+				}
+				else if(((i==path1.length-26)||(i==path1.length-76))&&(pass>pass_no-2)){
+					if(i==path1.length-26){
+						g+="g1x"+(((path1[i].X+Math.abs(xmin))/25.4)).toFixed(4) +"y"+ (((path1[i].Y+ymax)/25.4)+0.2).toFixed(4) + "f" + feed + "\n"
+						g+="g0z-"+(pass_depth*(pass_no-1.5)).toFixed(4)+"\n"
+						g+="g1x"+(((path1[i].X+Math.abs(xmin))/25.4)).toFixed(4) +"y"+ (((path1[i].Y+ymax)/25.4)+0.1).toFixed(4) + "f" + feed + "\n"
+					}
+					else if(i==path1.length-76){
+						g+="g1x"+(((path1[i].X+Math.abs(xmin))/25.4)).toFixed(4) +"y"+ (((path1[i].Y+ymax)/25.4)-0.2).toFixed(4) + "f" + feed + "\n"
+						g+="g0z-"+(pass_depth*(pass_no-1.5)).toFixed(4)+"\n"
+						g+="g1x"+(((path1[i].X+Math.abs(xmin))/25.4)).toFixed(4) +"y"+ (((path1[i].Y+ymax)/25.4)-0.1).toFixed(4) + "f" + feed + "\n"
+					}
+					g+="g1z-"+ (pass_depth*pass).toFixed(4) + "f" + plunge + "\n"
+	   	   	g+="g1x"+((path1[i].X+Math.abs(xmin))/25.4).toFixed(4) +"y"+ ((path1[i].Y+ymax)/25.4).toFixed(4) + "f" + feed + "\n"
+					
+				}
+				//
+				else{
+	   	   	g+="g1x"+((path1[i].X+Math.abs(xmin))/25.4).toFixed(4) +"y"+ ((path1[i].Y+ymax)/25.4).toFixed(4) + "f" + feed + "\n"
+				}
+				
 			}
    		pass++
 		}
@@ -254,6 +325,7 @@ for(i=0;i<net.length;i++){
 		}
 	}
 	//
+	//console.log(g)
 
 	fabmo.submitJob({
    	file : g,

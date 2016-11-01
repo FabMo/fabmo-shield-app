@@ -3,6 +3,8 @@
 
 function draw(){
 
+	
+
 	if((pan==true)&&(click==0)){
 		document.getElementById('myCanvas').style.cursor = 'grab'
 		document.getElementById('myCanvas').style.cursor = '-webkit-grab'
@@ -103,12 +105,17 @@ if((document.getElementById("board").value)=="arduino"){
 	}
 }
 
-if((seg==1)&&(line==true)&&(pan==false) &&	(document.getElementById("type").value=="route")){
+if((seg==1)&&(line==true)&&(pan==false)&&((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA"))){
 	ctx.beginPath()
 	ctx.strokeStyle="#999"
 	ctx.moveTo((ctx.canvas.width/2)+(endX*sf),(ctx.canvas.height/2)+(endY*sf))
 	ctx.lineTo((ctx.canvas.width/2)+(mouseX*sf),(ctx.canvas.height/2)+(mouseY*sf))
-	ctx.lineWidth=0.6*sf
+	if(document.getElementById("type").value=="routeA"){
+		ctx.lineWidth=0.3*sf
+	}
+	else{
+		ctx.lineWidth=0.6*sf
+	}
 	ctx.stroke()
 }
 
@@ -175,13 +182,11 @@ ctx.strokeStyle="#0000aa"
 	for(i=0;i<frame1.length;i++){
 		ctx.lineTo((frame1[i].X*sf)+ctx.canvas.width/2,(frame1[i].Y*sf)+ctx.canvas.height/2)
 	}
+	ctx.stroke()
 
-ctx.stroke()
-
-	
-ctx.lineWidth="1"
-ctx.fillStyle="#fff"
-ctx.strokeStyle="#999"
+	ctx.lineWidth="1"
+	ctx.fillStyle="#fff"
+	ctx.strokeStyle="#999"
 
 for(i=0;i<net.length;i++){
 	for(j=0;j<net[i].length;j++){
@@ -202,7 +207,7 @@ for(i=0;i<net.length;i++){
 		if( (i==net.length-1) && (j==(net[i].length-1)) ){
 			ctx.beginPath()
 			ctx.fillStyle="#00ff00"
-			if(document.getElementById("type").value=="route"){
+			if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")){
 				//ctx.fillStyle="#fff000"			
 				ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.25*sf,0,(Math.PI*2))
 			}
@@ -231,7 +236,7 @@ for(i=0;i<net.length;i++){
 			ctx.fillStyle="#ff0000"
 		}
 
-		if((document.getElementById("type").value=="route")&&(seg>0)){
+		if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")&&(seg>0)){
 			//ctx.fillStyle="#fff000"
 			//ctx.arc(ctx.canvas.width/2+((net[i-1][net[i-1].length-1].X)*sf),ctx.canvas.height/2+((net[i-1][net[i-1].length-1].Y)*sf),0.25*sf,0,(Math.PI*2))
 		}
@@ -314,12 +319,16 @@ if((on_grid==true)&&(pan==false)){
 		ctx.stroke()
 	}
 	else if(document.getElementById("type").value=="smd"){
-		//ctx.fillStyle="#fff"
-		ctx.moveTo((ctx.canvas.width/2)+((mouseX-0.85)*sf),(ctx.canvas.height/2)+((mouseY-0.85)*sf))
-		ctx.lineTo((ctx.canvas.width/2)+((mouseX-0.85)*sf),(ctx.canvas.height/2)+((mouseY+0.85)*sf))
-		ctx.lineTo((ctx.canvas.width/2)+((mouseX+0.85)*sf),(ctx.canvas.height/2)+((mouseY+0.85)*sf))
-		ctx.lineTo((ctx.canvas.width/2)+((mouseX+0.85)*sf),(ctx.canvas.height/2)+((mouseY-0.85)*sf))
-		ctx.lineTo((ctx.canvas.width/2)+((mouseX-0.85)*sf),(ctx.canvas.height/2)+((mouseY-0.85)*sf))
+		
+		var padSize = 0.85
+		if(padType=="0.03"){
+			padSize = 0.425
+		}
+		ctx.moveTo((ctx.canvas.width/2)+((mouseX-padSize)*sf),(ctx.canvas.height/2)+((mouseY-padSize)*sf))
+		ctx.lineTo((ctx.canvas.width/2)+((mouseX-padSize)*sf),(ctx.canvas.height/2)+((mouseY+padSize)*sf))
+		ctx.lineTo((ctx.canvas.width/2)+((mouseX+padSize)*sf),(ctx.canvas.height/2)+((mouseY+padSize)*sf))
+		ctx.lineTo((ctx.canvas.width/2)+((mouseX+padSize)*sf),(ctx.canvas.height/2)+((mouseY-padSize)*sf))
+		ctx.lineTo((ctx.canvas.width/2)+((mouseX-padSize)*sf),(ctx.canvas.height/2)+((mouseY-padSize)*sf))
 		ctx.fill()
 	}
 
@@ -343,7 +352,7 @@ ctx.beginPath()
 	if((document.getElementById("type").value=="dip")||(document.getElementById("type").value=="smd")){
 		//ctx.fillStyle="#ffff00"
 	}
-	if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="resistor")){
+	if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")||(document.getElementById("type").value=="resistor")){
 		ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.25*sf,0,(Math.PI*2) )
 		ctx.lineWidth=0.4*sf
 		ctx.stroke()
@@ -361,6 +370,17 @@ for(i=0;i<outlines.length;i++){
 	for(j=0;j<outlines[i].length;j++){
 		ctx.lineTo(((ctx.canvas.width/2)+(outlines[i][j].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(outlines[i][j].Y/scale*sf)).toFixed(3))
 	}
+	ctx.stroke()
+}
+
+ctx.strokeStyle="#ff0000"
+for(i=0;i<passA.length;i++){
+	ctx.beginPath()
+	ctx.moveTo(((ctx.canvas.width/2)+(passA[i][0].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passA[i][0].Y/scale*sf)).toFixed(3))
+	for(j=0;j<passA[i].length;j++){
+		ctx.lineTo(((ctx.canvas.width/2)+(passA[i][j].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passA[i][j].Y/scale*sf)).toFixed(3))
+	}
+	ctx.lineTo(((ctx.canvas.width/2)+(passA[i][0].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passA[i][0].Y/scale*sf)).toFixed(3))		
 	ctx.stroke()
 }
 
@@ -702,7 +722,7 @@ function undo(){
 
 	temp=[]
 	pad=0
-	console.log(net)
+	//console.log(net)
 
 	$("#undo").blur()
 

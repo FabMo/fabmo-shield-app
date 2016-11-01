@@ -24,7 +24,6 @@ input{
 
 #input_save{
 	position: absolute;
-	display: none;
 	left: 10px;
 	bottom: 10px;
 	width:100px;
@@ -65,7 +64,7 @@ depth{
 	position: absolute;
 	right: 10px;
 	top: 60px;
-	width:155px;
+	width:170px;
 	height:37px;
 }
 
@@ -73,7 +72,7 @@ depth{
 	position: absolute;
 	right: 10px;
 	top:   105px;
-	width: 155px;
+	width: 170px;
 	height: 37px;
 }
 

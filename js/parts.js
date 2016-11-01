@@ -1,4 +1,4 @@
-var outlineA = []
+var passA = []
 
 function parts(){
 
@@ -181,8 +181,15 @@ function add_trace(){
 
 	var oset = []
 
+	//
+	passA = []
+	offset = new ClipperLib.Paths()
+	co.Execute(offset, (-scale*0.2))
+	passA=offset
+	//
+
 	i=1
-	var toolOffset = 0.39
+	var toolOffset = 0.41
 
 	while(i<3){
 		//if(i==1){
@@ -278,62 +285,62 @@ function route(){
 
 function makeFrame(radius) {
 
-if(document.getElementById("board").value=="arduino"){
-	var fo = 0
-}
-else{
-	fo = 0.2
-}
-frame1=[]
-path1=[]
-
-for (i=0;i<=verts;i++) {
-   if(i<=25){
-      frame1.push({X:((xmax+fo-radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymax+fo-radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
-      
-      path1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})
-   }
-   else if((i>25)&&(i<=50)){
-      frame1.push({X:((xmax+fo-radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymin-fo+radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
-      
-      path1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))}) 
-   }
-   else if((i>50)&&(i<=75)){
-      frame1.push({X:((xmin-fo+radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymin-fo+radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
-      
-      path1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})     
-   }
-   else if((i>75)&&(i<=100)){
-      frame1.push({X:((xmin-fo+radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymax+fo-radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
-      
-      path1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})  
-           
-      if(i==100){
-      	frame1.push(frame1[0])
-      	path1.push(path1[0])
-      }      
-   }   
-}
-
-if(radius==0){
+	if(document.getElementById("board").value=="arduino"){
+		var fo = 0
+	}	
+	else{
+		fo = 0.2
+	}
 	frame1=[]
-	frame1.push({X:xmax,Y:ymax})
-	frame1.push({X:xmax,Y:ymin})
-	frame1.push({X:xmin,Y:ymin})
-	frame1.push({X:xmin,Y:ymax})
-	frame1.push({X:xmax,Y:ymax})
-}
-
-else if(radius+tool<=0){
 	path1=[]
-	path1.push({X:-xmax-tool,Y:-ymax-tool})
-	path1.push({X:-xmax-tool,Y:-ymin+tool})
-	path1.push({X:-xmin+tool,Y:-ymin+tool})
-	path1.push({X:-xmin+tool,Y:-ymax-tool})
-	path1.push({X:-xmax-tool,Y:-ymax-tool})
-}
-	frame1.reverse()
-	draw()
+
+	for (i=0;i<=verts;i++) {
+   	if(i<=25){
+   	   frame1.push({X:((xmax+fo-radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymax+fo-radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
+      
+   	   path1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})
+		}
+   	else if((i>25)&&(i<=50)){
+      	frame1.push({X:((xmax+fo-radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymin-fo+radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
+      
+      	path1.push({X:((xmax-radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))}) 
+   	}
+   	else if((i>50)&&(i<=75)){
+   	   frame1.push({X:((xmin-fo+radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymin-fo+radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
+      
+   	   path1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymin+radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})     
+   	}
+   	else if((i>75)&&(i<=100)){
+   	   frame1.push({X:((xmin-fo+radius)+Math.sin((Math.PI*2)/verts*i)*radius),Y:((ymax+fo-radius)+Math.cos((Math.PI*2)/verts*i)*radius)})
+      
+   	   path1.push({X:((xmin+radius)+Math.sin((Math.PI*2)/verts*i)*(radius+tool)),Y:((ymax-radius)+Math.cos((Math.PI*2)/verts*i)*(radius+tool))})  
+           
+   	   if(i==100){
+   	   	frame1.push(frame1[0])
+   	   	path1.push(path1[0])
+   	   }      
+   	}   
+	}
+
+	if(radius==0){
+		frame1=[]
+		frame1.push({X:xmax,Y:ymax})
+		frame1.push({X:xmax,Y:ymin})
+		frame1.push({X:xmin,Y:ymin})
+		frame1.push({X:xmin,Y:ymax})
+		frame1.push({X:xmax,Y:ymax})
+	}
+
+	else if(radius+tool<=0){
+		path1=[]
+		path1.push({X:-xmax-tool,Y:-ymax-tool})
+		path1.push({X:-xmax-tool,Y:-ymin+tool})
+		path1.push({X:-xmin+tool,Y:-ymin+tool})
+		path1.push({X:-xmin+tool,Y:-ymax-tool})
+		path1.push({X:-xmax-tool,Y:-ymax-tool})
+	}
+		frame1.reverse()
+		draw()
 }
 
 //
@@ -343,7 +350,7 @@ function makeGrid(){
 	pts = []
 	grid = []
 
-if((document.getElementById("board").value)=="arduino"){
+	if((document.getElementById("board").value)=="arduino"){
 	pinNum = 0
 
 	if((document.getElementById("grid").value)=="0.05"){

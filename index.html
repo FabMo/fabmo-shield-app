@@ -18,11 +18,12 @@
 
 <body onload="makeFrame(radius); parts();">
 
-<select id="type" autocomplete="on" data-resistor="resistor">
+<select id="type" autocomplete="on">
   <option value="part" selected disabled>&#43; parts</option>
   <option value="hole">hole (0.1"&#8960;)</option>
   <option value="dip">pad (DIP)</option>
-  <option value="smd">pad (SMD)</option>
+  <option value="smd" data-part="0.06">pad (SMD 0.06")</option>
+  <option value="smd" data-part="0.03">pad (SMD 0.03")</option>
   <option value="route">route (0.024")</option>
   <option value="routeA">route (0.012")</option>
   <option value="resistor">SMD (1206)</option>
@@ -212,6 +213,7 @@ var start = 0
 var pkgOutlines = []
 var temp = []
 var temp2
+var padType
 
 var batteryOutline
 var resistor=[ 
@@ -301,7 +303,7 @@ $("#type").on('change', function(e) {
 	$("#grid").blur()
 	//console.log(pad)
 
-	if(document.getElementById("type").value=="route"){
+	if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")){
 		seg=0
 		trace.push([])
 		net.push([])
@@ -324,6 +326,8 @@ $("#myCanvas").on('click', function(e) {
 
 	//console.log(e)
 
+	//console.log(padType)	
+
 	$("#help").blur()
 	$("#type").blur()
 	$("#grid").blur()
@@ -337,27 +341,33 @@ $("#myCanvas").on('click', function(e) {
 			var v = 25
 			var drill = false
 			var skip = false
-		if(document.getElementById("type").value=="dip"){
-			drill = true
-		}
-		else if(document.getElementById("type").value=="route"){
-			r = 0.32
-		}
-		else if(document.getElementById("type").value=="routeA"){
-			r = 0.16
-			d = 0.15
-		}
-		else if(document.getElementById("type").value=="hole"){
-			r = 1.27
-			drill="hole"
-		}
 
-		if((document.getElementById("grid").value)=="0.05"){
-			var space = 0.635
-		}
-		else{
-			var space = 1.27
-		}
+			if(document.getElementById("type").value=="dip"){
+				drill = true
+			}
+			else if(document.getElementById("type").value=="route"){
+				r = 0.32
+			}
+			else if(document.getElementById("type").value=="routeA"){
+				r = 0.16
+				d = 0.15
+			}
+			else if(document.getElementById("type").value=="hole"){
+				r = 1.27
+				drill="hole"
+			}
+			else if(padType=="0.03"){
+				r=0.425
+			}
+
+			if((document.getElementById("grid").value)=="0.05"){
+				var space = 0.635
+			}
+			else{
+				var space = 1.27
+			}
+
+
 	
 		for(i=0;i<pts.length;i++){
 
@@ -555,38 +565,38 @@ $("#myCanvas").on('click', function(e) {
 })
 
 
-
-
 $("#myCanvas").on('mousedown', function(e) {
 
-if(pan==true){
-	x = ((e.clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)-panX
-	y = ((e.clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)-panY
-
-	if(click==0){
-	px = x
-	py = y
-	click = 1
+	if(document.getElementById("type").value=="smd"){
+		padType=($('#type').find('option:selected').attr('data-part'))
 	}
-}
+	if(pan==true){
+		x = ((e.clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)-panX
+		y = ((e.clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)-panY
+		if(click==0){
+			px = x
+			py = y
+			click = 1
+		}
+	}
 })
 
 $("#myCanvas").on('mouseup', function(e) {
-
-if(pan==true){
-
-	if(click==1){
-		click=0		
+	if(pan==true){
+		if(click==1){
+			click=0		
+		}
+		draw()
 	}
-
-	draw()
-}
-
 })
 
 
 
 $("#myCanvas").on('mousemove', function(e) {
+
+	if(document.getElementById("type").value=="smd"){
+		padType=($('#type').find('option:selected').attr('data-part'))
+	}
 
 	mouseX=((e.clientX-(10)-(xo)-(ctx.canvas.width/2))/sf)-panX
 	mouseY=((e.clientY-(10)-(yo)-(ctx.canvas.height/2))/sf)-panY
@@ -597,7 +607,6 @@ $("#myCanvas").on('mousemove', function(e) {
 	else{
 		var space=1.27
 	}
-
 	
 	if(pan==false){
 		for(i=0;i<pts.length;i++){
