@@ -733,9 +733,10 @@ ctx.fillText("IOREF",(-58.5*sf)-yoffsetBot,(2.54*3*sf)-(1.6*sf))
 
 function undo(){
 
+	//console.log(net)
+
 	temp=[]
 	pad=0
-	//console.log(net)
 
 	$("#undo").blur()
 
@@ -767,14 +768,13 @@ function undo(){
 		trace.pop()
 	}
 	if((net[net.length-1].length==0)){
-		//endX=(net[net.length-2][net[net.length-2].length-1].X)
-		//endY=(net[net.length-2][net[net.length-2].length-1].Y)
+		
+
 	}
 	else{
 		endX=(net[net.length-1][net[net.length-1].length-1].X)
 		endY=(net[net.length-1][net[net.length-1].length-1].Y)
-		//mouseX=endX
-		//mouseY=endY
+		
 	}
 	}
 	else{

@@ -128,16 +128,13 @@
 <script>
 
 //TODO
+
 //
-//save (default:led, motor driver)
-//
-//
-//bug (change type after first click 1206)
 //
 //default circuits
 //
 //delete part/trace
-
+//
 //schematic
 //
 
@@ -279,7 +276,6 @@ $("#myCanvas").on("touchstart", function(e){
 
 	}
 
-
 })
 
 $("#myCanvas").on("touchend", function(e){
@@ -301,7 +297,6 @@ $("#type").on('change', function(e) {
 	$("#help").blur()
 	$("#type").blur()
 	$("#grid").blur()
-	//console.log(pad)
 
 	if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")){
 		seg=0
@@ -310,7 +305,6 @@ $("#type").on('change', function(e) {
 	}
 	
 	if((document.getElementById("type").value!="resistor")&&(pad==1)){
-		//$( "#myCanvas" ).click()
 		console.log(x + " " + y)
 		for(j=0;j<temp.length;j++){
 			trace.push(temp[j])
@@ -325,8 +319,6 @@ $("#type").on('change', function(e) {
 $("#myCanvas").on('click', function(e) {
 
 	//console.log(e)
-
-	//console.log(padType)	
 
 	$("#help").blur()
 	$("#type").blur()
@@ -591,8 +583,6 @@ $("#myCanvas").on('mouseup', function(e) {
 	}
 })
 
-
-
 $("#myCanvas").on('mousemove', function(e) {
 
 	if(document.getElementById("type").value=="smd"){
@@ -653,8 +643,6 @@ $(document).keypress(function(e){
 
 
 $(document).keydown(function(e){
-
-
 
 	if(e.which === 90 && e.ctrlKey){
 		undo() 
@@ -723,7 +711,6 @@ $(document).keydown(function(e){
 	else if(e.which === 67){
 
 		//clear all
-		//(document.getElementById("type").value="part"
 
 		finishPass=false
 
@@ -923,8 +910,6 @@ $("#y-bot").on("change", function(){
 })
 
 function load(){
-
-	console.log(fabmo.isPresent())
 	
 	if(fabmo.isPresent()==false){
 		myConfig = localStorage.getItem("default")
