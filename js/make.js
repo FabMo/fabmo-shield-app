@@ -324,21 +324,51 @@ function make(){
 			jobFile = 'shield.g'
 		}
 	}
-	//
-	//console.log(g)
+	if(document.getElementById('side').value=="top"){
+		flip()
+	}
 
 	fabmo.submitJob({
    	file : g,
    	filename : jobFile,
-   	name : jobName,
+   	name : jobName + " first pass",
 		description : (((xmax+Math.abs(xmin))/25.4).toFixed(2)) + " x " + (((ymax+Math.abs(ymin))/25.4).toFixed(2)) + "\" " + "(1/32\" endmill)"  
 	})
 
+
 	g=""
 
-	if(document.getElementById('side').value=="top"){
-		flip()
+	
+	if(finishPass==true){
+		var g2 = ""
+
+		//if(filetype=="gcode"){
+			g2+="g0z0.2\n"
+			g2+="m3\n"
+			g2+="g4p3\n"
+	
+			for(i=0;i<passA.length;i++){
+				g2+="g0x"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+"y"+ (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
+	   		g2+="g1z-"+ (0.003) + "f" + (plunge/2).toFixed(1) + "\n"
+				g2+="g4p0.1\n"
+					for(j=1;j<passA[i].length;j++){
+						g2+="g1x"+((passA[i][j].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4) + "y" + (((passA[i][j].Y/scale)+ymax)/25.4).toFixed(4) + "f" + (feed/2).toFixed(1) + "\n"		
+					}
+				g2+="g1x"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+"y"+ (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "f" + (feed/2).toFixed(1) + "\n"
+				g2+="g0z0.1\n"
+			}
+			
+		//} 
+		fabmo.submitJob({
+	   	file : g2,
+	   	filename : 'finishPass.g',
+	   	name : 'Arduino Shield finish pass',
+			description : (((xmax+Math.abs(xmin))/25.4).toFixed(2)) + " x " + (((ymax+Math.abs(ymin))/25.4).toFixed(2)) + "\" " + "(1/64\" endmill)"  
+		})
+
 	}
+
+	//console.log(g)
 
 }
 
@@ -351,6 +381,17 @@ function flip(){
 			}
 			else{
 				outlines[i][j]={X:outlines[i][j].X,Y:(0-(outlines[i][j].Y))}	
+			}
+		}
+	}
+
+   for(i=0;i<passA.length;i++){
+		for(j=0;j<passA[i].length;j++){
+			if((passA[i][j].Y)<0){
+				passA[i][j]={X:passA[i][j].X,Y:(Math.abs(passA[i][j].Y))}
+			}
+			else{
+				passA[i][j]={X:passA[i][j].X,Y:(0-(passA[i][j].Y))}	
 			}
 		}
 	}

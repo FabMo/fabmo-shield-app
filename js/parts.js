@@ -1,4 +1,5 @@
 var passA = []
+var myBoard = new Object()
 
 function parts(){
 
@@ -175,29 +176,35 @@ function add_trace(){
 	}
 
 	var co = new ClipperLib.ClipperOffset(scale*0.4, 0.25)
+
 	//co.ArcTolerance = 1.23
 	//co.MiterLimit = 0.7
+
 	co.AddPaths(solution_paths, ClipperLib.JoinType.jtMiter, ClipperLib.EndType.etClosedPolygon, 0.25)
 
 	var oset = []
 
 	//
-	passA = []
-	offset = new ClipperLib.Paths()
-	co.Execute(offset, (-scale*0.2))
-	passA=offset
+	if(finishPass==true){
+		passA = []
+		offset = new ClipperLib.Paths()
+		co.Execute(offset, (-scale*0.2))
+		passA=offset
+	}
 	//
 
 	i=1
 	var toolOffset = 0.41
 
 	while(i<3){
+
 		//if(i==1){
 		//	toolOffset = 0.2
 		//}
 		//else{
 		//	toolOffset = 0.39
 		//}
+
 		offset = new ClipperLib.Paths()
 		co.Execute(offset, (-scale*toolOffset)*i)
 		i++
@@ -278,6 +285,8 @@ function route(){
 	}
 
 	add_trace()
+
+	load()
 
 }
 
@@ -473,7 +482,7 @@ function makeGrid(){
 			for(i=0;i<(Math.round(((Math.abs(ymin))+ymax)/2.54));i++){
 				grid.push([{X:xmin+1.27,Y:(ymax-(i*2.54))},{X:xmax-1.27,Y:(ymax-(i*2.54))}])
 			}
-			for(i=0;i<(Math.round(((Math.abs(xmin))+xmax)/2.54));i++){
+			for(i=1;i<(Math.round(((Math.abs(xmin))+xmax)/2.54));i++){
 				grid.push([{X:(xmin+(i*2.54)),Y:(ymax-1.27)},{X:(xmin+(i*2.54)),Y:(ymin+1.27)}])
 			}	
 		}

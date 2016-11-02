@@ -22,10 +22,10 @@
   <option value="part" selected disabled>&#43; parts</option>
   <option value="hole">hole (0.1"&#8960;)</option>
   <option value="dip">pad (DIP)</option>
-  <option value="smd" data-part="0.06">pad (SMD 0.06")</option>
   <option value="smd" data-part="0.03">pad (SMD 0.03")</option>
-  <option value="route">route (0.024")</option>
+  <option value="smd" data-part="0.06">pad (SMD 0.06")</option>
   <option value="routeA">route (0.012")</option>
+  <option value="route">route (0.024")</option>
   <option value="resistor">SMD (1206)</option>
 </select>
 
@@ -45,8 +45,8 @@
 </select>
 
 <select id="grid" autocomplete="on">
-  <option value="0.1" selected>grid: 0.1"</option>
   <option value="0.05">grid: 0.05"</option>
+  <option value="0.1" selected>grid: 0.1"</option>
 </select>
 
 <select id="project" autocomplete="on">
@@ -61,7 +61,7 @@
 <button id="input_submit" onclick="make()">SUBMIT<br>JOB</button>
 
 <input id="undo" type="submit" value="UNDO" onclick="undo()"/>
-<input id="input_save" type="submit" value="SAVE" onclick=""/>
+<input id="input_save" type="submit" value="SAVE" onclick="save()"/>
 
 <canvas id="myCanvas"></canvas>
 
@@ -139,7 +139,6 @@
 //delete part/trace
 
 //schematic
-//tool change
 //
 
 var fabmo = new FabMoDashboard()
@@ -214,6 +213,7 @@ var pkgOutlines = []
 var temp = []
 var temp2
 var padType
+var finishPass = false
 
 var batteryOutline
 var resistor=[ 
@@ -357,10 +357,12 @@ $("#myCanvas").on('click', function(e) {
 				drill="hole"
 			}
 			else if(padType=="0.03"){
+				finishPass=true
 				r=0.425
 			}
 
 			if((document.getElementById("grid").value)=="0.05"){
+				finishPass=true
 				var space = 0.635
 			}
 			else{
@@ -512,6 +514,7 @@ $("#myCanvas").on('click', function(e) {
 	
 							var Fx = Bx + (-(d)*PNABx)
 							var Fy = By + (-(d)*PNABy)
+
 					if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")){
 						trace.push([{X:Cx,Y:Cy},{X:Dx,Y:Dy},{X:Ex,Y:Ey},{X:Fx,Y:Fy},{X:Cx,Y:Cy}])
 					}
@@ -556,11 +559,9 @@ $("#myCanvas").on('click', function(e) {
 
 				}//
 
-				}
+			}
 		}
-		//if(seg==0){
-			add_trace()
-		//}
+		add_trace()
 	}
 })
 
@@ -721,8 +722,9 @@ $(document).keydown(function(e){
 	}
 	else if(e.which === 67){
 		//clear all
-
 		//(document.getElementById("type").value="part"
+
+		finishPass=false
 
 		document.getElementById("y-top").value=0
 		document.getElementById("y-bot").value=0
@@ -919,7 +921,60 @@ $("#y-bot").on("change", function(){
 
 })
 
+function load(){
+	var myConfig
 
+	//fabmo.getAppConfig(function(err, myConfig) {
+	//	console.log(myConfig)
+	//})
+	
+	if(fabmo.isPresent()==false){
+		myConfig = localStorage.getItem("default")
+		if(myConfig!=null){
+			console.log( JSON.parse(myConfig) )
+			myConfig = JSON.parse(myConfig)
+
+			document.getElementById("side").value = myConfig.side
+			document.getElementById("grid").value = myConfig.grid
+
+			document.getElementById("board").value = myConfig.board
+			$(document.getElementById("board")).trigger("change")
+
+			document.getElementById("x-left").value = myConfig.xmin	
+			document.getElementById("x-right").value = myConfig.xmax
+			document.getElementById("y-top").value = myConfig.ymin
+			document.getElementById("y-bot").value = myConfig.ymax
+			$(document.getElementById("x-left")).trigger("change")
+			$(document.getElementById("x-right")).trigger("change")
+			$(document.getElementById("y-top")).trigger("change")
+			$(document.getElementById("y-bot")).trigger("change")
+
+			trace = myConfig.trace
+			net = myConfig.net
+		}
+		add_trace()
+	}
+}
+
+function save(){
+
+
+	console.log(fabmo.isPresent())
+	
+	myBoard.trace = trace
+	myBoard.net = net
+	myBoard.xmin = document.getElementById("x-left").value
+	myBoard.xmax = document.getElementById("x-right").value
+	myBoard.ymin = document.getElementById("y-top").value
+	myBoard.ymax = document.getElementById("y-bot").value
+	myBoard.hole = hole
+	myBoard.board = document.getElementById("board").value
+	myBoard.side = document.getElementById("side").value
+	myBoard.grid = document.getElementById("grid").value
+
+	localStorage.setItem("default",JSON.stringify(myBoard));	
+
+}
 
 
 </script>

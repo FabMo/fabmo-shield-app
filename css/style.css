@@ -130,17 +130,17 @@ depth{
 
 #side{
 	position: absolute;
-	left: 10px;
-	top: 105px;
-	width: 120px;
+	right: 10px;
+	top: 195px;
+	width: 170px;
 	height: 37px;
 }
 
 #grid{
 	position: absolute;
-	left: 10px;
+	right: 10px;
 	top: 150px;
-	width: 120px;
+	width: 170px;
 	height: 37px;
 }
 

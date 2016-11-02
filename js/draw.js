@@ -208,8 +208,13 @@ for(i=0;i<net.length;i++){
 			ctx.beginPath()
 			ctx.fillStyle="#00ff00"
 			if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")){
-				//ctx.fillStyle="#fff000"			
-				ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.25*sf,0,(Math.PI*2))
+				//ctx.fillStyle="#fff000"
+				if(document.getElementById("type").value=="routeA"){
+					ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.15*sf,0,(Math.PI*2))
+				}
+				else{			
+					ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.25*sf,0,(Math.PI*2))
+				}
 			}
 			else if(net[i][j].D=="hole"){
 				ctx.fillStyle="#fff"			
@@ -353,8 +358,14 @@ ctx.beginPath()
 		//ctx.fillStyle="#ffff00"
 	}
 	if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")||(document.getElementById("type").value=="resistor")){
-		ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.25*sf,0,(Math.PI*2) )
-		ctx.lineWidth=0.4*sf
+		if(document.getElementById("type").value=="routeA"){
+			ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.15*sf,0,(Math.PI*2) )
+			ctx.lineWidth=0.2*sf
+		}
+		else{
+			ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.25*sf,0,(Math.PI*2) )
+			ctx.lineWidth=0.4*sf
+		}
 		ctx.stroke()
 		ctx.fill()
 	}
@@ -373,15 +384,17 @@ for(i=0;i<outlines.length;i++){
 	ctx.stroke()
 }
 
-ctx.strokeStyle="#ff0000"
-for(i=0;i<passA.length;i++){
-	ctx.beginPath()
-	ctx.moveTo(((ctx.canvas.width/2)+(passA[i][0].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passA[i][0].Y/scale*sf)).toFixed(3))
-	for(j=0;j<passA[i].length;j++){
-		ctx.lineTo(((ctx.canvas.width/2)+(passA[i][j].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passA[i][j].Y/scale*sf)).toFixed(3))
+if(finishPass==true){
+	ctx.strokeStyle="#0000ff"
+	for(i=0;i<passA.length;i++){
+		ctx.beginPath()
+		ctx.moveTo(((ctx.canvas.width/2)+(passA[i][0].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passA[i][0].Y/scale*sf)).toFixed(3))
+		for(j=0;j<passA[i].length;j++){
+			ctx.lineTo(((ctx.canvas.width/2)+(passA[i][j].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passA[i][j].Y/scale*sf)).toFixed(3))
+		}
+		ctx.lineTo(((ctx.canvas.width/2)+(passA[i][0].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passA[i][0].Y/scale*sf)).toFixed(3))		
+		ctx.stroke()
 	}
-	ctx.lineTo(((ctx.canvas.width/2)+(passA[i][0].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passA[i][0].Y/scale*sf)).toFixed(3))		
-	ctx.stroke()
 }
 
 var size_font = (14)
@@ -470,7 +483,7 @@ ctx.fillText("y: "+droY,ctx.canvas.width/2-(103)-(panX*sf),-ctx.canvas.height/2+
 
 var size_font = (12)
 ctx.font = (size_font + "px Arial")
-ctx.fillText("inch",ctx.canvas.width/2-(50)-(panX*sf),-ctx.canvas.height/2+(40)-yo-(panY*sf))
+ctx.fillText("inch",ctx.canvas.width/2-(45)-(panX*sf),-ctx.canvas.height/2+(40)-yo-(panY*sf))
 
 //
 size_font = (1.5*sf)
