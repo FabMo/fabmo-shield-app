@@ -362,7 +362,7 @@ function make(){
 		fabmo.submitJob({
 	   	file : g2,
 	   	filename : 'finishPass.g',
-	   	name : 'Arduino Shield finish pass',
+	   	name : jobName + ' finish pass',
 			description : (((xmax+Math.abs(xmin))/25.4).toFixed(2)) + " x " + (((ymax+Math.abs(ymin))/25.4).toFixed(2)) + "\" " + "(1/64\" endmill)"  
 		})
 

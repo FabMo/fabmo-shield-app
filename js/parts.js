@@ -198,13 +198,6 @@ function add_trace(){
 
 	while(i<3){
 
-		//if(i==1){
-		//	toolOffset = 0.2
-		//}
-		//else{
-		//	toolOffset = 0.39
-		//}
-
 		offset = new ClipperLib.Paths()
 		co.Execute(offset, (-scale*toolOffset)*i)
 		i++
@@ -279,7 +272,6 @@ function route(){
 	offset = new ClipperLib.Paths()
 	co.Execute(offset, -scale*0.4)
 
-	
 	for(i=0;i<offset.length;i++){
 		offset[i].push(offset[i][0])
 	}
@@ -289,8 +281,6 @@ function route(){
 	load()
 
 }
-
-////
 
 function makeFrame(radius) {
 

@@ -721,6 +721,7 @@ $(document).keydown(function(e){
 		$(document.getElementById("y-bot")).trigger("change")
 	}
 	else if(e.which === 67){
+
 		//clear all
 		//(document.getElementById("type").value="part"
 
@@ -922,44 +923,56 @@ $("#y-bot").on("change", function(){
 })
 
 function load(){
-	var myConfig
 
-	//fabmo.getAppConfig(function(err, myConfig) {
-	//	console.log(myConfig)
-	//})
+	console.log(fabmo.isPresent())
 	
 	if(fabmo.isPresent()==false){
 		myConfig = localStorage.getItem("default")
 		if(myConfig!=null){
-			console.log( JSON.parse(myConfig) )
 			myConfig = JSON.parse(myConfig)
 
-			document.getElementById("side").value = myConfig.side
-			document.getElementById("grid").value = myConfig.grid
-
-			document.getElementById("board").value = myConfig.board
-			$(document.getElementById("board")).trigger("change")
-
-			document.getElementById("x-left").value = myConfig.xmin	
-			document.getElementById("x-right").value = myConfig.xmax
-			document.getElementById("y-top").value = myConfig.ymin
-			document.getElementById("y-bot").value = myConfig.ymax
-			$(document.getElementById("x-left")).trigger("change")
-			$(document.getElementById("x-right")).trigger("change")
-			$(document.getElementById("y-top")).trigger("change")
-			$(document.getElementById("y-bot")).trigger("change")
-
-			trace = myConfig.trace
-			net = myConfig.net
+			loadConfig(myConfig)
 		}
 		add_trace()
 	}
+	else if(fabmo.isPresent()==true){
+		fabmo.getAppConfig(function(err, myConfig) {
+			if(myConfig.finishPass!=undefined){
+				loadConfig(myConfig)
+			}
+		})
+	}
+
+	function loadConfig(myConfig){
+
+		finishPass = myConfig.finishPass
+
+		document.getElementById("side").value = myConfig.side
+		document.getElementById("grid").value = myConfig.grid
+
+		document.getElementById("board").value = myConfig.board
+		$(document.getElementById("board")).trigger("change")
+
+		document.getElementById("x-left").value = myConfig.xmin	
+		document.getElementById("x-right").value = myConfig.xmax
+		document.getElementById("y-top").value = myConfig.ymin
+		document.getElementById("y-bot").value = myConfig.ymax
+
+		$(document.getElementById("x-left")).trigger("change")
+		$(document.getElementById("x-right")).trigger("change")
+		$(document.getElementById("y-top")).trigger("change")
+		$(document.getElementById("y-bot")).trigger("change")
+
+		pkgOutlines = myConfig.pkgOutlines
+		trace = myConfig.trace
+		net = myConfig.net
+
+		add_trace()
+	}
+
 }
 
 function save(){
-
-
-	console.log(fabmo.isPresent())
 	
 	myBoard.trace = trace
 	myBoard.net = net
@@ -971,8 +984,15 @@ function save(){
 	myBoard.board = document.getElementById("board").value
 	myBoard.side = document.getElementById("side").value
 	myBoard.grid = document.getElementById("grid").value
+	myBoard.finishPass = finishPass
+	myBoard.pkgOutlines = pkgOutlines
 
-	localStorage.setItem("default",JSON.stringify(myBoard));	
+	if(fabmo.isPresent()==false){
+		localStorage.setItem("default",JSON.stringify(myBoard))	
+	}
+	else if(fabmo.isPresent()==true){
+		fabmo.setAppConfig(myBoard)
+	}	
 
 }
 
