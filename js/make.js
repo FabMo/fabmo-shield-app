@@ -342,7 +342,7 @@ function make(){
 	if(finishPass==true){
 		var g2 = ""
 
-		//if(filetype=="gcode"){
+		if(filetype=="gcode"){
 			g2+="g0z0.2\n"
 			g2+="m3\n"
 			g2+="g4p3\n"
@@ -357,15 +357,45 @@ function make(){
 				g2+="g1x"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+"y"+ (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "f" + (feed/2).toFixed(1) + "\n"
 				g2+="g0z0.1\n"
 			}
-		//}
-		
-		fabmo.submitJob({
-	   	file : g2,
-	   	filename : 'finishPass.g',
-	   	name : jobName + ' finish pass',
-			description : (((xmax+Math.abs(xmin))/25.4).toFixed(2)) + " x " + (((ymax+Math.abs(ymin))/25.4).toFixed(2)) + "\" " + "(1/64\" endmill)"  
-		})
 
+			g2+="g0z0.2\n"
+			g2+="m5\n"
+
+			fabmo.submitJob({
+	   		file : g2,
+	   		filename : 'finishPass.g',
+	   		name : jobName + ' finish pass',
+				description : (((xmax+Math.abs(xmin))/25.4).toFixed(2)) + " x " + (((ymax+Math.abs(ymin))/25.4).toFixed(2)) + "\" " + "(1/64\" endmill)"  
+			})
+		}
+		else if(filetype=="sbp"){
+
+			g+="MS," + ((material.feed/25.4/60)/2).toFixed(1) + "," + ((material.plunge/25.4/60)/2).toFixed(1) + "\n"
+			g+="JZ,0.2\n"
+			g+="SO,1,1\n"
+			g+="PAUSE 5\n"
+	
+			for(i=0;i<passA.length;i++){
+				g2+="J2,"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+","+ (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
+	   		g2+="MZ,-"+ (0.003) + "\n"
+				g2+="PAUSE 0.1\n"
+					for(j=1;j<passA[i].length;j++){
+						g2+="M2,"+((passA[i][j].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4) + "," + (((passA[i][j].Y/scale)+ymax)/25.4).toFixed(4) + "\n"		
+					}
+				g2+="M2,"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4) + "," + (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
+				g2+="JZ,0.1\n"
+			}
+
+			g2+="JZ,0.2\n"
+			g2+="SO,1,0\n"
+
+			fabmo.submitJob({
+	   		file : g2,
+	   		filename : 'finishPass.sbp',
+	   		name : jobName + ' finish pass',
+				description : (((xmax+Math.abs(xmin))/25.4).toFixed(2)) + " x " + (((ymax+Math.abs(ymin))/25.4).toFixed(2)) + "\" " + "(1/64\" endmill)"  
+			})
+		}
 
 	}
 
