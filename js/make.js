@@ -357,14 +357,15 @@ function make(){
 				g2+="g1x"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+"y"+ (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "f" + (feed/2).toFixed(1) + "\n"
 				g2+="g0z0.1\n"
 			}
-			
-		//} 
+		//}
+		
 		fabmo.submitJob({
 	   	file : g2,
 	   	filename : 'finishPass.g',
 	   	name : jobName + ' finish pass',
 			description : (((xmax+Math.abs(xmin))/25.4).toFixed(2)) + " x " + (((ymax+Math.abs(ymin))/25.4).toFixed(2)) + "\" " + "(1/64\" endmill)"  
 		})
+
 
 	}
 

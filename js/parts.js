@@ -356,14 +356,43 @@ function makeGrid(){
 		var space = 1.27
 		var rows = 39
 		var columns = 37
-		var multiply = 2
+		var gridScale = 2
 		pinNum=0
 
-		y=2.54+(parseInt(document.getElementById("y-bot").value*multiply)*space)
+		y=2.54+(parseInt(document.getElementById("y-bot").value*gridScale)*space)
 
-		for(i=0;i<rows+(parseInt(document.getElementById("y-top").value*multiply))+(parseInt(document.getElementById("y-bot").value*multiply));i++){
-			x=2.54-(parseInt(document.getElementById("x-left").value*multiply)*space)
-			for(j=0;j<columns+(parseInt(document.getElementById("x-right").value*multiply))+(parseInt(document.getElementById("x-left").value*multiply));j++){
+		for(i=0;i<rows+(parseInt(document.getElementById("y-top").value*gridScale))+(parseInt(document.getElementById("y-bot").value*gridScale));i++){
+			x=2.54-(parseInt(document.getElementById("x-left").value*gridScale)*space)
+			for(j=0;j<columns+(parseInt(document.getElementById("x-right").value*gridScale))+(parseInt(document.getElementById("x-left").value*gridScale));j++){
+
+				//pins
+				if((j>=8+(parseInt(document.getElementById("x-left").value*gridScale)))&&(i<3+(parseInt(document.getElementById("y-bot").value*gridScale)))&&(i>=(parseInt(document.getElementById("y-bot").value*gridScale))) ){
+					if((j%2==0)&&(j<24+(parseInt(document.getElementById("x-left").value*gridScale)))){
+						pinNum++
+					}
+					else if((j%2==0)&&(j>24+(parseInt(document.getElementById("x-left").value*gridScale)))&&(j<37+(parseInt(document.getElementById("x-left").value*gridScale)))){
+						pinNum++
+					}
+					else if(j>=37+(parseInt(document.getElementById("x-left").value*gridScale))){
+						pinNum=0
+					}
+				}
+				else if((j>=0+(parseInt(document.getElementById("x-left").value*gridScale)))&&(i<39+(parseInt(document.getElementById("y-bot").value*gridScale)))&&(i>=(parseInt(document.getElementById("y-bot").value*gridScale+36))) ){
+					if(j==0+(parseInt(document.getElementById("x-left").value*gridScale)) ){
+						pinNum=15
+					}
+					else if(j==22+(parseInt(document.getElementById("x-left").value*gridScale))){
+						pinNum=25
+					}
+					else if((j%2==0)&&(j>(parseInt(document.getElementById("x-left").value*gridScale))) ){
+						pinNum++
+					}
+				}
+				else{
+					pinNum=0
+				}
+				//
+
 				pts.push({X:-19.685+o+x,Y:21.61+y,PIN:pinNum})
 				x+=space
 			}
@@ -375,7 +404,7 @@ function makeGrid(){
 		var space = 2.54
 		var rows = 20
 		var columns = 19
-		var multiply = 1
+		var gridScale = 1
 	}
 
 
@@ -430,12 +459,12 @@ function makeGrid(){
 		}
 	}
 	y = 3.79
-		for(i=0;i<rows+(parseInt(document.getElementById("y-top").value)*multiply)+(parseInt(document.getElementById("y-bot").value)*multiply);i++){
+		for(i=0;i<rows+(parseInt(document.getElementById("y-top").value)*gridScale)+(parseInt(document.getElementById("y-bot").value)*gridScale);i++){
 			grid.push([{X:-19.685+2.54-(parseInt(document.getElementById("x-left").value)*2.54)+o,Y:25.4+2.54+(parseInt(document.getElementById("y-bot").value)*2.54)-y},{X:29.845-2.54+o+1.27+(parseFloat(document.getElementById("x-right").value)*2.54),Y:25.4+2.54+(parseInt(document.getElementById("y-bot").value)*2.54)-y}])
 			y = y + space
 		}
 		x = 0
-		for(i=0;i<columns+(parseInt(document.getElementById("x-right").value*multiply))+(parseInt(document.getElementById("x-left").value)*multiply);i++){
+		for(i=0;i<columns+(parseInt(document.getElementById("x-right").value*gridScale))+(parseInt(document.getElementById("x-left").value)*gridScale);i++){
 			grid.push([{X:-19.685+2.54-(parseInt(document.getElementById("x-left").value)*2.54)+o+x,Y:21.61+2.54+(parseInt(document.getElementById("y-bot").value)*2.54)},{X:-19.685+2.54-(parseInt(document.getElementById("x-left").value)*2.54)+o+x,Y:-21.61-2.54-(parseInt(document.getElementById("y-top").value)*2.54)}])
 			x = x + space
 		}	
