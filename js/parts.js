@@ -507,7 +507,7 @@ function makeGrid(){
 			}
 
 
-			for(i=0;i<(Math.round(((Math.abs(ymin))+ymax)/2.54));i++){
+			for(i=1;i<(Math.round(((Math.abs(ymin))+ymax)/2.54));i++){
 				grid.push([{X:xmin+1.27,Y:(ymax-(i*2.54))},{X:xmax-1.27,Y:(ymax-(i*2.54))}])
 			}
 			for(i=1;i<(Math.round(((Math.abs(xmin))+xmax)/2.54));i++){
