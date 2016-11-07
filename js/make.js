@@ -321,7 +321,7 @@ function make(){
 		jobFile = 'pcb.sbp'
 		jobName = 'PCB'
 		if(filetype=="gcode"){
-			jobFile = 'shield.g'
+			jobFile = 'pcb.g'
 		}
 	}
 
