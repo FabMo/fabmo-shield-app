@@ -12,9 +12,14 @@ function draw(){
 	else if((pan==true)&&(click==1)){
 		document.getElementById('myCanvas').style.cursor = 'move'
 	}
+	else if(select==true){
+		document.getElementById('myCanvas').style.cursor = 'default'
+	}
 	else{
 		document.getElementById('myCanvas').style.cursor = 'crosshair'
 	}
+
+
 
 
 	document.getElementById('board_width').innerHTML = (((xmax + Math.abs(xmin))/25.4).toFixed(2) + "\"")
@@ -396,6 +401,18 @@ if(finishPass==true){
 		ctx.stroke()
 	}
 }
+
+
+ctx.fillStyle="#fff000"
+for(i=0;i<traceNum.length;i++){
+	for(j=0;j<traceNum[i].node.length;j=j+2){
+		ctx.beginPath()
+		ctx.arc((ctx.canvas.width/2)+(traceNum[i].node[j]*sf),(ctx.canvas.height/2)+(traceNum[i].node[j+1]*sf),1,0,Math.PI*2)
+		ctx.fill()
+	}	
+
+}
+
 
 var size_font = (14)
 ctx.font = (size_font + "px Arial")

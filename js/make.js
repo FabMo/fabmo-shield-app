@@ -324,9 +324,6 @@ function make(){
 			jobFile = 'shield.g'
 		}
 	}
-	if(document.getElementById('side').value=="top"){
-		flip()
-	}
 
 	fabmo.submitJob({
    	file : g,
@@ -349,12 +346,12 @@ function make(){
 	
 			for(i=0;i<passA.length;i++){
 				g2+="g0x"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+"y"+ (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
-	   		g2+="g1z-"+ (0.003) + "f" + (plunge/2).toFixed(1) + "\n"
+	   		g2+="g1z-"+ (0.003) + "f" + (plunge/2).toFixed(2) + "\n"
 				g2+="g4p0.1\n"
 					for(j=1;j<passA[i].length;j++){
-						g2+="g1x"+((passA[i][j].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4) + "y" + (((passA[i][j].Y/scale)+ymax)/25.4).toFixed(4) + "f" + (feed/2).toFixed(1) + "\n"		
+						g2+="g1x"+((passA[i][j].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4) + "y" + (((passA[i][j].Y/scale)+ymax)/25.4).toFixed(4) + "f" + (feed/2).toFixed(2) + "\n"		
 					}
-				g2+="g1x"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+"y"+ (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "f" + (feed/2).toFixed(1) + "\n"
+				g2+="g1x"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+"y"+ (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "f" + (feed/2).toFixed(2) + "\n"
 				g2+="g0z0.1\n"
 			}
 
@@ -370,10 +367,10 @@ function make(){
 		}
 		else if(filetype=="sbp"){
 
-			g+="MS," + ((material.feed/25.4/60)/2).toFixed(1) + "," + ((material.plunge/25.4/60)/2).toFixed(1) + "\n"
-			g+="JZ,0.2\n"
-			g+="SO,1,1\n"
-			g+="PAUSE 5\n"
+			g2+="MS," + ((material.feed/25.4/60)/2).toFixed(2) + "," + ((material.plunge/25.4/60)/2).toFixed(2) + "\n"
+			g2+="JZ,0.2\n"
+			g2+="SO,1,1\n"
+			g2+="PAUSE 5\n"
 	
 			for(i=0;i<passA.length;i++){
 				g2+="J2,"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+","+ (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
@@ -396,6 +393,10 @@ function make(){
 				description : (((xmax+Math.abs(xmin))/25.4).toFixed(2)) + " x " + (((ymax+Math.abs(ymin))/25.4).toFixed(2)) + "\" " + "(1/64\" endmill)"  
 			})
 		}
+
+	if(document.getElementById('side').value=="top"){
+		flip()
+	}
 
 	}
 

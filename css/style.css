@@ -120,6 +120,15 @@ depth{
 	height: 37px;
 }
 
+#delete{
+	display: none;
+	position: absolute;
+	right: 10px;
+	top: 240px;
+	width: 170px;
+	height: 37px;
+}
+
 #board{
 	position: absolute;
 	left: 10px;
@@ -156,7 +165,7 @@ depth{
 #file{
 	position: absolute;
 	right: 10px;
-	bottom: 130px;
+	bottom: 120px;
 	width: 100px;
 	height: 37px;
 }

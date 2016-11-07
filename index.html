@@ -62,6 +62,7 @@
 
 <input id="undo" type="submit" value="UNDO" onclick="undo()"/>
 <input id="input_save" type="submit" value="SAVE" onclick="save()"/>
+<input id="delete" type="submit" value="select" onclick="ripup()"/>
 
 <canvas id="myCanvas"></canvas>
 
@@ -129,10 +130,11 @@
 
 //TODO
 
+//delete part/trace, actions[]
+//
+//variable hole size
 //
 //default circuits
-//
-//delete part/trace
 //
 //schematic
 //
@@ -149,7 +151,7 @@ var xmax = 24.1  	//27.1
 var ymax = 25.4  	//27.1
 var radius = 0.75
 var tool = parseFloat(document.getElementById("input_tool").value/2)
-var scale = 100
+var scale = 500
 var mouseX=-25.4
 var mouseY= 24.1
 var endX
@@ -157,6 +159,8 @@ var endY
 var line = true
 var xpos = 0
 var hole = []
+var partNum = 0
+var traceNum = []
 
 var o = -5.7135  //x display offset 
 var c
@@ -210,6 +214,8 @@ var temp = []
 var temp2
 var padType
 var finishPass = false
+var select = false
+var partSelected
 
 var batteryOutline
 var resistor=[ 
@@ -329,7 +335,7 @@ $("#myCanvas").on('click', function(e) {
 		if(pan==false){
 			var d = 0.3
 			var r = 0.85
-			var v = 25
+			var v = 55
 			var drill = false
 			var skip = false
 
@@ -376,7 +382,7 @@ $("#myCanvas").on('click', function(e) {
 							if(pad==0){
 								pkgOutlines.push([])
 								for(j=0;j<resistorOutline.length;j++){
-									pkgOutlines[pkgOutlines.length-1].push({X:parseFloat((resistorOutline[j].X+(pts[i].X)).toFixed(3)),Y:parseFloat((resistorOutline[j].Y+(pts[i].Y)).toFixed(3))})
+									pkgOutlines[pkgOutlines.length-1].push({X:parseFloat((resistorOutline[j].X+(pts[i].X)).toFixed(3)),Y:parseFloat((resistorOutline[j].Y+(pts[i].Y)).toFixed(3)),test:"HI",part:(partNum)})
 							}
 						}
 					}
@@ -394,7 +400,7 @@ $("#myCanvas").on('click', function(e) {
 						//net.push([])
 						//seg=0
 					}
-					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill,T:"res"})
+					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill,T:"res",part:partNum})
 					temp.push([])
 						resistor[j].reverse()
 						for(k=0;k<resistor[j].length;k++){
@@ -430,7 +436,7 @@ $("#myCanvas").on('click', function(e) {
 				}
 
 				if(((net[net.length-1].length)==0) && (document.getElementById("type").value!="resistor") ){
-					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill})
+					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill,part:partNum})
 
 						trace.push([])
 						
@@ -466,7 +472,7 @@ $("#myCanvas").on('click', function(e) {
 				//
 				else if((pts[i].X==net[net.length-1][net[net.length-1].length-1].X) && (pts[i].Y==net[net.length-1][net[net.length-1].length-1].Y)){
 				
-				net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill})
+				net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill,part:partNum})
 					trace.push([])					
 					for(j=0;j<=4;j++){
 						trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/4*j)*0.1),Y:((pts[i].Y)+Math.cos((Math.PI*2)/4*j)*0.1)})
@@ -535,7 +541,7 @@ $("#myCanvas").on('click', function(e) {
 
 						}					
 
-					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill})
+					net[net.length-1].push({X:(pts[i].X),Y:(pts[i].Y),D:drill,part:partNum})
 					}
 
 					if(skip==false){
@@ -552,7 +558,41 @@ $("#myCanvas").on('click', function(e) {
 
 			}
 		}
-		add_trace()
+		//part#
+		//console.log(trace)
+		//console.log(net)
+	if(document.getElementById("type").value!="part"){
+		if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")){
+			if(seg==1){
+				//console.log(x + ' ' + y)
+				traceNum.push({node:[endX,endY]})
+			}
+			if(seg==0){
+				traceNum[traceNum.length-1].part = partNum
+				traceNum[traceNum.length-1].trace = [trace.length-1,trace.length-2,trace.length-3]
+
+				traceNum[traceNum.length-1].node.push(endX)
+				traceNum[traceNum.length-1].node.push(endY)
+
+				partNum++
+			}		
+		}
+		else if((document.getElementById("type").value=="resistor")){
+			if(seg==0){
+				traceNum.push({part:partNum,trace:[trace.length-1,trace.length-2],node:[endX,endY]})
+				partNum++
+			}		
+		}
+		else{
+			traceNum.push({part:partNum,trace:[trace.length-1],node:[endX,endY]})
+			partNum++
+		}
+			add_trace()
+		}
+		//console.log(trace)
+		console.log(traceNum)
+
+		
 	}
 })
 
@@ -710,6 +750,10 @@ $(document).keydown(function(e){
 	else if(e.which === 67){
 
 		//clear all
+
+		partNum = 0
+		traceNum = []
+		passA = []
 
 		finishPass=false
 
@@ -980,6 +1024,48 @@ function save(){
 
 }
 
+function ripup(){
+
+	document.getElementById("type").value="part"
+	//console.log(traceNum)
+	if(select == false){
+		select = true
+	}
+	else{
+		select = false
+	}
+
+/*
+
+	var remove = partNum-1
+
+	for(i=0;i<net.length;i++){
+		for(j=0;j<net[i].length;j++){
+			if(net[i][j].part==remove){
+				net[i].splice(j,1)
+				j--
+			}
+		}
+	}
+
+	for(i=0;i<traceNum.length;i++){
+		if(traceNum[i].part==remove){
+			trace.splice(traceNum[i].trace[traceNum[i].trace.length-1],traceNum[i].trace.length)
+			traceNum.splice(i,1)
+			i--
+		}
+	}
+	seg = 0
+
+	for(i=0;i<pkgOutlines.length;i++){
+		if(pkgOutlines[i][0].part==remove){
+			pkgOutlines.splice(i,1)
+		}
+	}
+
+	add_trace()
+	*/
+}
 
 </script>
 

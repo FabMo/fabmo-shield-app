@@ -170,10 +170,10 @@ function add_trace(){
 		solution_paths[i].push(solution_paths[i][0])
 	}
 
-	solution_paths.push([])
-	for(i=0;i<frame1.length;i++){
-		solution_paths[solution_paths.length-1].push({X:parseInt(frame1[i].X*scale),Y:parseInt(frame1[i].Y*scale)})
-	}
+	//solution_paths.push([])
+	//for(i=0;i<frame1.length;i++){
+	//	solution_paths[solution_paths.length-1].push({X:parseInt(frame1[i].X*scale),Y:parseInt(frame1[i].Y*scale)})
+	//}
 
 	var co = new ClipperLib.ClipperOffset(scale*0.4, 0.25)
 
@@ -188,7 +188,11 @@ function add_trace(){
 	if(finishPass==true){
 		passA = []
 		offset = new ClipperLib.Paths()
-		co.Execute(offset, (-scale*0.2))
+		co.Execute(offset, (scale*0.2))
+
+		for(i=0;i<offset.length;i++){
+			offset[i].reverse()
+		}
 		passA=offset
 	}
 	//
@@ -199,7 +203,7 @@ function add_trace(){
 	while(i<3){
 
 		offset = new ClipperLib.Paths()
-		co.Execute(offset, (-scale*toolOffset)*i)
+		co.Execute(offset, (scale*toolOffset)*i)
 		i++
 		for(j=0;j<offset.length;j++){
 			oset.push(offset[j])
@@ -209,6 +213,7 @@ function add_trace(){
 	offset=oset
 
 	for(i=0;i<offset.length;i++){
+		offset[i].reverse()
 		offset[i].push(offset[i][0])
 	}
 	outlines = offset
@@ -234,7 +239,7 @@ function add(){
 		for(j=0;j<pkgOutlines[pkgOutlines.length-1].length;j++){
 			pkgOutlines[pkgOutlines.length-1][j]={X:(((resistorOutline[j].X)*(Math.cos(angle)))-((resistorOutline[j].Y)*(Math.sin(angle)))),Y:(((resistorOutline[j].Y)*(Math.cos(angle)))+((resistorOutline[j].X)*(Math.sin(angle))))}
 
-			pkgOutlines[pkgOutlines.length-1][j]={X:(pkgOutlines[pkgOutlines.length-1][j].X+origin.X),Y:(pkgOutlines[pkgOutlines.length-1][j].Y+origin.Y)}
+			pkgOutlines[pkgOutlines.length-1][j]={X:(pkgOutlines[pkgOutlines.length-1][j].X+origin.X),Y:(pkgOutlines[pkgOutlines.length-1][j].Y+origin.Y),part:partNum}
 		}
 
 		for(j=0;j<temp.length;j++){
@@ -253,6 +258,8 @@ function add(){
 ////
 
 function route(){
+
+/*
 
 	for(i=0;i<frame1.length;i++){
 		outlines.push({X:parseInt(frame1[i].X*scale),Y:parseInt(frame1[i].Y*scale)})
@@ -276,7 +283,9 @@ function route(){
 		offset[i].push(offset[i][0])
 	}
 
-	add_trace()
+	*/
+
+	//add_trace()
 
 	load()
 
