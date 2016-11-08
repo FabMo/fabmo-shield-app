@@ -60,6 +60,11 @@ function parts(){
 	}
 
 
+for(i=0;i<pin_outlines.length;i++){
+	pin_outlines[i].reverse()
+}
+
+
 x=-17.10
 for(i=0;i<10;i++){
 	connect.push({X:(x+o),Y:(-21.61)})
@@ -132,6 +137,8 @@ for(i=24;i<31;i++){
 		x = x -2.54
 	}
 
+
+
 draw()
 load()
 
@@ -166,7 +173,7 @@ function add_trace(){
 	cpr.Execute(ClipperLib.ClipType.ctUnion, solution_paths, ClipperLib.PolyFillType.pftNonZero, ClipperLib.PolyFillType.pftNonZero);
 
 	for(i=0;i<solution_paths.length;i++){
-		solution_paths[i].reverse()
+		//solution_paths[i].reverse()
 		solution_paths[i].push(solution_paths[i][0])
 	}
 
@@ -191,7 +198,7 @@ function add_trace(){
 		co.Execute(offset, (scale*0.2))
 
 		for(i=0;i<offset.length;i++){
-			offset[i].reverse()
+			//offset[i].reverse()
 		}
 		passA=offset
 	}
@@ -209,7 +216,9 @@ function add_trace(){
 			oset.push(offset[j])
 		}
 		if(i==2){
-			if(passA.length==offset.length){
+			console.log(passA)
+			console.log(offset)
+			if(passA.length<=offset.length){
 				finishPass=false
 			}
 		}
