@@ -216,8 +216,6 @@ function add_trace(){
 			oset.push(offset[j])
 		}
 		if(i==2){
-			console.log(passA)
-			console.log(offset)
 			if(passA.length<=offset.length){
 				finishPass=false
 			}
@@ -337,8 +335,11 @@ function makeFrame(radius) {
 //
 
 function makeGrid(){
+
 	pts = []
 	grid = []
+
+	document.getElementById('gridSpacing').innerHTML = document.getElementById('grid').value + "\""
 
 	if((document.getElementById("board").value)=="arduino"){
 	pinNum = 0

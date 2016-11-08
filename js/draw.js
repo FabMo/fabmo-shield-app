@@ -19,9 +19,6 @@ function draw(){
 		document.getElementById('myCanvas').style.cursor = 'crosshair'
 	}
 
-
-
-
 	document.getElementById('board_width').innerHTML = (((xmax + Math.abs(xmin))/25.4).toFixed(2) + "\"")
 	document.getElementById('board_height').innerHTML = (((ymax + Math.abs(ymin))/25.4).toFixed(2) + "\"")
 
