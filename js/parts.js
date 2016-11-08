@@ -133,7 +133,7 @@ for(i=24;i<31;i++){
 	}
 
 draw()
-route()
+load()
 
 }
 
@@ -208,6 +208,11 @@ function add_trace(){
 		for(j=0;j<offset.length;j++){
 			oset.push(offset[j])
 		}
+		if(i==2){
+			if(passA.length==offset.length){
+				finishPass=false
+			}
+		}
 	}
 
 	offset=oset
@@ -257,39 +262,7 @@ function add(){
 
 ////
 
-function route(){
 
-/*
-
-	for(i=0;i<frame1.length;i++){
-		outlines.push({X:parseInt(frame1[i].X*scale),Y:parseInt(frame1[i].Y*scale)})
-	}
-	outlines = [outlines]
-
-	for(i=0;i<pin_outlines.length;i++){
-		outlines.push([])
-		pin_outlines[i].reverse()
-		for(j=0;j<pin_outlines[i].length;j++){
-			outlines[outlines.length-1].push({X:parseInt(pin_outlines[i][j].X*scale),Y:parseInt(pin_outlines[i][j].Y*scale)})
-		}
-	}
-
-	var co = new ClipperLib.ClipperOffset(-scale*0.4, 0.25)
-	co.AddPaths(outlines, ClipperLib.JoinType.jtMiter, ClipperLib.EndType.etClosedPolygon)
-	offset = new ClipperLib.Paths()
-	co.Execute(offset, -scale*0.4)
-
-	for(i=0;i<offset.length;i++){
-		offset[i].push(offset[i][0])
-	}
-
-	*/
-
-	//add_trace()
-
-	load()
-
-}
 
 function makeFrame(radius) {
 

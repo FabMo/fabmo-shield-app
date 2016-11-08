@@ -182,7 +182,7 @@ for(i=0;i<arduino_pins.length;i++){
 
 ctx.beginPath()
 ctx.lineWidth="2"
-ctx.strokeStyle="#0000aa"
+ctx.strokeStyle="#333"
 
 	for(i=0;i<frame1.length;i++){
 		ctx.lineTo((frame1[i].X*sf)+ctx.canvas.width/2,(frame1[i].Y*sf)+ctx.canvas.height/2)
