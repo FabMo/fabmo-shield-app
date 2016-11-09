@@ -311,14 +311,14 @@ function make(){
 	}
 	//
 	if((document.getElementById("board").value)=="arduino"){
-		var jobFile = 'shield.sbp'
+		var jobFile = 'shield1_32.sbp'
 		var jobName = 'Arduino Shield'
 		if(filetype=="gcode"){
 			jobFile = 'shield1_32.g'
 		}
 	}
 	else if((document.getElementById("board").value)=="blank"){
-		jobFile = 'pcb.sbp'
+		jobFile = 'pcb1_32.sbp'
 		jobName = 'PCB'
 		if(filetype=="gcode"){
 			jobFile = 'pcb1_32.g'
@@ -388,7 +388,7 @@ function make(){
 
 			fabmo.submitJob({
 	   		file : g2,
-	   		filename : 'finishPass.sbp',
+	   		filename : 'finishPass1_64.sbp',
 	   		name : jobName + ' finish pass',
 				description : (((xmax+Math.abs(xmin))/25.4).toFixed(2)) + " x " + (((ymax+Math.abs(ymin))/25.4).toFixed(2)) + "\" " + "(1/64\" endmill)"  
 			})

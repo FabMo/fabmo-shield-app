@@ -54,8 +54,7 @@
 <input id="input_depth" type="number" value="1.7" autocomplete="on" step="0.1" min="0"/>
 
 <input id="undo" type="submit" value="UNDO" onclick="undo()"/>
-<input id="input_save" type="submit" value="SAVE" onclick="save()"/>
-<input id="delete" type="submit" value="select" onclick="ripup()"/>
+<input id="select" type="submit" value="delete" onclick="ripup()"/>
 
 <select id="file" autocomplete="on">
   <option value="gcode">.gcode</option>
@@ -64,11 +63,11 @@
 
 <button id="input_submit" onclick="make()">SUBMIT<br>JOB</button>
 
-
-<select id="part-list" autocomplete="on">
+<select id="part-list" autocomplete="off">
   <option value="part" selected disabled>part#</option>
 </select>
 
+<input id="input_save" type="submit" value="SAVE" onclick="save()"/>
 
 <canvas id="myCanvas"></canvas>
 
@@ -138,7 +137,7 @@
 
 //TODO
 
-//delete part/trace, actions[]
+//delete part/trace, actions[], undo delete
 //
 //variable hole size
 //
@@ -321,7 +320,7 @@ $("#type").on('change', function(e) {
 		console.log(x + " " + y)
 		for(j=0;j<temp.length;j++){
 			trace.push(temp[j])
-			}						
+		}						
 		pad=0
 		add_trace()
 		net.push([])
@@ -332,7 +331,6 @@ $("#type").on('change', function(e) {
 $("#myCanvas").on('click', function(e) {
 
 	//console.log(e)
-
 	$("#help").blur()
 	$("#type").blur()
 	$("#grid").blur()
@@ -570,33 +568,48 @@ $("#myCanvas").on('click', function(e) {
 		//console.log(trace)
 		//console.log(net)
 	if(document.getElementById("type").value!="part"){
+		
 		if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeB")){
 			if(seg==1){
 				//console.log(x + ' ' + y)
 				traceNum.push({node:[endX,endY]})
+				
 			}
 			if(seg==0){
 				traceNum[traceNum.length-1].part = partNum
 				traceNum[traceNum.length-1].trace = [trace.length-1,trace.length-2,trace.length-3]
 				traceNum[traceNum.length-1].node.push(endX)
 				traceNum[traceNum.length-1].node.push(endY)
+				$( "#part-list" ).append( "<option id=\"part" +  partNum + "\"value=\"" + partNum + "\">" + partNum + "</option>" )
+				document.getElementById("part-list").value = partNum
 				partNum++
-	
+				
 				//get line length
 				//setment line
 				//append to part list
 				//
-
 			}		
 		}
 		else if((document.getElementById("type").value=="resistor")){
+			//console.log(pad)
 			if(seg==0){
-				traceNum.push({part:partNum,trace:[trace.length-1,trace.length-2],node:[endX,endY]})
-				partNum++
-			}		
+				if(pad==1){
+					traceNum.push({part:partNum,node:[endX,endY]})
+				}				
+				if(pad==0){
+					traceNum[traceNum.length-1].trace = [trace.length-1,trace.length-2]
+
+					$( "#part-list" ).append( "<option id=\"part" +  partNum + "\"value=\"" + partNum + "\">" + partNum + "</option>" )
+					document.getElementById("part-list").value = partNum
+					partNum++
+				}
+			}
+				
 		}
 		else{
 			traceNum.push({part:partNum,trace:[trace.length-1],node:[endX,endY]})
+			$( "#part-list" ).append( "<option id=\"part" +  partNum + "\"value=\"" + partNum + "\">" + partNum + "</option>" )
+			document.getElementById("part-list").value = partNum
 			partNum++
 		}
 			add_trace()
@@ -759,7 +772,8 @@ $(document).keydown(function(e){
 	else if(e.which === 67){
 
 		//clear all
-
+		$("#part-list").empty()
+		$( "#part-list" ).append( "<option value=\"part\" selected disabled>part#</option>" )
 		partNum = 0
 		traceNum = []
 		passA = []
@@ -826,6 +840,7 @@ if(document.getElementById("board").value=="blank"){
 }
 
 
+
 $("#x-right").on("change", function(){
 
 	if((document.getElementById("board").value)=="arduino"){
@@ -859,6 +874,10 @@ $("#x-left").on("change", function(){
 	makeGrid()
 	add_trace()
 
+})
+
+$("#part-list").on("change", function(){
+	draw()
 })
 
 $("#board").on("change", function(){
@@ -1039,18 +1058,23 @@ function save(){
 
 function ripup(){
 
-	document.getElementById("type").value="part"
+	//console.log(document.getElementById("part-list").value)
+
+	//document.getElementById("type").value="part"
 	//console.log(traceNum)
-	if(select == false){
-		select = true
-	}
-	else{
-		select = false
-	}
+	//if(select == false){
+	//	select = true
+	//}
+	//else{
+	//	select = false
+	//}
+	temp=[]
 
-/*
+	$( "#select" ).blur()
 
-	var remove = partNum-1
+	var remove = parseInt(document.getElementById("part-list").value)
+	document.getElementById("part-list").value = "part"
+	$( "#part"+remove ).remove()
 
 	for(i=0;i<net.length;i++){
 		for(j=0;j<net[i].length;j++){
@@ -1060,24 +1084,39 @@ function ripup(){
 			}
 		}
 	}
-
+	//console.log(trace)
 	for(i=0;i<traceNum.length;i++){
 		if(traceNum[i].part==remove){
-			trace.splice(traceNum[i].trace[traceNum[i].trace.length-1],traceNum[i].trace.length)
+			console.log(traceNum[i].trace.length)
+			if(traceNum[i].trace.length==3){
+				trace.splice(traceNum[i].trace[traceNum[i].trace.length-1],traceNum[i].trace.length,[],[],[])
+			}
+			else if(traceNum[i].trace.length==2){
+				trace.splice(traceNum[i].trace[traceNum[i].trace.length-1],traceNum[i].trace.length,[],[])
+			}
+			else{
+			trace.splice(traceNum[i].trace[traceNum[i].trace.length-1],traceNum[i].trace.length,[])
+			}
 			traceNum.splice(i,1)
 			i--
 		}
 	}
-	seg = 0
+	//console.log(trace)
 
 	for(i=0;i<pkgOutlines.length;i++){
 		if(pkgOutlines[i][0].part==remove){
 			pkgOutlines.splice(i,1)
 		}
 	}
+	//console.log(pkgOutlines)
+	//make new list
+	//with parts
+	//
+	//console.log(traceNum)
+
 
 	add_trace()
-	*/
+	
 }
 
 </script>

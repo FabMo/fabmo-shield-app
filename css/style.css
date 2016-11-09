@@ -120,12 +120,13 @@ depth{
 	height: 37px;
 }
 
-#delete{
+#select{
 	/*display: none;*/
 	position: absolute;
-	right: 10px;
-	top: 240px;
-	width: 170px;
+	position: absolute;
+	left: 10px;
+	top: 150px;
+	width: 120px;
 	height: 37px;
 }
 
@@ -138,7 +139,7 @@ depth{
 }
 
 #part-list{
-	display: none;
+	/*display: none;*/
 	position: absolute;
 	left: 10px;
 	top: 105px;
