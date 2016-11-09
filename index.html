@@ -884,6 +884,13 @@ $("#board").on("change", function(){
 
 $("#board").blur()
 
+$("#part-list").empty()
+$( "#part-list" ).append( "<option value=\"part\" selected disabled>part#</option>" )
+partNum = 0
+traceNum = []
+passA = []
+finishPass=false
+
 hole=[]
 pkgOutlines = []
 trace = []
