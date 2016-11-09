@@ -24,7 +24,7 @@
   <option value="dip">pad (DIP)</option>
   <option value="smd" data-part="0.03">pad (SMD 0.03")</option>
   <option value="smd" data-part="0.06">pad (SMD 0.06")</option>
-  <option value="routeA">route (0.012")</option>
+  <option value="routeB">route (0.012")</option>
   <option value="route">route (0.024")</option>
   <option value="resistor">SMD (1206)</option>
 </select>
@@ -32,11 +32,6 @@
 <select id="board" autocomplete="on">
   <option value="arduino" selected>Arduino</option>
   <option value="blank">blank</option>
-</select>
-
-<select id="file" autocomplete="on">
-  <option value="gcode">.gcode</option>
-  <option value="sbp" selected>.sbp</option>
 </select>
 
 <select id="side" autocomplete="on">
@@ -58,11 +53,22 @@
 <input id="input_tool" type="number" value="0.79" autocomplete="on" step="0.01"/>
 <input id="input_depth" type="number" value="1.7" autocomplete="on" step="0.1" min="0"/>
 
-<button id="input_submit" onclick="make()">SUBMIT<br>JOB</button>
-
 <input id="undo" type="submit" value="UNDO" onclick="undo()"/>
 <input id="input_save" type="submit" value="SAVE" onclick="save()"/>
 <input id="delete" type="submit" value="select" onclick="ripup()"/>
+
+<select id="file" autocomplete="on">
+  <option value="gcode">.gcode</option>
+  <option value="sbp" selected>.sbp</option>
+</select>
+
+<button id="input_submit" onclick="make()">SUBMIT<br>JOB</button>
+
+
+<select id="part-list" autocomplete="on">
+  <option value="part" selected disabled>part#</option>
+</select>
+
 
 <canvas id="myCanvas"></canvas>
 
@@ -305,7 +311,7 @@ $("#type").on('change', function(e) {
 	$("#type").blur()
 	$("#grid").blur()
 
-	if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")){
+	if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeB")){
 		seg=0
 		trace.push([])
 		net.push([])
@@ -347,7 +353,7 @@ $("#myCanvas").on('click', function(e) {
 			else if(document.getElementById("type").value=="route"){
 				r = 0.32
 			}
-			else if(document.getElementById("type").value=="routeA"){
+			else if(document.getElementById("type").value=="routeB"){
 				r = 0.16
 				d = 0.15
 			}
@@ -452,7 +458,7 @@ $("#myCanvas").on('click', function(e) {
 								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
 							}
 						}
-						else if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")){
+						else if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeB")){
 							for(j=0;j<=v;j++){
 								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
 							}
@@ -514,7 +520,7 @@ $("#myCanvas").on('click', function(e) {
 							var Fx = Bx + (-(d)*PNABx)
 							var Fy = By + (-(d)*PNABy)
 
-					if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")){
+					if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeB")){
 						trace.push([{X:Cx,Y:Cy},{X:Dx,Y:Dy},{X:Ex,Y:Ey},{X:Fx,Y:Fy},{X:Cx,Y:Cy}])
 					}
 					else{
@@ -522,7 +528,7 @@ $("#myCanvas").on('click', function(e) {
 					}
 
 					trace.push([])
-						if((document.getElementById("type").value=="dip")||(document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")){
+						if((document.getElementById("type").value=="dip")||(document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeB")){
 							for(j=0;j<=v;j++){
 								trace[trace.length-1].push({X:((pts[i].X)+Math.sin((Math.PI*2)/v*j)*r),Y:((pts[i].Y)+Math.cos((Math.PI*2)/v*j)*r)})
 							}
@@ -564,7 +570,7 @@ $("#myCanvas").on('click', function(e) {
 		//console.log(trace)
 		//console.log(net)
 	if(document.getElementById("type").value!="part"){
-		if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")){
+		if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeB")){
 			if(seg==1){
 				//console.log(x + ' ' + y)
 				traceNum.push({node:[endX,endY]})
@@ -572,11 +578,15 @@ $("#myCanvas").on('click', function(e) {
 			if(seg==0){
 				traceNum[traceNum.length-1].part = partNum
 				traceNum[traceNum.length-1].trace = [trace.length-1,trace.length-2,trace.length-3]
-
 				traceNum[traceNum.length-1].node.push(endX)
 				traceNum[traceNum.length-1].node.push(endY)
-
 				partNum++
+	
+				//get line length
+				//setment line
+				//append to part list
+				//
+
 			}		
 		}
 		else if((document.getElementById("type").value=="resistor")){
@@ -993,6 +1003,8 @@ function load(){
 		pkgOutlines = myConfig.pkgOutlines
 		trace = myConfig.trace
 		net = myConfig.net
+		partNum = myConfig.partNum
+		traceNum = myConfig.traceNum
 
 		add_trace()
 	}
@@ -1013,6 +1025,8 @@ function save(){
 	myBoard.grid = document.getElementById("grid").value
 	myBoard.finishPass = finishPass
 	myBoard.pkgOutlines = pkgOutlines
+	myBoard.traceNum = traceNum
+	myBoard.partNum = partNum
 
 	if(fabmo.isPresent()==false){
 		localStorage.setItem("default",JSON.stringify(myBoard))	

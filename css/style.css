@@ -121,7 +121,7 @@ depth{
 }
 
 #delete{
-	display: none;
+	/*display: none;*/
 	position: absolute;
 	right: 10px;
 	top: 240px;
@@ -133,6 +133,15 @@ depth{
 	position: absolute;
 	left: 10px;
 	top: 60px;
+	width: 120px;
+	height: 37px;
+}
+
+#part-list{
+	display: none;
+	position: absolute;
+	left: 10px;
+	top: 105px;
 	width: 120px;
 	height: 37px;
 }

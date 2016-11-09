@@ -107,12 +107,12 @@ if((document.getElementById("board").value)=="arduino"){
 	}
 }
 
-if((seg==1)&&(line==true)&&(pan==false)&&((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA"))){
+if((seg==1)&&(line==true)&&(pan==false)&&((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeB"))){
 	ctx.beginPath()
 	ctx.strokeStyle="#999"
 	ctx.moveTo((ctx.canvas.width/2)+(endX*sf),(ctx.canvas.height/2)+(endY*sf))
 	ctx.lineTo((ctx.canvas.width/2)+(mouseX*sf),(ctx.canvas.height/2)+(mouseY*sf))
-	if(document.getElementById("type").value=="routeA"){
+	if(document.getElementById("type").value=="routeB"){
 		ctx.lineWidth=0.3*sf
 	}
 	else{
@@ -209,9 +209,9 @@ for(i=0;i<net.length;i++){
 		if( (i==net.length-1) && (j==(net[i].length-1)) ){
 			ctx.beginPath()
 			ctx.fillStyle="#00ff00"
-			if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")){
+			if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeB")){
 				//ctx.fillStyle="#fff000"
-				if(document.getElementById("type").value=="routeA"){
+				if(document.getElementById("type").value=="routeB"){
 					ctx.arc(ctx.canvas.width/2+((net[i][j].X)*sf),ctx.canvas.height/2+((net[i][j].Y)*sf),0.15*sf,0,(Math.PI*2))
 				}
 				else{			
@@ -243,7 +243,7 @@ for(i=0;i<net.length;i++){
 			ctx.fillStyle="#ff0000"
 		}
 
-		if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")&&(seg>0)){
+		if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeB")&&(seg>0)){
 			//ctx.fillStyle="#fff000"
 			//ctx.arc(ctx.canvas.width/2+((net[i-1][net[i-1].length-1].X)*sf),ctx.canvas.height/2+((net[i-1][net[i-1].length-1].Y)*sf),0.25*sf,0,(Math.PI*2))
 		}
@@ -359,8 +359,8 @@ ctx.beginPath()
 	if((document.getElementById("type").value=="dip")||(document.getElementById("type").value=="smd")){
 		//ctx.fillStyle="#ffff00"
 	}
-	if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeA")||(document.getElementById("type").value=="resistor")){
-		if(document.getElementById("type").value=="routeA"){
+	if((document.getElementById("type").value=="route")||(document.getElementById("type").value=="routeB")||(document.getElementById("type").value=="resistor")){
+		if(document.getElementById("type").value=="routeB"){
 			ctx.arc(	(ctx.canvas.width/2+(mouseX)*sf),(ctx.canvas.height/2+(mouseY)*sf),0.15*sf,0,(Math.PI*2) )
 			ctx.lineWidth=0.2*sf
 		}
@@ -388,13 +388,13 @@ for(i=0;i<outlines.length;i++){
 
 if(finishPass==true){
 	ctx.strokeStyle="#0000ff"
-	for(i=0;i<passA.length;i++){
+	for(i=0;i<passB.length;i++){
 		ctx.beginPath()
-		ctx.moveTo(((ctx.canvas.width/2)+(passA[i][0].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passA[i][0].Y/scale*sf)).toFixed(3))
-		for(j=0;j<passA[i].length;j++){
-			ctx.lineTo(((ctx.canvas.width/2)+(passA[i][j].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passA[i][j].Y/scale*sf)).toFixed(3))
+		ctx.moveTo(((ctx.canvas.width/2)+(passB[i][0].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passB[i][0].Y/scale*sf)).toFixed(3))
+		for(j=0;j<passB[i].length;j++){
+			ctx.lineTo(((ctx.canvas.width/2)+(passB[i][j].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passB[i][j].Y/scale*sf)).toFixed(3))
 		}
-		ctx.lineTo(((ctx.canvas.width/2)+(passA[i][0].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passA[i][0].Y/scale*sf)).toFixed(3))		
+		ctx.lineTo(((ctx.canvas.width/2)+(passB[i][0].X/scale*sf)).toFixed(3),((ctx.canvas.height/2)+(passB[i][0].Y/scale*sf)).toFixed(3))		
 		ctx.stroke()
 	}
 }

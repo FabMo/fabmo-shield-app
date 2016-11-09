@@ -1,4 +1,4 @@
-var passA = []
+var passB = []
 var myBoard = new Object()
 
 function parts(){
@@ -59,6 +59,7 @@ function parts(){
 	x = x - 2.54
 	}
 
+	//console.log(outlines.length)
 
 for(i=0;i<pin_outlines.length;i++){
 	pin_outlines[i].reverse()
@@ -193,14 +194,14 @@ function add_trace(){
 
 	//
 	if(finishPass==true){
-		passA = []
+		passB = []
 		offset = new ClipperLib.Paths()
 		co.Execute(offset, (scale*0.2))
 
 		for(i=0;i<offset.length;i++){
 			//offset[i].reverse()
 		}
-		passA=offset
+		passB=offset
 	}
 	//
 
@@ -216,7 +217,7 @@ function add_trace(){
 			oset.push(offset[j])
 		}
 		if(i==2){
-			if(passA.length<=offset.length){
+			if(passB.length<=offset.length){
 				finishPass=false
 			}
 		}
@@ -445,7 +446,6 @@ function makeGrid(){
 				else{
 					x = x+space
 				}
-
 			}
 		y = y-space
 		}

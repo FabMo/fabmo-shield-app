@@ -344,14 +344,14 @@ function make(){
 			g2+="m3\n"
 			g2+="g4p3\n"
 	
-			for(i=0;i<passA.length;i++){
-				g2+="g0x"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+"y"+ (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
+			for(i=0;i<passB.length;i++){
+				g2+="g0x"+((passB[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+"y"+ (((passB[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
 	   		g2+="g1z-"+ (0.003) + "f" + (plunge/2).toFixed(2) + "\n"
 				g2+="g4p0.1\n"
-					for(j=1;j<passA[i].length;j++){
-						g2+="g1x"+((passA[i][j].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4) + "y" + (((passA[i][j].Y/scale)+ymax)/25.4).toFixed(4) + "f" + (feed/2).toFixed(2) + "\n"		
+					for(j=1;j<passB[i].length;j++){
+						g2+="g1x"+((passB[i][j].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4) + "y" + (((passB[i][j].Y/scale)+ymax)/25.4).toFixed(4) + "f" + (feed/2).toFixed(2) + "\n"		
 					}
-				g2+="g1x"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+"y"+ (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "f" + (feed/2).toFixed(2) + "\n"
+				g2+="g1x"+((passB[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+"y"+ (((passB[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "f" + (feed/2).toFixed(2) + "\n"
 				g2+="g0z0.1\n"
 			}
 
@@ -372,14 +372,14 @@ function make(){
 			g2+="SO,1,1\n"
 			g2+="PAUSE 5\n"
 	
-			for(i=0;i<passA.length;i++){
-				g2+="J2,"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+","+ (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
+			for(i=0;i<passB.length;i++){
+				g2+="J2,"+((passB[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4)+","+ (((passB[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
 	   		g2+="MZ,-"+ (0.003) + "\n"
 				g2+="PAUSE 0.1\n"
-					for(j=1;j<passA[i].length;j++){
-						g2+="M2,"+((passA[i][j].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4) + "," + (((passA[i][j].Y/scale)+ymax)/25.4).toFixed(4) + "\n"		
+					for(j=1;j<passB[i].length;j++){
+						g2+="M2,"+((passB[i][j].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4) + "," + (((passB[i][j].Y/scale)+ymax)/25.4).toFixed(4) + "\n"		
 					}
-				g2+="M2,"+((passA[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4) + "," + (((passA[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
+				g2+="M2,"+((passB[i][0].X/scale/25.4)+Math.abs(xmin)/25.4).toFixed(4) + "," + (((passB[i][0].Y/scale)+ymax)/25.4).toFixed(4) + "\n"
 				g2+="JZ,0.1\n"
 			}
 
@@ -394,13 +394,11 @@ function make(){
 			})
 		}
 
+	}
+
 	if(document.getElementById('side').value=="top"){
 		flip()
 	}
-
-	}
-
-	//console.log(g)
 
 }
 
@@ -417,13 +415,13 @@ function flip(){
 		}
 	}
 
-   for(i=0;i<passA.length;i++){
-		for(j=0;j<passA[i].length;j++){
-			if((passA[i][j].Y)<0){
-				passA[i][j]={X:passA[i][j].X,Y:(Math.abs(passA[i][j].Y))}
+   for(i=0;i<passB.length;i++){
+		for(j=0;j<passB[i].length;j++){
+			if((passB[i][j].Y)<0){
+				passB[i][j]={X:passB[i][j].X,Y:(Math.abs(passB[i][j].Y))}
 			}
 			else{
-				passA[i][j]={X:passA[i][j].X,Y:(0-(passA[i][j].Y))}	
+				passB[i][j]={X:passB[i][j].X,Y:(0-(passB[i][j].Y))}	
 			}
 		}
 	}
