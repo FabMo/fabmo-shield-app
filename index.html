@@ -1024,7 +1024,9 @@ function load(){
 		net = myConfig.net
 		partNum = myConfig.partNum
 		traceNum = myConfig.traceNum
-
+		for(i=0;i<traceNum.length;i++){
+			$( "#part-list" ).append( "<option id=\"part" +  traceNum[i].part + "\"value=\"" + traceNum[i].part + "\">" + traceNum[i].part + "</option>" )
+		}
 		add_trace()
 	}
 
@@ -1060,14 +1062,6 @@ function ripup(){
 
 	//console.log(document.getElementById("part-list").value)
 
-	//document.getElementById("type").value="part"
-	//console.log(traceNum)
-	//if(select == false){
-	//	select = true
-	//}
-	//else{
-	//	select = false
-	//}
 	temp=[]
 
 	$( "#select" ).blur()
@@ -1084,7 +1078,7 @@ function ripup(){
 			}
 		}
 	}
-	//console.log(trace)
+	
 	for(i=0;i<traceNum.length;i++){
 		if(traceNum[i].part==remove){
 			console.log(traceNum[i].trace.length)
@@ -1101,19 +1095,12 @@ function ripup(){
 			i--
 		}
 	}
-	//console.log(trace)
 
 	for(i=0;i<pkgOutlines.length;i++){
 		if(pkgOutlines[i][0].part==remove){
 			pkgOutlines.splice(i,1)
 		}
 	}
-	//console.log(pkgOutlines)
-	//make new list
-	//with parts
-	//
-	//console.log(traceNum)
-
 
 	add_trace()
 	

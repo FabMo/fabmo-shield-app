@@ -410,10 +410,16 @@ for(i=0;i<traceNum.length;i++){
 		ctx.arc((ctx.canvas.width/2)+(traceNum[i].node[j]*sf),(ctx.canvas.height/2)+(traceNum[i].node[j+1]*sf),1,0,Math.PI*2)
 		ctx.fill()
 		if(document.getElementById("part-list").value==traceNum[i].part){
+			ctx.fillStyle="#ff00ff"
+			ctx.beginPath()
+			ctx.arc((ctx.canvas.width/2)+(traceNum[i].node[j]*sf),(ctx.canvas.height/2)+(traceNum[i].node[j+1]*sf),0.25*sf,0,Math.PI*2)
+			ctx.fill()
+
 			ctx.fillStyle="#ffff00"
 			ctx.beginPath()
 			ctx.arc((ctx.canvas.width/2)+(traceNum[i].node[j]*sf),(ctx.canvas.height/2)+(traceNum[i].node[j+1]*sf),0.15*sf,0,Math.PI*2)
 			ctx.fill()
+
 			if((j==0)&&(traceNum[i].node.length>2)){
 				ctx.beginPath()		
 				ctx.moveTo((ctx.canvas.width/2)+(traceNum[i].node[j]*sf),(ctx.canvas.height/2)+(traceNum[i].node[j+1]*sf))
