@@ -61,6 +61,7 @@ depth{
 }
 
 #undo{
+	display: none;
 	position: absolute;
 	right: 10px;
 	top: 60px;
@@ -71,7 +72,7 @@ depth{
 #type{
 	position: absolute;
 	right: 10px;
-	top:   105px;
+	top:   60px;
 	width: 170px;
 	height: 37px;
 }
@@ -150,7 +151,7 @@ depth{
 #side{
 	position: absolute;
 	right: 10px;
-	top: 195px;
+	top: 150px;
 	width: 170px;
 	height: 37px;
 }
@@ -158,7 +159,7 @@ depth{
 #grid{
 	position: absolute;
 	right: 10px;
-	top: 150px;
+	top: 105px;
 	width: 170px;
 	height: 37px;
 }

@@ -706,7 +706,7 @@ $(document).keypress(function(e){
 $(document).keydown(function(e){
 
 	if(e.which === 90 && e.ctrlKey){
-		undo() 
+		//undo() 
 	}
 	else if(e.which === 90){
 		zoom = 0
@@ -879,6 +879,11 @@ $("#x-left").on("change", function(){
 $("#part-list").on("change", function(){
 	draw()
 })
+
+$('.parts').hover(function(e) {
+	console.log(e.target);
+});
+
 
 $("#board").on("change", function(){
 
