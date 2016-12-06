@@ -1,7 +1,7 @@
 
 {
-	"name":"SmoothSketch",
-	"repository":"https://github.com/FabMo/fabmo-smoothsketch-app.git",
+	"name":"Shield",
+	"repository":"https://github.com/FabMo/fabmo-shield-app.git",
 	"license":"MIT",
 	"main":"./index.html",
 	"icon":"icon.png",
