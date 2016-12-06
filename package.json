@@ -1,10 +1,17 @@
+
 {
-	"name":"SHIELD",
+	"name":"SmoothSketch",
+	"repository":"https://github.com/FabMo/fabmo-smoothsketch-app.git",
+	"license":"MIT",
 	"main":"./index.html",
 	"icon":"icon.png",
-	"icon_color":"white",
-	"version":"0.0.2",
+	"icon_color":"#fff",
+	"version":"1.0.0",
 	"author":"Jonathan Ward",
-	"website":"http://github.com/FabMo/",
-	"description":"design+mill custom Arduino shields"
+	"website":"http://gofabmo.org/fabmo-shield-app",
+	"description":"make custom Arduino shields and circuit boards",
+	"devDependencies": {
+    	"grunt": "^0.4.5",
+    	"grunt-zip": "^0.17.1"
+  	}
 }
