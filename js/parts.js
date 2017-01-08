@@ -170,7 +170,7 @@ function add_trace(){
 	var cpr = new ClipperLib.Clipper()
 	cpr.AddPaths(traces, ClipperLib.PolyType.ptSubject, true)
 
-	var solution_paths = new ClipperLib.Paths();
+	var solution_paths = new ClipperLib.Paths()
 	cpr.Execute(ClipperLib.ClipType.ctUnion, solution_paths, ClipperLib.PolyFillType.pftNonZero, ClipperLib.PolyFillType.pftNonZero);
 
 	for(i=0;i<solution_paths.length;i++){
